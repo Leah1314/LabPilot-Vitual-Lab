@@ -1,0 +1,159 @@
+@import "tailwindcss";
+
+/*
+ * Palette derives from bacteriology's own materials rather than a generic
+ * dashboard accent set: crystal violet and safranin are the two Gram stain
+ * counterstains, and the ground is the pale cast of an agar plate. Resistant
+ * uses safranin red, susceptible a deep viridian — a red/teal pair that stays
+ * separable under deuteranopia. Colour never carries meaning alone; every
+ * R/S value is also labelled and counted in text.
+ */
+@theme {
+  --color-paper: #f1f3ee;
+  --color-card: #ffffff;
+  --color-ink: #15181b;
+  --color-muted: #616761;
+  --color-hairline: #dbded4;
+
+  --color-violet: #47285f;
+  --color-violet-tint: #ece7f1;
+  --color-safranin: #be3a4b;
+  --color-safranin-tint: #f8e7e9;
+  --color-viridian: #146b5c;
+  --color-viridian-tint: #e1efeb;
+  --color-amber: #8a6210;
+  --color-amber-tint: #f6eeda;
+
+  --font-display: var(--font-archivo), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-public-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-plex-mono), ui-monospace, monospace;
+}
+
+@layer base {
+  html {
+    background-color: var(--color-paper);
+    color: var(--color-ink);
+  }
+
+  body {
+    font-family: var(--font-sans);
+    font-feature-settings: "tnum" 1;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-violet);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+}
+
+@layer components {
+  /* Institutional signage register: mono, wide-tracked, uppercase. */
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+    color: var(--color-muted);
+  }
+
+  .display {
+    font-family: var(--font-display);
+    font-weight: 600;
+    letter-spacing: -0.022em;
+    line-height: 1.05;
+  }
+
+  .tabular {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /*
+   * The denominator rail — the one place this dashboard spends its boldness.
+   *
+   * A rail's *width is its denominator*, drawn on a scale shared by every rail
+   * on the page. A cluster with 12 phenotyped isolates is physically shorter
+   * than one with 63, so a "75%" can never be read as equivalent across
+   * clusters. This makes prompt.md's rule — never show a percentage without
+   * its denominator — structural rather than a caption someone can forget.
+   */
+  .rail-track {
+    position: relative;
+    height: 1.375rem;
+    background-image: repeating-linear-gradient(
+      90deg,
+      var(--color-hairline) 0 1px,
+      transparent 1px 100%
+    );
+    background-size: 10% 100%;
+    border-bottom: 1px solid var(--color-hairline);
+  }
+
+  .rail-extent {
+    display: flex;
+    height: 100%;
+    transform-origin: left center;
+    animation: rail-in 520ms cubic-bezier(0.2, 0.75, 0.3, 1) both;
+  }
+
+  .rail-seg-resistant {
+    background-color: var(--color-safranin);
+  }
+
+  .rail-seg-susceptible {
+    background-color: var(--color-viridian);
+  }
+
+  /*
+   * Lineage rail: raw genome rows (dashed) against distinct strains (solid),
+   * same unit, same scale. The unfilled remainder is clonal oversampling.
+   */
+  .lineage-track {
+    position: relative;
+    height: 0.75rem;
+  }
+
+  .lineage-raw {
+    position: absolute;
+    inset-block: 0;
+    left: 0;
+    border: 1px dashed var(--color-muted);
+    background-image: repeating-linear-gradient(
+      -45deg,
+      var(--color-hairline) 0 2px,
+      transparent 2px 5px
+    );
+  }
+
+  .lineage-dedup {
+    position: absolute;
+    inset-block: 0;
+    left: 0;
+    background-color: var(--color-violet);
+  }
+
+  /* CopilotKit v2 chat inherits page type rather than shipping its own. */
+  .consult-surface {
+    --copilot-kit-primary-color: var(--color-violet);
+    --copilot-kit-separator-color: var(--color-hairline);
+    --copilot-kit-muted-color: var(--color-muted);
+    font-family: var(--font-sans);
+  }
+}
+
+@keyframes rail-in {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rail-extent {
+    animation: none;
+  }
+}

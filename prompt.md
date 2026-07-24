@@ -11,6 +11,16 @@
 | Dashboard | **[frontend.md](./frontend.md)** | Next.js + CopilotKit UI |
 | Evaluation | §5 below | Braintrust faithfulness scores |
 
+**Step-by-step runbooks.** The three docs above are reference material — what is
+true about each platform. These three are the ordered prompts you actually paste
+into a coding agent to execute a workstream:
+
+| Runbook | Covers |
+|---|---|
+| **[daytona_ssh.md](./daytona_ssh.md)** | CLI install → sandbox → SSH in → BV-BRC pull → analysis → serve |
+| **[fireworks_2.md](./fireworks_2.md)** | Hosting an open-weights model: serverless, on-demand, or custom upload |
+| **[dashboard.md](./dashboard.md)** | CopilotKit v2 dashboard with genome upload and disease association |
+
 ---
 
 ## 1. The product
