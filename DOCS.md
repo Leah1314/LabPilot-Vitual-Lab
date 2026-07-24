@@ -1,9 +1,10 @@
 # Documentation index
 
-Canonical entry point: **[README.md](./README.md)**.
+Canonical entry point: **[README.md](./README.md)** — **one integrated system**
+using BV-BRC → Daytona → Fireworks → CopilotKit (plus Claude agent surface).
 
-This file maps every other doc in the repo so judges and teammates can find the
-right runbook without reading everything.
+This file maps every other doc so judges and teammates can find the right
+runbook without reading everything.
 
 ---
 
@@ -11,8 +12,8 @@ right runbook without reading everything.
 
 | Doc | Audience | Contents |
 |---|---|---|
-| [README.md](./README.md) | Everyone | What the project is, measured results, quickstart, contracts, honesty |
-| [ABOUT.md](./ABOUT.md) | Judges / GitHub visitors | Short product + demo blurb |
+| [README.md](./README.md) | Everyone | Integrated product story, full-stack quickstart, contracts, honesty |
+| [ABOUT.md](./ABOUT.md) | Judges / GitHub visitors | Short product + full-stack blurb |
 | [DOCS.md](./DOCS.md) | Everyone | This index |
 | [CONTRIBUTING.md](./CONTRIBUTING.md) | Builders | Honesty rules when editing |
 | [SECURITY.md](./SECURITY.md) | Everyone | Disclosure + not-for-clinical-use |
@@ -37,15 +38,15 @@ right runbook without reading everything.
 
 ---
 
-## Executable READMEs (apps & pipeline)
+## Executable READMEs (pipeline & UIs)
 
-| Path | What to run |
+| Path | Role in the integrated system |
 |---|---|
-| [pipeline/README.md](./pipeline/README.md) | Part A: fetch → Daytona H100 → enrichment → validate |
-| [dashboard/README.md](./dashboard/README.md) | Next.js + CopilotKit (Fireworks) — **primary demo UI** |
+| [pipeline/README.md](./pipeline/README.md) | Part A: BV-BRC → **Daytona** H100 → enrichment → validate |
+| [dashboard/README.md](./dashboard/README.md) | Product UI — Next.js + **CopilotKit** + **Fireworks** (+ Daytona API) |
 | [dashboard/CLAUDE.md](./dashboard/CLAUDE.md) | Agent notes for the dashboard codebase |
-| [pathogen-pathfinder/README.md](./pathogen-pathfinder/README.md) | Next.js + CopilotKit + Claude Agent SDK |
-| [Insight Uploader/README.md](./Insight%20Uploader/README.md) | TanStack Start research workspace UI |
+| [pathogen-pathfinder/README.md](./pathogen-pathfinder/README.md) | Agent UI — CopilotKit + Claude on the same contracts |
+| [Insight Uploader/README.md](./Insight%20Uploader/README.md) | TanStack research shell on the same contracts |
 
 ---
 
@@ -77,7 +78,7 @@ Never commit `.env`. This repository is public.
 
 ## Suggested reading order for a new teammate
 
-1. [README.md](./README.md) — architecture + honesty rules  
+1. [README.md](./README.md) — integrated architecture + full-stack quickstart  
 2. [prompt.md](./prompt.md) §1–3 — product and scientific bar  
 3. Your workstream README (`pipeline/`, `dashboard/`, or `pathogen-pathfinder/`)  
 4. Matching spec (`daytona.md` / `fireworks.md` / `frontend.md`) only as needed  
@@ -86,6 +87,6 @@ Never commit `.env`. This repository is public.
 
 ## Suggested reading order for a judge / demo
 
-1. [README.md](./README.md) — measured table + negative result  
-2. Live UI (`dashboard/` sample dataset)  
+1. [README.md](./README.md) — measured table + negative result + tool map  
+2. Live **dashboard/** Consult with Fireworks key  
 3. `data/timing.json` + `data/cluster_enrichment.json` if pressed on GPU / resistance claims  

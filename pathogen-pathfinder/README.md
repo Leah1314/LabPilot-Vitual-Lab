@@ -1,16 +1,16 @@
 # Pathogen Pathfinder (CopilotKit + Claude)
 
-Next.js rebuild of the Pathogen AI research workspace, living inside the
-[daytona_hackathon](https://github.com/johnqh/daytona_hackathon) monorepo.
+Agent UI for the integrated
+[daytona_hackathon](https://github.com/johnqh/daytona_hackathon) system.
 
-Pairs a multi-page AMR dashboard with a **real CopilotKit agent** (Claude Agent
-SDK over AG-UI) that must call `getPathogenDataset` before answering — so chat
-is grounded on the loaded workspace, not free-form hallucination.
+Same BV-BRC → **Daytona** → **Fireworks** contracts as the rest of the monorepo,
+with a **CopilotKit + Claude Agent SDK** chat that must call `getPathogenDataset`
+before answering.
+
+**Product UI (Fireworks Consult):** [`../dashboard/`](../dashboard/).  
+**This surface:** deeper grounded chat with Claude on the same workspace data.
 
 **Research prototype. Not for clinical use.**
-
-> Primary Fireworks-based CopilotKit demo: [`../dashboard/`](../dashboard/).  
-> This app is the Claude-agent alternative with the same upload → analyze → explore flow.
 
 ## Features
 

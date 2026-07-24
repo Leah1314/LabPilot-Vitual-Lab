@@ -10,20 +10,19 @@ repo sidebar, `ABOUT.md`, and `README.md` do not drift apart.
 
 | Field | Value | Limit |
 |---|---|---|
-| **Description** | Antimicrobial-resistance dashboard for the gut-derived pathogens behind infected pancreatic necrosis. BV-BRC genomes, ESM2 embeddings on a Daytona H100, and Fireworks observations that quote only measured numbers. Research prototype, not for clinical use. | 255 / 350 chars |
-| **Website** | `https://github.com/johnqh/daytona_hackathon#quickstart-demo-with-committed-data` | — |
-| **Topics** | `antimicrobial-resistance` `amr` `bioinformatics` `genomics` `bv-brc` `daytona` `fireworks-ai` `esm2` `protein-embeddings` `gpu` `copilotkit` `nextjs` `tanstack-start` `llm` `hackathon` | 15 / 20 topics |
+| **Description** | Integrated AMR system for gut-derived pathogens in infected pancreatic necrosis: BV-BRC → Daytona H100 ESM2 → Fireworks → CopilotKit. Research prototype, not for clinical use. | ≤ 350 chars |
+| **Website** | `https://github.com/johnqh/daytona_hackathon#full-stack-quickstart-use-all-the-tools` | — |
+| **Topics** | `antimicrobial-resistance` `amr` `bioinformatics` `genomics` `bv-brc` `daytona` `fireworks-ai` `esm2` `protein-embeddings` `gpu` `copilotkit` `nextjs` `tanstack-start` `llm` `hackathon` | ≤ 20 topics |
 
-GitHub truncates the description at 350 characters. Keep any rewrite under it,
-and keep the not-for-clinical-use clause — it is the last thing that should be
-cut for length.
+GitHub truncates the description at 350 characters. Keep the not-for-clinical-use
+clause — it is the last thing that should be cut for length.
 
 ## Apply
 
 ```bash
 gh repo edit johnqh/daytona_hackathon \
-  --description "Antimicrobial-resistance dashboard for the gut-derived pathogens behind infected pancreatic necrosis. BV-BRC genomes, ESM2 embeddings on a Daytona H100, and Fireworks observations that quote only measured numbers. Research prototype, not for clinical use." \
-  --homepage "https://github.com/johnqh/daytona_hackathon#quickstart-demo-with-committed-data" \
+  --description "Integrated AMR system for gut-derived pathogens in infected pancreatic necrosis: BV-BRC → Daytona H100 ESM2 → Fireworks → CopilotKit. Research prototype, not for clinical use." \
+  --homepage "https://github.com/johnqh/daytona_hackathon#full-stack-quickstart-use-all-the-tools" \
   --add-topic antimicrobial-resistance --add-topic amr \
   --add-topic bioinformatics --add-topic genomics --add-topic bv-brc \
   --add-topic daytona --add-topic fireworks-ai --add-topic esm2 \
@@ -36,15 +35,12 @@ By hand: **Settings → General → Repository details**.
 
 ## Why these topics
 
-- `amr` and `antimicrobial-resistance` both stay. Redundant to read, but people
-  search both, and topics are a discovery surface rather than prose.
-- `tanstack-start` sits beside `nextjs` because the repo ships three frontends:
-  `dashboard/` and `pathogen-pathfinder/` are Next.js, `Insight Uploader/` is
-  TanStack Start.
-- `braintrust` is deliberately absent — `eval/braintrust_results.json` reports
-  `braintrust_api_key_present: false`, and tagging it would advertise an
-  integration that has not run.
-- To drop below ten, cut `amr`, `gpu`, `llm`, `hackathon` and
-  `protein-embeddings` first.
+- `amr` and `antimicrobial-resistance` both stay — people search both.
+- `daytona`, `fireworks-ai`, `copilotkit`, `esm2` name the live sponsor stack.
+- `tanstack-start` sits beside `nextjs` because three UIs share the contracts:
+  `dashboard/` and `pathogen-pathfinder/` (Next.js) plus `Insight Uploader/`
+  (TanStack Start).
+- Add `braintrust` once remote Braintrust logging is wired; today faithfulness
+  is written locally to `eval/braintrust_results.json`.
 
-In-repo About copy for humans and judges: [ABOUT.md](./ABOUT.md).
+In-repo About copy: [ABOUT.md](./ABOUT.md).

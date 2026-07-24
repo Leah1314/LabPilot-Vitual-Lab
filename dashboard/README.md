@@ -1,18 +1,19 @@
 # Gut-to-Pancreas AMR Dashboard
 
-Part C of the BV-BRC hackathon build
+Product UI for the integrated BV-BRC hackathon system
 ([johnqh/daytona_hackathon](https://github.com/johnqh/daytona_hackathon)).
-A Next.js + CopilotKit dashboard showing resistance and virulence gene structure
-across gut-derived pathogens implicated in infected pancreatic necrosis, with a
-conversational panel for interrogating the cohort.
 
-**This is the primary demo UI** for the monorepo. See also
-[`../pathogen-pathfinder/`](../pathogen-pathfinder/) (Claude agent) and
-[`../Insight Uploader/`](../Insight%20Uploader/) (TanStack Start).
+Next.js + **CopilotKit** + **Fireworks**, with optional **Daytona** sandbox
+visibility and live observation regeneration. Consumes Contracts 1 & 2 produced
+by the Daytona GPU pipeline and Fireworks observation step.
+
+Sibling surfaces on the **same contracts**:
+[`../pathogen-pathfinder/`](../pathogen-pathfinder/) (CopilotKit + Claude) and
+[`../Insight Uploader/`](../Insight%20Uploader/) (TanStack shell).
 
 Research prototype. Not for clinical use.
 
-Monorepo overview: [../README.md](../README.md) · Doc index: [../DOCS.md](../DOCS.md)
+Monorepo overview (full stack): [../README.md](../README.md) · [../DOCS.md](../DOCS.md)
 
 ## Install
 

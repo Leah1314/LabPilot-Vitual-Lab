@@ -1,16 +1,16 @@
 # Insight Uploader — Pathogen AI research workspace
 
-TanStack Start frontend for the Gut-to-Pancreas AMR hackathon
+TanStack Start research shell for the integrated Gut-to-Pancreas AMR system
 ([johnqh/daytona_hackathon](https://github.com/johnqh/daytona_hackathon)).
 
-Loads **Contract 1** (`cluster_summary.json`) and **Contract 2**
-(`observations.json`) from upload, API, or sample data, then shows dashboard,
-gene explorer, insights, pipeline stages, and a chat panel.
+Loads **Contract 1** / **Contract 2** produced by **BV-BRC → Daytona → Fireworks**,
+then shows dashboard, gene explorer, insights, pipeline stages, and chat.
+
+**Product UI:** [`../dashboard/`](../dashboard/) (CopilotKit + Fireworks).  
+**Agent UI:** [`../pathogen-pathfinder/`](../pathogen-pathfinder/) (CopilotKit + Claude).  
+**This shell:** upload-first TanStack workspace on the same contracts.
 
 **Research prototype. Not for clinical use.**
-
-> For the primary CopilotKit demo UI, prefer [`../dashboard/`](../dashboard/).
-> This app is the Lovable/TanStack variant of the same research workspace.
 
 ## Stack
 
