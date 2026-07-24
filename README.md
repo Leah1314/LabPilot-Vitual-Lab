@@ -1,81 +1,110 @@
 # Gut-to-Pancreas Pathogen AMR Dashboard
 
 Real antimicrobial-resistance and virulence data for the gut-derived pathogens that
-cause infected pancreatic necrosis, pulled from BV-BRC, embedded on a GPU, narrated
-by an LLM under strict grounding rules, and served in an interactive dashboard.
+cause infected pancreatic necrosis — pulled from [BV-BRC](https://www.bv-brc.org),
+embedded on a Daytona H100, narrated under strict grounding rules, and shown in
+interactive CopilotKit dashboards.
 
 **Research prototype. Not for clinical use.**
 
----
-
-## What actually runs, and what it measured
-
-Every number below was measured on this repo's data, not estimated. Nothing here
-is a projection.
-
-| Stage | Result |
+| | |
 |---|---|
-| BV-BRC pull | 240 pinned genomes, 6 organisms, **34,466 proteins**, 117s |
-| ESM2 embedding | **34,466 proteins in 93.0s on an NVIDIA H100 80GB** (370 seq/s) |
-| Same job on CPU | 5 seq/s measured — the GPU is doing real work |
-| Clustering | k=4 by silhouette (0.1271), 6.9s |
-| Observations | 4 grounded observations, mean faithfulness 1.0 (n=4) |
-| Frontend | builds clean, 6 routes serve HTTP 200 with real data |
-
-### The headline finding is a negative result
-
-**The clusters carry no resistance signal.** Enrichment is the share within a
-cluster divided by the share across the whole corpus, so 1.0 means "identical to
-background":
-
-| cluster | n_genes | max phenotype deviation | verdict |
-|---|---|---|---|
-| 0 | 12,497 | 0.075 | flat |
-| 1 | 5,804 | 0.081 | flat |
-| 2 | 13,238 | 0.112 | flat |
-| 3 | 2,927 | 0.084 | flat |
-
-Every cluster's Resistant/Susceptible split reproduces the corpus base rate to
-within 11%. This is the correct result, not a broken pipeline: ESM2 embeds
-proteins by sequence and structure, so it groups by **protein family**, whereas
-resistance is a property of the **isolate**, carried by a handful of specific
-genes. It does not survive averaging over every annotated protein in a genome.
-
-Consequence, enforced in code rather than left as advice: **no cluster may be
-described as "linked to" or "enriched for" resistance.**
-`data/cluster_enrichment.json` exposes `clusters_with_phenotype_signal`, which is
-the gate for any association language and is **currently empty**. The frontend
-imports it as `clusterEnrichment`.
-
-Reported plainly, this is a negative control you ran and disclosed — considerably
-stronger than a cluster chart implying a link the arithmetic refuses to support.
+| **Repo** | https://github.com/johnqh/daytona_hackathon |
+| **Cohort** | 240 pinned genomes · 6 organisms · 34,466 proteins |
+| **GPU** | 34,466 embeddings in **93.0s** on NVIDIA H100 80GB (370 seq/s) |
+| **Stack** | BV-BRC · Daytona · ESM2 · Fireworks · Braintrust · CopilotKit |
 
 ---
 
-## Quickstart
+## What this is
+
+ICU clinicians treating infected pancreatic necrosis often choose empiric antibiotics
+with limited visibility into current resistance structure among gut-derived organisms.
+This hackathon build turns BV-BRC's already-annotated tables into:
+
+1. **GPU-clustered protein summaries** (Daytona H100 + ESM2)
+2. **Grounded natural-language observations** (Fireworks, or deterministic offline)
+3. **Interactive dashboards** with CopilotKit chat that must not invent numbers
+
+### Headline scientific result (measured, not estimated)
+
+**The clusters carry no resistance signal.** Every cluster's Resistant/Susceptible
+split matches the corpus base rate to within ~11%. ESM2 groups proteins by sequence
+family; resistance is an isolate-level trait carried by a few genes — it does not
+survive averaging over every annotated protein.
+
+**Consequence (enforced in code):** no cluster may be described as “linked to” or
+“enriched for” resistance. Gate on `data/cluster_enrichment.json` →
+`clusters_with_phenotype_signal` (currently **empty**).
+
+| Stage | Measured result |
+|---|---|
+| BV-BRC pull | 240 genomes, 6 organisms, **34,466 proteins**, ~117s |
+| ESM2 on H100 | **93.0s** (370 seq/s) — see `data/timing.json` |
+| Same job on CPU | ~5 seq/s measured |
+| Clustering | k=4 by silhouette (0.1271), 6.9s |
+| Observations | 4 grounded observations (offline path); local faithfulness mean 1.0 |
+
+---
+
+## Quickstart (demo with committed data)
+
+You do **not** need Daytona or Fireworks to demo the dashboards — `data/` and
+`insights/` already contain a full pipeline run.
+
+### Option A — Next.js + CopilotKit dashboard (recommended demo)
 
 ```bash
-# 1. Data + GPU pipeline (Part A)
-pip install requests pandas fair-esm torch scikit-learn daytona
-cp .env.example .env          # fill in DAYTONA_API_KEY
-python pipeline/bvbrc_fetch.py            # BV-BRC -> data/*.csv    (~2 min)
-python pipeline/run_on_daytona.py         # ESM2 + KMeans on H100   (~4 min)
-python pipeline/enrichment.py             # signal check -> the honesty gate
-python pipeline/validate_contract.py      # Contract 1 gate before handoff
-
-# 2. Observations + eval (Part B)
-pip install -r requirements-step-b.txt
-export FIREWORKS_API_KEY=...
-python scripts/generate_observations.py --input data/cluster_summary.json
-#   ...or without a key, deterministic and still fully grounded:
-python scripts/generate_observations.py --input data/cluster_summary.json --offline
-
-# 3. Dashboard (Part C)
-cd "Insight Uploader" && npm install && npm run dev
+cd dashboard
+bun install          # or: npm install
+cp .env.example .env.local
+bun run sync-data    # copy root contracts into dashboard/data/
+bun run dev          # http://localhost:3000
 ```
 
-`bvbrc_fetch.py` resumes — any CSV already in `data/` is reused. Pass `--fresh` to
-refetch and re-pin the cohort.
+Pick **Sample dataset** on the source picker. Add `FIREWORKS_API_KEY` only if you
+want the Consult chat panel live.
+
+### Option B — Pathogen Pathfinder (CopilotKit + Claude agent)
+
+```bash
+cd pathogen-pathfinder
+cp .env.example .env   # set ANTHROPIC_API_KEY
+npm install
+npm run dev            # UI :3000 · agent :8000
+```
+
+Upload → Sample dataset → Analyzing → Dashboard / Copilot.
+
+### Option C — Insight Uploader (TanStack Start)
+
+```bash
+cd "Insight Uploader"
+npm install
+npm run dev
+```
+
+### Full pipeline rebuild (Part A → B → C)
+
+```bash
+cp .env.example .env   # DAYTONA_API_KEY, optional FIREWORKS_API_KEY / BRAINTRUST_API_KEY
+
+# Part A — data + GPU
+pip install requests pandas fair-esm torch scikit-learn daytona
+python pipeline/bvbrc_fetch.py
+python pipeline/run_on_daytona.py
+python pipeline/enrichment.py
+python pipeline/validate_contract.py
+
+# Part B — observations
+pip install -r requirements-step-b.txt
+python scripts/generate_observations.py --input data/cluster_summary.json
+# without a Fireworks key (deterministic, still grounded):
+python scripts/generate_observations.py --input data/cluster_summary.json --offline
+
+# Part C — refresh dashboard fixtures
+cd dashboard && bun run sync-data
+```
 
 ---
 
@@ -86,197 +115,151 @@ BV-BRC REST API
       │  sp_gene, genome_amr, genome, genome_feature, feature_sequence
       ▼
 pipeline/bvbrc_fetch.py ──────────► data/*.csv, pipeline/manifest.json
-      │                                   (cohort pinned, cannot drift)
+      │                                   (cohort pinned — cannot drift)
       ▼
 pipeline/run_on_daytona.py
       │  uploads sequences.csv to a Daytona H100 sandbox
       ▼
 pipeline/gpu_embedding_cluster.py ─► data/cluster_summary.json   (Contract 1)
-      │  ESM2 t12_35M inference + KMeans                data/timing.json
+      │  ESM2 t12_35M + KMeans              data/timing.json
       ▼
 pipeline/enrichment.py ───────────► data/cluster_enrichment.json (honesty gate)
       │
       ▼
 scripts/generate_observations.py ─► insights/observations.json   (Contract 2)
-      │  Fireworks, or deterministic offline       eval/braintrust_results.json
+      │  Fireworks or --offline            eval/braintrust_results.json
       ▼
-Insight Uploader/  (TanStack Start + React)
+┌─────────────────────────────────────────────────────────────┐
+│  Frontends (pick one for the demo)                          │
+│  • dashboard/              Next.js + CopilotKit + Fireworks │
+│  • pathogen-pathfinder/    Next.js + CopilotKit + Claude    │
+│  • Insight Uploader/       TanStack Start research UI       │
+└─────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
 ## Repo layout
 
-| Path | What it is | Owner |
-|---|---|---|
-| `pipeline/` | BV-BRC fetch, ESM2 + KMeans, Daytona runner, enrichment, contract gate | Part A |
-| `data/` | the real dataset and its outputs | Part A |
-| `scripts/generate_observations.py` | statistics → grounded English | Part B |
-| `insights/`, `eval/` | observations and faithfulness scores | Part B |
-| `Insight Uploader/` | TanStack Start dashboard, wired to real data | Part C |
-| `dashboard/` | second frontend, Next.js + CopilotKit | Part C |
-| `prompt.md`, `daytona.md`, `fireworks.md`, `frontend.md` | workstream specs | — |
-
-Two frontends exist. `Insight Uploader/` is the one currently wired to real Part A
-output; `dashboard/` is a separate Next.js + CopilotKit app with its own fixtures
-under `dashboard/data/`. Pick one for the demo.
+| Path | Role |
+|---|---|
+| [`pipeline/`](./pipeline/) | BV-BRC fetch, Daytona H100 ESM2 + KMeans, enrichment, contract validation |
+| [`data/`](./data/) | Pinned cohort CSVs + Contract 1 outputs + timing |
+| [`scripts/generate_observations.py`](./scripts/generate_observations.py) | Statistics → grounded English (Part B) |
+| [`insights/`](./insights/) | Contract 2 observations |
+| [`eval/`](./eval/) | Faithfulness scores |
+| [`dashboard/`](./dashboard/) | **Primary demo UI** — Next.js + CopilotKit (Fireworks) |
+| [`pathogen-pathfinder/`](./pathogen-pathfinder/) | Alternate CopilotKit UI with Claude Agent SDK |
+| [`Insight Uploader/`](./Insight%20Uploader/) | TanStack Start / Lovable-origin UI wired to contracts |
+| Specs | [`prompt.md`](./prompt.md), [`daytona.md`](./daytona.md), [`fireworks.md`](./fireworks.md), [`frontend.md`](./frontend.md), … |
+| Doc index | [`DOCS.md`](./DOCS.md) |
 
 ---
 
 ## Data contracts
 
-**Contract 1** — `data/cluster_summary.json`, Part A → Part B and Part C. Top-level
-keys are cluster ids as strings and **nothing else**, so consumers can iterate it
-directly. Validate with `python pipeline/validate_contract.py`.
+**Contract 1** — `data/cluster_summary.json` (Part A → B/C). Top-level keys are
+cluster ids as strings **only** (no `_meta`). Validate with:
 
-```json
-{ "0": { "n_genes": 12497,
-         "example_genes": ["fig|1351.1163.peg.1570"],
-         "top_products": {"Translation elongation factor Tu": 180},
-         "resistant_phenotype_breakdown": {"Resistant": 7390, "Susceptible": 3935, "Unknown": 1172},
-         "species_breakdown": {"Escherichia coli": 5604} } }
+```bash
+python pipeline/validate_contract.py
 ```
 
-**Contract 2** — `insights/observations.json`, Part B → Part C:
+**Contract 2** — `insights/observations.json` (Part B → C):
 
 ```json
-{ "generated_at": "...",
-  "clusters": [ { "cluster_id": "0", "headline": "...", "observation": "...",
-                  "confidence": "medium", "eval_score": 1.0,
-                  "supporting_gene_count": 12497 } ] }
+{
+  "generated_at": "...",
+  "clusters": [
+    {
+      "cluster_id": "0",
+      "headline": "...",
+      "observation": "...",
+      "confidence": "medium",
+      "eval_score": 1.0,
+      "supporting_gene_count": 12497
+    }
+  ]
+}
 ```
-
-The frontend's `ClusterSummaryEntry` type in
-`Insight Uploader/src/lib/data-sources.ts` matches Contract 1 field-for-field, so
-no translation layer exists or is needed.
 
 ---
 
 ## The cohort
 
-Pinned in `pipeline/manifest.json` — 40 genomes per organism, 240 total, written
-once and reused so the cohort cannot shift between the pipeline run and the demo.
+Pinned in `pipeline/manifest.json` (40 genomes × 6 organisms = 240), written once
+so the demo cannot drift from the pipeline run.
 
-| Organism | taxon_id | role |
+| Organism | taxon_id | Role |
 |---|---|---|
 | *Escherichia coli* | 562 | resistance + virulence |
 | *Klebsiella pneumoniae* | 573 | resistance + virulence |
 | *Enterococcus faecium* | 1352 | resistance + virulence |
 | *Enterococcus faecalis* | 1351 | resistance + virulence |
 | *Clostridioides difficile* | 1496 | resistance + virulence |
-| *Helicobacter pylori* | 210 | **virulence only** |
+| *Helicobacter pylori* | 210 | **virulence only** — never quote resistance stats |
 
-For the five AMR organisms, genomes are ranked by how many lab-measured antibiotic
-results they carry, so the phenotype label rests on real testing rather than a
-single MIC. *H. pylori* has **265** lab-measured AMR rows against *K. pneumoniae*'s
-85,291 — it rides along for the gut-health framing, and **no resistance statistic
-may be quoted for it**.
-
-### Phenotype labelling
-
-`genome_amr` gives one result per genome per antibiotic; the cluster summary needs
-one label per gene. The rule, stated so nobody has to guess:
-
-> A genome is **Resistant** when it has more Resistant than Susceptible
-> lab-measured results, otherwise **Susceptible**. Genomes with no lab AMR data are
-> **Unknown** and counted as neither. Intermediate results are excluded.
-
-Raw counts (`n_resistant`, `n_susceptible`) ride along in `data/sequences.csv` so
-nothing downstream has to quote a label without its denominator.
+**Phenotype rule:** a genome is **Resistant** when it has more lab-measured
+Resistant than Susceptible AST results; otherwise **Susceptible**. No lab AMR →
+**Unknown**. Intermediate excluded. Raw counts stay in `data/sequences.csv`.
 
 ---
 
-## Honesty rules
+## Environment variables
 
-These are the difference between a project that survives Q&A and one that does not.
+Root `.env` (never commit):
 
-- **Never present computational predictions as laboratory measurements.** `sp_gene`
-  calls are BLAST-family annotations from CARD/NDARO/VFDB/PATRIC_VF. `genome_amr`
-  rows filtered to `evidence == "Laboratory Method"` *are* lab measurements — and
-  15.9M of the 17.3M rows in that collection are BV-BRC's own predictions, so the
-  filter is not optional.
-- **No cluster is associated with resistance.** Gate on
-  `clusters_with_phenotype_signal`; it is empty.
-- **Never show a percentage without its denominator.**
-- **Never quote a speedup you have not measured.** The measured numbers are 93.0s
-  on H100 and 5 seq/s on CPU. `data/timing.json` is the source of truth — quote it,
-  not memory.
-- **Genomes are not deduplicated by strain.** Public genome databases are heavily
-  oversampled for outbreak strains, so a concentrated cluster may reflect clonal
-  oversampling. `data/bvbrc_metadata.csv` carries `isolation_country`,
-  `collection_year` and `mlst` if there is time to quantify it. Saying this before
-  being asked is worth more than any accuracy number.
-- **The clustering is partly circular by construction.** Every protein here already
-  carries a curated CARD/VFDB identifier, so clustering their embeddings largely
-  recovers families the annotation already states. It organises the cohort; it is
-  not gene discovery.
-- **k selection is near-arbitrary.** Best silhouette was 0.1271, with k=4..12 all
-  between 0.087 and 0.127. Do not present the chosen k as a discovered natural
-  number of groups. `data/timing.json` records the full silhouette-by-k table.
+| Variable | Used by | Purpose |
+|---|---|---|
+| `DAYTONA_API_KEY` | Part A | H100 sandbox for ESM2 |
+| `FIREWORKS_API_KEY` | Part B + `dashboard/` | LLM observations / Consult chat |
+| `BRAINTRUST_API_KEY` | Part B | Optional remote eval |
+
+`pathogen-pathfinder/.env` additionally needs `ANTHROPIC_API_KEY` (Claude agent).
+See each app’s `.env.example`.
+
+---
+
+## Honesty rules (non-negotiable)
+
+These are the difference between surviving Q&A and getting dismantled.
+
+- Never present computational annotations (`sp_gene`) as laboratory measurements.
+  Only `genome_amr` rows with `evidence == "Laboratory Method"` are lab results.
+- **No cluster is associated with resistance** — gate on
+  `clusters_with_phenotype_signal`.
+- Never show a percentage without its denominator.
+- Never quote a speedup you have not measured — cite `data/timing.json`.
+- Genomes are **not** strain-deduplicated by default; outbreak oversampling is real.
+- Clustering partly recovers annotation families (circular by construction).
+- k selection is near-arbitrary (silhouette 0.087–0.127 for k=4..12).
+- Every screen: **research prototype, not for clinical use.**
+
+Full product brief and eval rules: [`prompt.md`](./prompt.md).
 
 ---
 
 ## Known gaps
 
-- **Fireworks has not been exercised.** No `FIREWORKS_API_KEY` was available, so
-  observations were generated with `--offline`, a deterministic grounded path.
-  Every number in the prose is copied verbatim from the cluster summary, but the
-  LLM path itself is untested. Set the key and re-run without `--offline`.
-- **Braintrust has not been exercised.** `eval/braintrust_results.json` reports
-  `braintrust_api_key_present: false` and `mean_faithfulness: 1.0` over n=4 — a
-  local scorer, not a Braintrust run. A panel reporting 100% on everything reads as
-  untested; add deliberate failure cases and show the eval catching them.
-- **Observations do not yet flag the flat enrichment.** They are grounded and quote
-  real numbers, but none says "this cluster does not distinguish resistant from
-  susceptible isolates." That sentence should come from
-  `data/cluster_enrichment.json`.
-- **`Insight Uploader.zip`** at the repo root is a stale duplicate of
-  `Insight Uploader/` and can be deleted.
+- Fireworks / Braintrust live paths may be untested on a given machine — the
+  committed observations used `--offline` with a local faithfulness scorer
+  (`eval/braintrust_results.json`: `fireworks_used: false`).
+- Observations quote real numbers but do not yet explicitly say clusters are
+  phenotype-flat; that sentence should come from `cluster_enrichment.json`.
+- `Insight Uploader.zip` at repo root is a stale duplicate of `Insight Uploader/`
+  and can be deleted.
 
 ---
 
-## Traps already paid for
+## Docs map
 
-Each of these cost real time. They are handled in code — do not re-discover them.
-
-**BV-BRC API** (`pipeline/bvbrc.py`)
-
-| Trap | Symptom | Fix |
-|---|---|---|
-| 25,000-row hard cap | `limit(50000)` returns 25,000, HTTP 200, no warning | page via `paged()` with a stable `sort()` |
-| Space in a literal | `400 Illegal character in query string` | percent-encode: `eq(evidence,%22Laboratory%20Method%22)` |
-| Pipe in `patric_id` | `400 query.args[1].join is not a function` | percent-encode values in `in(...)`; quoting does **not** work |
-| `aa_sequence` unreachable | `select(aa_sequence)` silently omits it | two-hop join: `genome_feature.aa_sequence_md5` → `feature_sequence.md5` |
-| Long id lists | URL length limits on GET | issue every query as POST with RQL in the body |
-| Virulence typo | `Virulance factor` is a separate value from `Virulence Factor` | filter by `source`, normalise `property` client-side |
-
-**Daytona** (`pipeline/run_on_daytona.py`)
-
-- GPU sandboxes **must** be ephemeral: `auto_delete_interval=0`, or creation is
-  hard-rejected.
-- `auto_stop_interval` defaults to 15 minutes and **fires mid-job**. Set it to 0.
-- The **4 vCPU / 8 GiB cap applies to GPU sandboxes too**, despite the platform docs
-  quoting up to 16 vCPU / 192 GB.
-- GPU sandbox filesystems are **deleted on stop**. Results are downloaded before
-  teardown; ESM2 weights live on a persistent Volume.
-- The sandbox **cannot reach `dl.fbaipublicfiles.com`** — the ESM2 download dies
-  with `[Errno 104] Connection reset by peer`. Weights are fetched locally and
-  pushed to the Volume, a one-time cost.
-- `get_session_command_logs` returns a `SessionCommandLogsResponse`, not a string;
-  read `.output`.
-- Do **not** load ESM2 via `torch.hub.load("facebookresearch/esm:main", ...)` — it
-  calls the GitHub API and 403s from shared and cloud IPs. Use
-  `esm.pretrained.<model>()`.
-
-Image builds cache for 24h: first sandbox took 160s, subsequent ones **1s**.
+See **[DOCS.md](./DOCS.md)** for the full index of specs, runbooks, and app READMEs.
 
 ---
 
 ## Attribution
 
-Data from [BV-BRC](https://www.bv-brc.org), publicly funded and freely available.
-Annotations from **CARD**, **NDARO**, **VFDB** and **PATRIC_VF**, each with its own
-terms. Protein embeddings from **ESM2** (`esm2_t12_35M_UR50D`, Meta AI). Show the
-pinned cohort date from `pipeline/manifest.json` in the UI.
-
-Every screen must carry: **research prototype, not for clinical use.**
+Data from [BV-BRC](https://www.bv-brc.org) (publicly funded). Annotations from
+**CARD**, **NDARO**, **VFDB**, and **PATRIC_VF**. Embeddings from **ESM2**
+(`esm2_t12_35M_UR50D`, Meta AI). Show the pinned cohort date from
+`pipeline/manifest.json` in the UI.

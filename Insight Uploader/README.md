@@ -1,29 +1,79 @@
-# Welcome to your Lovable project
+# Insight Uploader — Pathogen AI research workspace
 
-This project was built with [Lovable](https://lovable.dev).
+TanStack Start frontend for the Gut-to-Pancreas AMR hackathon
+([johnqh/daytona_hackathon](https://github.com/johnqh/daytona_hackathon)).
 
-## Build with Lovable
+Loads **Contract 1** (`cluster_summary.json`) and **Contract 2**
+(`observations.json`) from upload, API, or sample data, then shows dashboard,
+gene explorer, insights, pipeline stages, and a chat panel.
 
-Open your project in the [Lovable editor](https://lovable.dev) and keep building.
+**Research prototype. Not for clinical use.**
 
-- **Ship faster**: describe what you want to build and Lovable handles the code.
-- **Stay in sync**: connect the project to GitHub and every change made in Lovable is committed straight to your repository.
-- **Full ownership**: this code is yours. Push to your repository and your changes sync back into Lovable, ready for your next prompt.
+> For the primary CopilotKit demo UI, prefer [`../dashboard/`](../dashboard/).
+> This app is the Lovable/TanStack variant of the same research workspace.
 
-## Development
+## Stack
 
-Prefer working locally? You need Node.js and npm — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
+- TanStack Start + React Router  
+- TypeScript + Tailwind CSS 4  
+- Recharts  
 
-```sh
-git clone <this-repository-url>
-cd <repository-name>
-npm i
+## Setup
+
+```bash
+cd "Insight Uploader"
+npm install   # or: bun install
 npm run dev
 ```
 
+Open the printed local URL (typically Vite/TanStack on a free port).
+
+## Using it
+
+1. **Choose data source** — Upload files, Connect API, or Try Sample Dataset  
+2. Wait through the analyzing animation  
+3. Explore **Dashboard**, **Gene Explorer**, **AI Insights**, **Pipeline**, **Copilot**
+
+Sample / upload paths resolve to the same normalised `DashboardData` shape used
+across the monorepo (see root [README.md](../README.md) contracts).
+
+### Expected filenames (upload)
+
+Minimum required:
+
+- `genome_amr.csv`
+- `metadata.csv`
+- `sequences.csv`
+- `observations.json`
+
+Also recognised: `sp_gene.csv`, `cluster_summary.json`.
+
+## Wiring to Part A / B outputs
+
+Root pipeline outputs live at:
+
+- `../data/cluster_summary.json`
+- `../insights/observations.json`
+
+Point the **Connect API** tab at any HTTP endpoint that serves those contracts,
+or use sample data for a key-free demo.
+
+## Honesty
+
+Same rules as the monorepo root README:
+
+- No resistance–cluster association language without
+  `clusters_with_phenotype_signal`
+- No percentage without a denominator  
+- Research prototype disclaimer on every surface  
+
+## Related
+
+- Monorepo overview: [../README.md](../README.md)  
+- Doc index: [../DOCS.md](../DOCS.md)  
+- Next.js CopilotKit dashboard: [../dashboard/README.md](../dashboard/README.md)  
+- Claude CopilotKit rebuild: [../pathogen-pathfinder/README.md](../pathogen-pathfinder/README.md)  
+
 ## Built with
 
-- TanStack Start
-- TypeScript
-- React
-- Tailwind CSS
+TanStack Start · TypeScript · React · Tailwind CSS

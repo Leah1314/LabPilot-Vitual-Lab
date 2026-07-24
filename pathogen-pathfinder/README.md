@@ -1,30 +1,39 @@
-# Pathogen Pathfinder (CopilotKit)
+# Pathogen Pathfinder (CopilotKit + Claude)
 
-Rebuild of [Leah1314/pathogen-pathfinder](https://github.com/Leah1314/pathogen-pathfinder) as a **Next.js + CopilotKit** app with a real Claude agent grounded on the loaded AMR workspace dataset.
+Next.js rebuild of the Pathogen AI research workspace, living inside the
+[daytona_hackathon](https://github.com/johnqh/daytona_hackathon) monorepo.
 
-## What you get
+Pairs a multi-page AMR dashboard with a **real CopilotKit agent** (Claude Agent
+SDK over AG-UI) that must call `getPathogenDataset` before answering — so chat
+is grounded on the loaded workspace, not free-form hallucination.
 
-Same Pathogen AI research workspace flow:
+**Research prototype. Not for clinical use.**
 
-1. **Upload** — files, live API, or sample dataset  
-2. **Analyzing** — simulated pipeline progress  
-3. **Dashboard** — cluster resistance, trends, KPIs  
-4. **Gene Explorer** — AMR gene class distribution  
-5. **AI Insights** — grounded insight feed  
-6. **Pipeline** — end-to-end stage map  
-7. **Copilot** — CopilotKit chat (Claude) that calls `getPathogenDataset` before answering
+> Primary Fireworks-based CopilotKit demo: [`../dashboard/`](../dashboard/).  
+> This app is the Claude-agent alternative with the same upload → analyze → explore flow.
+
+## Features
+
+| Route | Purpose |
+|---|---|
+| `/` Upload | Files, live API, or sample dataset |
+| `/analyzing` | Simulated pipeline progress |
+| `/dashboard` | Cluster resistance, trends, KPIs |
+| `/gene-explorer` | AMR gene-class distribution |
+| `/insights` | Grounded observation feed |
+| `/pipeline` | End-to-end stage map |
+| `/copilot` | CopilotKit + Claude chat |
 
 ## Stack
 
 - Next.js 16 + React 19 + Tailwind CSS 4  
 - CopilotKit v2 (`@copilotkit/react-core`, runtime)  
-- Claude Agent SDK (TypeScript) on port 8000 via AG-UI  
+- Claude Agent SDK (TypeScript) on port **8000** via AG-UI  
 
 ## Setup
 
-1. Copy env and add your Anthropic key:
-
 ```bash
+cd pathogen-pathfinder
 cp .env.example .env
 ```
 
@@ -32,40 +41,64 @@ cp .env.example .env
 ANTHROPIC_API_KEY=sk-ant-...
 CLAUDE_MODEL=claude-sonnet-5
 AGENT_URL=http://localhost:8000
-# Optional: COPILOTKIT_LICENSE_TOKEN=...
+# Optional:
+# COPILOTKIT_LICENSE_TOKEN=...
 ```
-
-2. Install and run:
 
 ```bash
 npm install
 npm run dev
 ```
 
-- UI: http://localhost:3000  
-- Agent health: http://localhost:8000/health  
+| Service | URL |
+|---|---|
+| UI | http://localhost:3000 |
+| Agent health | http://localhost:8000/health |
 
-## Try it
+## Demo path
 
-1. Open **Upload** → **Try Sample Dataset** → **Load Sample Data**  
+1. **Upload** → **Try Sample Dataset** → Load  
 2. Wait for analyzing → land on **Dashboard**  
-3. Open **Copilot** and ask: “Which cluster has highest resistance?”
+3. Open **Copilot** → ask *“Which cluster has highest resistance?”*
+
+The agent uses frontend tool `getPathogenDataset` plus shared state synced from
+the workspace store.
+
+## Using real Part A / B data
+
+Monorepo contracts:
+
+- `../data/cluster_summary.json` (Contract 1)  
+- `../insights/observations.json` (Contract 2)  
+
+Serve them behind any JSON HTTP API and use **Connect API** on the upload page,
+or extend the sample loader to import those files. Upload parsing currently
+falls back to a sample-shaped `DashboardData` (same limitation as the original
+Lovable app).
 
 ## Project layout
 
 ```
-src/app/                 # Next.js routes (upload, dashboard, copilot, …)
-src/lib/                 # workspace store + data-source abstraction
-src/services/            # external API connection helpers
-src/hooks/               # pathogen agent context + generative UI tools
-agent/                   # Claude Agent SDK AG-UI server
+src/app/           Next.js routes
+src/lib/           workspace store + data-source abstraction
+src/services/      external API helpers
+src/hooks/         pathogen agent context + generative UI
+agent/             Claude Agent SDK AG-UI server
 ```
 
-## Notes
+## Honesty
 
-- Upload parsing still returns the sample-shaped `DashboardData` (same as the Lovable original).  
-- API connect/test uses browser `fetch` (CORS applies).  
-- The mock regex copilot from the original is replaced by CopilotKit + Claude.
+Follow the monorepo rules in [../README.md](../README.md):
+
+- Gate resistance association claims on `clusters_with_phenotype_signal`  
+- Never invent numbers in chat — always read the loaded dataset  
+- Always disclose: research prototype, not for clinical use  
+
+## Related
+
+- Doc index: [../DOCS.md](../DOCS.md)  
+- Fireworks CopilotKit dashboard: [../dashboard/README.md](../dashboard/README.md)  
+- Pipeline: [../pipeline/README.md](../pipeline/README.md)  
 
 ## License
 

@@ -2,6 +2,8 @@
 
 Owner: Part A. Produces the four CSVs and `data/cluster_summary.json` (Contract 1).
 
+Monorepo overview: [../README.md](../README.md) · Doc index: [../DOCS.md](../DOCS.md)
+
 ## Run order
 
 ```bash
