@@ -1,5 +1,12 @@
 # Gut-to-Pancreas Pathogen AMR Dashboard
 
+[![Research prototype](https://img.shields.io/badge/status-research%20prototype-orange)](./SECURITY.md)
+[![Not for clinical use](https://img.shields.io/badge/clinical-not%20for%20use-red)](./SECURITY.md)
+[![BV-BRC](https://img.shields.io/badge/data-BV--BRC-0A66C2)](https://www.bv-brc.org)
+[![Daytona H100](https://img.shields.io/badge/GPU-Daytona%20H100-111111)](./daytona.md)
+[![CopilotKit](https://img.shields.io/badge/UI-CopilotKit-7C3AED)](./dashboard/README.md)
+[![Docs](https://img.shields.io/badge/docs-DOCS.md-blue)](./DOCS.md)
+
 Real antimicrobial-resistance and virulence data for the gut-derived pathogens that
 cause infected pancreatic necrosis — pulled from [BV-BRC](https://www.bv-brc.org),
 embedded on a Daytona H100, narrated under strict grounding rules, and shown in
@@ -10,9 +17,11 @@ interactive CopilotKit dashboards.
 | | |
 |---|---|
 | **Repo** | https://github.com/johnqh/daytona_hackathon |
+| **About** | [ABOUT.md](./ABOUT.md) · [SECURITY.md](./SECURITY.md) · [CITATION.cff](./CITATION.cff) |
 | **Cohort** | 240 pinned genomes · 6 organisms · 34,466 proteins |
 | **GPU** | 34,466 embeddings in **93.0s** on NVIDIA H100 80GB (370 seq/s) |
 | **Stack** | BV-BRC · Daytona · ESM2 · Fireworks · Braintrust · CopilotKit |
+| **Demo UI** | [`dashboard/`](./dashboard/) (Next.js + CopilotKit) |
 
 ---
 

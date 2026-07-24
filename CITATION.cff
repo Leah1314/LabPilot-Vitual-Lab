@@ -1,0 +1,30 @@
+# Citation File Format — https://citation-file-format.github.io/
+
+cff-version: 1.2.0
+title: "Gut-to-Pancreas Pathogen AMR Dashboard"
+message: >-
+  If you use this hackathon prototype or its pipeline outputs, please cite it
+  and credit BV-BRC / CARD / NDARO / VFDB / PATRIC_VF / ESM2 as appropriate.
+  Research prototype — not for clinical use.
+type: software
+authors:
+  - name: "Daytona Hackathon Team"
+    website: "https://github.com/johnqh/daytona_hackathon"
+repository-code: "https://github.com/johnqh/daytona_hackathon"
+url: "https://github.com/johnqh/daytona_hackathon"
+abstract: >-
+  Pulls gut-derived pathogen AMR and virulence annotations from BV-BRC, embeds
+  proteins with ESM2 on a Daytona H100, clusters them, generates grounded
+  observations, and serves interactive CopilotKit dashboards. Measured negative
+  finding: clusters do not separate resistant vs susceptible isolates.
+keywords:
+  - antimicrobial resistance
+  - BV-BRC
+  - Daytona
+  - ESM2
+  - CopilotKit
+  - bioinformatics
+  - hackathon
+license: MIT
+version: "0.1.0"
+date-released: "2026-07-24"
