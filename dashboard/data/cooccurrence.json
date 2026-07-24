@@ -1,0 +1,94 @@
+{
+  "organism": "Klebsiella pneumoniae",
+  "min_support": 5,
+  "pairs": [
+    {
+      "gene_a": "blaKPC-2",
+      "gene_b": "blaSHV-12",
+      "lift": 3.41,
+      "jaccard": 0.58,
+      "p_adj": 0.0000031,
+      "n_genomes_raw": 412,
+      "n_strains_dedup": 96,
+      "n_countries": 14,
+      "year_range": [2009, 2024]
+    },
+    {
+      "gene_a": "blaKPC-2",
+      "gene_b": "ybtS",
+      "lift": 2.87,
+      "jaccard": 0.44,
+      "p_adj": 0.000042,
+      "n_genomes_raw": 366,
+      "n_strains_dedup": 84,
+      "n_countries": 12,
+      "year_range": [2010, 2024]
+    },
+    {
+      "gene_a": "oqxA",
+      "gene_b": "oqxB",
+      "lift": 4.92,
+      "jaccard": 0.91,
+      "p_adj": 1.2e-9,
+      "n_genomes_raw": 501,
+      "n_strains_dedup": 188,
+      "n_countries": 19,
+      "year_range": [2006, 2025]
+    },
+    {
+      "gene_a": "blaCTX-M-15",
+      "gene_b": "aac(6')-Ib-cr",
+      "lift": 2.63,
+      "jaccard": 0.39,
+      "p_adj": 0.00018,
+      "n_genomes_raw": 344,
+      "n_strains_dedup": 121,
+      "n_countries": 17,
+      "year_range": [2008, 2025]
+    },
+    {
+      "gene_a": "rmpA",
+      "gene_b": "iucA",
+      "lift": 5.18,
+      "jaccard": 0.72,
+      "p_adj": 4.4e-8,
+      "n_genomes_raw": 189,
+      "n_strains_dedup": 63,
+      "n_countries": 9,
+      "year_range": [2011, 2024]
+    },
+    {
+      "gene_a": "mcr-1",
+      "gene_b": "ISApl1",
+      "lift": 6.04,
+      "jaccard": 0.83,
+      "p_adj": 0.0021,
+      "n_genomes_raw": 94,
+      "n_strains_dedup": 6,
+      "n_countries": 1,
+      "year_range": [2016, 2016]
+    },
+    {
+      "gene_a": "blaNDM-1",
+      "gene_b": "rmtB",
+      "lift": 3.96,
+      "jaccard": 0.51,
+      "p_adj": 0.00007,
+      "n_genomes_raw": 158,
+      "n_strains_dedup": 47,
+      "n_countries": 8,
+      "year_range": [2012, 2023]
+    },
+    {
+      "gene_a": "fosA",
+      "gene_b": "acrB",
+      "lift": 1.74,
+      "jaccard": 0.31,
+      "p_adj": 0.011,
+      "n_genomes_raw": 470,
+      "n_strains_dedup": 165,
+      "n_countries": 18,
+      "year_range": [2007, 2025]
+    }
+  ]
+}

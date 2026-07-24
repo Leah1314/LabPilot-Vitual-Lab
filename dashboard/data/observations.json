@@ -1,0 +1,54 @@
+{
+  "generated_at": "2026-07-24T19:11:37Z",
+  "clusters": [
+    {
+      "cluster_id": "0",
+      "headline": "Carbapenemase cluster in K. pneumoniae",
+      "observation": "This cluster contains 47 genes, led by class A carbapenemase (KPC) (14) and extended-spectrum beta-lactamase (11). The species breakdown is dominated by Klebsiella pneumoniae (41), with lab-measured phenotypes reported as 38 Resistant and 9 Susceptible across 96 deduplicated strains. The supporting rows span 14 countries and 2009 to 2024, so the observation is not limited to a single-country, single-year subset.",
+      "confidence": "high",
+      "eval_score": 1.0,
+      "supporting_gene_count": 47
+    },
+    {
+      "cluster_id": "1",
+      "headline": "Beta-lactamase cluster in E. coli",
+      "observation": "This cluster contains 63 genes, led by extended-spectrum beta-lactamase CTX-M (19) and dihydropteroate synthase (sul) (12). The species breakdown is dominated by Escherichia coli (52), with lab-measured phenotypes reported as 41 Resistant and 22 Susceptible across 173 deduplicated strains. The supporting rows span 21 countries and 2006 to 2025, so the observation is not limited to a single-country, single-year subset.",
+      "confidence": "high",
+      "eval_score": 1.0,
+      "supporting_gene_count": 63
+    },
+    {
+      "cluster_id": "2",
+      "headline": "VanA cluster in E. faecium",
+      "observation": "This cluster contains 29 genes, led by vancomycin resistance ligase VanA (9) and D-Ala-D-Ala dipeptidase VanX (6). The species breakdown is dominated by Enterococcus faecium (22), with lab-measured phenotypes reported as 19 Resistant and 10 Susceptible across 71 deduplicated strains. The supporting rows span 11 countries and 2008 to 2024, so the observation is not limited to a single-country, single-year subset.",
+      "confidence": "high",
+      "eval_score": 1.0,
+      "supporting_gene_count": 29
+    },
+    {
+      "cluster_id": "3",
+      "headline": "MCR-1 cluster in E. coli",
+      "observation": "This cluster contains 12 genes, led by phosphoethanolamine transferase MCR-1 (5) and IncI2 plasmid mobilization protein (3). The species breakdown is dominated by Escherichia coli (8), with lab-measured phenotypes reported as 9 Resistant and 3 Susceptible across 6 deduplicated strains. Because the pattern is confined to a single country or collection year (2016), read it as a possible outbreak or sampling artefact.",
+      "confidence": "low",
+      "eval_score": 1.0,
+      "supporting_gene_count": 12
+    },
+    {
+      "cluster_id": "4",
+      "headline": "Toxin cluster in C. difficile",
+      "observation": "This cluster contains 18 genes, led by toxin A (tcdA) (4) and toxin B (tcdB) (4). The species breakdown is dominated by Clostridioides difficile (18), with lab-measured phenotypes reported as 7 Resistant and 11 Susceptible across 58 deduplicated strains. The supporting rows span 9 countries and 2011 to 2023, so the observation is not limited to a single-country, single-year subset.",
+      "confidence": "high",
+      "eval_score": 1.0,
+      "supporting_gene_count": 18
+    }
+  ],
+  "pipeline_stats": {
+    "sequences_embedded": null,
+    "embedding_seconds": null,
+    "embedding_hardware": null,
+    "llm_median_latency_ms": null,
+    "llm_model": null,
+    "eval_mean_faithfulness": 1.0,
+    "eval_n_examples": 5
+  }
+}

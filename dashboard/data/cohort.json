@@ -1,0 +1,42 @@
+{
+  "pinned_date": "2026-07-24",
+  "organisms": [
+    {
+      "name": "Escherichia coli",
+      "taxon_id": 562,
+      "n_genomes": 420,
+      "resistance_reportable": true
+    },
+    {
+      "name": "Klebsiella pneumoniae",
+      "taxon_id": 573,
+      "n_genomes": 380,
+      "resistance_reportable": true
+    },
+    {
+      "name": "Enterococcus faecium",
+      "taxon_id": 1352,
+      "n_genomes": 210,
+      "resistance_reportable": true
+    },
+    {
+      "name": "Clostridioides difficile",
+      "taxon_id": 1496,
+      "n_genomes": 165,
+      "resistance_reportable": true
+    },
+    {
+      "name": "Enterococcus faecalis",
+      "taxon_id": 1351,
+      "n_genomes": 140,
+      "resistance_reportable": true
+    },
+    {
+      "name": "Helicobacter pylori",
+      "taxon_id": 210,
+      "n_genomes": 95,
+      "resistance_reportable": false
+    }
+  ],
+  "sources": ["BV-BRC", "CARD", "NDARO", "VFDB", "PATRIC_VF"]
+}

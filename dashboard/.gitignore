@@ -32,6 +32,15 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+# ...but the template carries no values and the README tells people to copy it.
+!.env.example
+
+# A global core.excludesFile here ignores any directory named "data", which
+# silently drops the fixtures that lib/fixtures.ts imports at build time. A
+# repo .gitignore outranks the global one, so re-include them explicitly. The
+# directory has to be re-included before the files inside it can be.
+!data/
+!data/*.json
 
 # vercel
 .vercel

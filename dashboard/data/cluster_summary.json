@@ -1,0 +1,158 @@
+{
+  "0": {
+    "n_genes": 47,
+    "example_genes": [
+      "fig|573.10412.peg.1842",
+      "fig|573.10412.peg.1847",
+      "fig|573.11208.peg.0993",
+      "fig|573.10877.peg.2610",
+      "fig|573.11455.peg.0418"
+    ],
+    "top_products": {
+      "class A carbapenemase (KPC)": 14,
+      "extended-spectrum beta-lactamase": 11,
+      "RND efflux pump subunit": 9,
+      "aminoglycoside 6'-N-acetyltransferase": 7,
+      "quinolone resistance protein QnrS": 6
+    },
+    "resistant_phenotype_breakdown": {
+      "Resistant": 38,
+      "Susceptible": 9
+    },
+    "species_breakdown": {
+      "Klebsiella pneumoniae": 41,
+      "Escherichia coli": 6
+    },
+    "n_genomes_raw": 412,
+    "n_strains_dedup": 96,
+    "n_countries": 14,
+    "year_range": [
+      2009,
+      2024
+    ]
+  },
+  "1": {
+    "n_genes": 63,
+    "example_genes": [
+      "fig|562.28311.peg.3204",
+      "fig|562.28311.peg.3209",
+      "fig|562.29014.peg.1176",
+      "fig|562.27788.peg.4402",
+      "fig|573.10990.peg.2288"
+    ],
+    "top_products": {
+      "extended-spectrum beta-lactamase CTX-M": 19,
+      "dihydropteroate synthase (sul)": 12,
+      "dihydrofolate reductase (dfrA)": 10,
+      "aminoglycoside adenylyltransferase": 8,
+      "class 1 integron integrase": 7
+    },
+    "resistant_phenotype_breakdown": {
+      "Resistant": 41,
+      "Susceptible": 22
+    },
+    "species_breakdown": {
+      "Escherichia coli": 52,
+      "Klebsiella pneumoniae": 11
+    },
+    "n_genomes_raw": 587,
+    "n_strains_dedup": 173,
+    "n_countries": 21,
+    "year_range": [
+      2006,
+      2025
+    ]
+  },
+  "2": {
+    "n_genes": 29,
+    "example_genes": [
+      "fig|1352.4471.peg.0812",
+      "fig|1352.4471.peg.0818",
+      "fig|1352.4890.peg.1533",
+      "fig|1351.3204.peg.0677",
+      "fig|1352.5011.peg.0290"
+    ],
+    "top_products": {
+      "vancomycin resistance ligase VanA": 9,
+      "D-Ala-D-Ala dipeptidase VanX": 6,
+      "rRNA adenine N-6-methyltransferase (ermB)": 5,
+      "enterococcal surface protein Esp": 5,
+      "collagen adhesin Acm": 4
+    },
+    "resistant_phenotype_breakdown": {
+      "Resistant": 19,
+      "Susceptible": 10
+    },
+    "species_breakdown": {
+      "Enterococcus faecium": 22,
+      "Enterococcus faecalis": 7
+    },
+    "n_genomes_raw": 208,
+    "n_strains_dedup": 71,
+    "n_countries": 11,
+    "year_range": [
+      2008,
+      2024
+    ]
+  },
+  "3": {
+    "n_genes": 12,
+    "example_genes": [
+      "fig|562.30155.peg.4871",
+      "fig|562.30155.peg.4874",
+      "fig|562.30161.peg.4863",
+      "fig|573.11902.peg.3355"
+    ],
+    "top_products": {
+      "phosphoethanolamine transferase MCR-1": 5,
+      "IncI2 plasmid mobilization protein": 3,
+      "insertion sequence ISApl1 transposase": 2,
+      "aminoglycoside phosphotransferase": 2
+    },
+    "resistant_phenotype_breakdown": {
+      "Resistant": 9,
+      "Susceptible": 3
+    },
+    "species_breakdown": {
+      "Escherichia coli": 8,
+      "Klebsiella pneumoniae": 4
+    },
+    "n_genomes_raw": 94,
+    "n_strains_dedup": 6,
+    "n_countries": 1,
+    "year_range": [
+      2016,
+      2016
+    ]
+  },
+  "4": {
+    "n_genes": 18,
+    "example_genes": [
+      "fig|1496.2087.peg.0641",
+      "fig|1496.2087.peg.0644",
+      "fig|1496.2233.peg.1108",
+      "fig|1496.1974.peg.0355"
+    ],
+    "top_products": {
+      "toxin A (tcdA)": 4,
+      "toxin B (tcdB)": 4,
+      "rRNA adenine N-6-methyltransferase (ermB)": 4,
+      "tetracycline ribosomal protection protein TetM": 3,
+      "multidrug efflux transporter CdeA": 3
+    },
+    "resistant_phenotype_breakdown": {
+      "Resistant": 7,
+      "Susceptible": 11
+    },
+    "species_breakdown": {
+      "Clostridioides difficile": 18
+    },
+    "n_genomes_raw": 143,
+    "n_strains_dedup": 58,
+    "n_countries": 9,
+    "year_range": [
+      2011,
+      2023
+    ]
+  }
+}
