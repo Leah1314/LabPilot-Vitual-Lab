@@ -30,3 +30,7 @@ data/embeddings.npy
 
 # OS
 .DS_Store
+
+# Office lock files
+~/\$*.pptx
+pitch/~\$*
