@@ -63,8 +63,8 @@ export default function CopilotPage() {
         Chat with your dataset
       </h1>
       <p className="mt-1 text-sm text-muted-foreground">
-        Powered by CopilotKit + Claude. Answers are grounded in the currently
-        loaded workspace data.
+        Powered by CopilotKit + Fireworks AI. Answers are grounded in the
+        currently loaded workspace data.
       </p>
 
       {sourceMeta && (
