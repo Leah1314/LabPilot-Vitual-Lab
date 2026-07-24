@@ -19,5 +19,14 @@ out/
 # Rebuild with: python pipeline/gpu_embedding_cluster.py
 data/embeddings.npy
 
+# A global core.excludesFile on some machines ignores any directory named
+# "data", which silently drops the pipeline outputs Parts A and B hand to the
+# dashboard — `git add data/` appears to succeed and commits nothing. A repo
+# .gitignore outranks the global file, so re-include them here. The directory
+# has to be re-included before the files inside it can be.
+!data/
+!data/*.json
+!data/*.csv
+
 # OS
 .DS_Store
