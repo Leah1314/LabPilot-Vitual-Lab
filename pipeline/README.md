@@ -107,10 +107,10 @@ susceptible isolates? They do not:
 
 | cluster | n_genes | max phenotype deviation | verdict |
 |---|---|---|---|
-| 0 | 12,497 | 0.07 | flat |
-| 1 | 5,804 | 0.08 | flat |
-| 2 | 13,238 | 0.11 | flat |
-| 3 | 2,927 | 0.08 | flat |
+| 0 | 12,497 | 0.075 | flat |
+| 1 | 5,804 | 0.081 | flat |
+| 2 | 13,238 | 0.112 | flat |
+| 3 | 2,927 | 0.084 | flat |
 
 Every cluster's Resistant/Susceptible split reproduces the corpus base rate to
 within ~10%. Species enrichment is also mild (0.42–1.46), and the strongest of

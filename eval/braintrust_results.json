@@ -1,12 +1,12 @@
 {
-  "generated_at": "2026-07-24T19:11:37Z",
+  "generated_at": "2026-07-24T20:21:06Z",
   "project": "amr-observation-faithfulness",
   "input_path": "data/cluster_summary.json",
   "model": null,
   "fireworks_used": false,
   "braintrust_api_key_present": false,
   "mean_faithfulness": 1.0,
-  "n_examples": 5,
+  "n_examples": 4,
   "results": [
     {
       "cluster_id": "0",
@@ -18,21 +18,20 @@
         "score": 1.0,
         "checks": {
           "observed_numbers": [
-            "47",
-            "14",
-            "11",
-            "41",
-            "38",
-            "9",
-            "96",
-            "14",
-            "2009",
-            "2024"
+            "12497",
+            "180",
+            "1",
+            "2.7",
+            "7.9",
+            "168",
+            "5604",
+            "7390",
+            "3935"
           ],
           "unsupported_numbers": [],
           "forbidden_phrases": [],
           "artefact_caveat_required": false,
-          "artefact_caveat_present": true
+          "artefact_caveat_present": false
         }
       }
     },
@@ -46,21 +45,19 @@
         "score": 1.0,
         "checks": {
           "observed_numbers": [
-            "63",
-            "19",
-            "12",
-            "52",
-            "41",
-            "22",
-            "173",
-            "21",
-            "2006",
-            "2025"
+            "5804",
+            "3.4",
+            "16.4",
+            "115",
+            "115",
+            "2349",
+            "3301",
+            "1837"
           ],
           "unsupported_numbers": [],
           "forbidden_phrases": [],
           "artefact_caveat_required": false,
-          "artefact_caveat_present": true
+          "artefact_caveat_present": false
         }
       }
     },
@@ -74,21 +71,17 @@
         "score": 1.0,
         "checks": {
           "observed_numbers": [
-            "29",
-            "9",
-            "6",
-            "22",
-            "19",
-            "10",
-            "71",
-            "11",
-            "2008",
-            "2024"
+            "13238",
+            "888",
+            "250",
+            "5348",
+            "7141",
+            "3443"
           ],
           "unsupported_numbers": [],
           "forbidden_phrases": [],
           "artefact_caveat_required": false,
-          "artefact_caveat_present": true
+          "artefact_caveat_present": false
         }
       }
     },
@@ -102,49 +95,17 @@
         "score": 1.0,
         "checks": {
           "observed_numbers": [
-            "1",
-            "12",
-            "1",
-            "5",
-            "3",
-            "8",
-            "9",
-            "3",
-            "6",
-            "2016"
-          ],
-          "unsupported_numbers": [],
-          "forbidden_phrases": [],
-          "artefact_caveat_required": true,
-          "artefact_caveat_present": true
-        }
-      }
-    },
-    {
-      "cluster_id": "4",
-      "score": 1.0,
-      "mode": "fallback",
-      "llm_latency_ms": null,
-      "details": {
-        "name": "faithfulness",
-        "score": 1.0,
-        "checks": {
-          "observed_numbers": [
-            "18",
-            "4",
-            "4",
-            "18",
-            "7",
-            "11",
-            "58",
-            "9",
-            "2011",
-            "2023"
+            "2927",
+            "97",
+            "81",
+            "1376",
+            "1808",
+            "877"
           ],
           "unsupported_numbers": [],
           "forbidden_phrases": [],
           "artefact_caveat_required": false,
-          "artefact_caveat_present": true
+          "artefact_caveat_present": false
         }
       }
     }
