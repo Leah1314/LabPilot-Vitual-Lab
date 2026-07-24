@@ -74,9 +74,10 @@ BV-BRC REST  ──►  pipeline/bvbrc_fetch.py   ──►  data/*.csv + pinned
                                                         │
                   pipeline/enrichment.py  ──►  the honesty gate
                                                         │
-                  Fireworks (GLM-5.2)     ──►  grounded observations
+                  Fireworks GLM-5.2       ──►  grounded narration
                                                         │
                   CopilotKit v2 BuiltInAgent  ──►  grounded chat
+                  (gate travels in the tool result)
 ```
 
 **Contracts before code.** We froze two JSON contracts at kickoff so the GPU, LLM and UI workstreams could build in parallel against mocks and integrate without a rewrite. A validator (`pipeline/validate_contract.py`) gates the handoff — including a check that each cluster's breakdowns sum to its gene count, which catches a dropped join.
@@ -89,32 +90,49 @@ BV-BRC REST  ──►  pipeline/bvbrc_fetch.py   ──►  data/*.csv + pinned
 
 ## Sponsor tools, and how we integrated them
 
-**🏅 Daytona — GPU compute, not a checkbox**
+Three of these are load-bearing: remove any one and the project does not work.
 
-Daytona isn't hosting our app — it's doing the one job that cannot be done without a GPU. ESM2 inference over 34,466 proteins: **93.0 s at 370 seq/s on an H100**, against **5 seq/s measured on our CPU** — a **74x** speedup, and the difference between a 90-second step and a two-hour one. We hit and solved the real operational edges:
+### 🏅 Daytona — the GPU is doing the work
 
-- GPU sandboxes are required to be **ephemeral** (`auto_delete_interval=0`); results are downloaded before teardown
-- `auto_stop_interval` defaults to 15 min and **fires mid-job** — set to 0
-- The sandbox **can't reach `dl.fbaipublicfiles.com`**, so we ship ESM2 weights to a **persistent Volume**, which survives sandbox deletion
-- Image caching took a re-run from **160 s to 1 s** sandbox start
+Daytona isn't hosting our app. It runs the one step that cannot happen without a GPU: ESM2 inference over **34,466 proteins in 93.0 s at 370 seq/s on an H100**, against **5 seq/s measured on our own CPU** — a **74x** speedup, and the difference between a 90-second step and a two-hour one. Without it, this pipeline does not fit inside a hackathon, or inside a researcher's afternoon.
 
-**🎖️ Fireworks AI — the narration layer**
+We drove the platform properly, not just `create()` and hope:
 
-`glm-5p2` (743B MoE, open weights) via `@ai-sdk/openai-compatible`, running in-process through CopilotKit's `BuiltInAgent`. It powers the live chat, under a system prompt that forbids generating, rounding or recomputing any number.
+- **Volumes for model weights.** The sandbox cannot reach `dl.fbaipublicfiles.com` — the ESM2 download dies mid-transfer with `Connection reset by peer`. We fetch the weights locally and push them to a **persistent Volume**, which survives sandbox deletion, making every later run a cache hit.
+- **Ephemerality is mandatory on GPU nodes.** `auto_delete_interval` must be `0` or creation is hard-rejected, so results are downloaded *before* teardown rather than after.
+- **`auto_stop_interval` defaults to 15 minutes and fires mid-job.** Set to `0`, or your embedding run dies silently at minute 15.
+- **Long jobs go through a session with `run_async`**, with logs streamed back, rather than a blocking `exec` that dies on an HTTP timeout.
+- **Image caching** took sandbox start from **160 s to 1 s** on re-runs.
+- Resource limits are real: **4 vCPU / 8 GiB applies to GPU sandboxes too**, despite the docs quoting up to 16/192. Asking for more is rejected, not downgraded.
 
-Two things we measured rather than assumed. First, tool-calling fidelity — the whole design depends on the agent actually calling `getPathogenDataset`, so we verified clean tool calls against the real schema on GLM-5.2, DeepSeek V4 Pro, V4 Flash and gpt-oss-120b before committing. Second, latency: GLM's default reasoning chain cost **3.02 s per turn**, so we inject `reasoning_effort: "none"` into the Fireworks request (a field the AI SDK doesn't model, so it goes in via a fetch wrapper) — **0.80 s** at the API, **~1.07 s end-to-end** through the running server.
+Every one of those is in `pipeline/run_on_daytona.py` with the symptom documented next to the fix, so the next team doesn't pay for them twice.
 
-The batch observation generator targets Fireworks too; the committed cards came from its deterministic restatement path, which is the safer default for a grounding-critical layer — the model that must never invent a number is the one you most want to be able to run without a model.
+### 🎖️ Fireworks AI — the model that must never invent a number
 
-**🎖️ CopilotKit — the interrogation surface**
+`glm-5p2` (743B MoE, 1M context, **open weights**) via `@ai-sdk/openai-compatible`, running in-process through CopilotKit's `BuiltInAgent`. It powers the live chat under a system prompt that forbids generating, rounding or recomputing any number, and that gates every resistance claim on a computed list.
 
-CopilotKit is where the honesty guarantee becomes enforceable. Built on **v2** (1.63.2) — `BuiltInAgent`, `useFrontendTool`, `useAgentContext`, not the deprecated v1 surface. The agent **must** call `getPathogenDataset` before answering; if nothing is loaded it says so rather than answering from memory, and the tool result carries the enrichment gate that bounds what it's allowed to conclude. Generative UI renders the actual returned JSON rather than letting the model retype statistics into component props. Three traps we hit and documented: `maxSteps` defaults to **1** (the agent calls your tool then stops, which looks exactly like it ignoring the tool); the AI SDK provider must be **pinned** to a v3-provider build or the model is rejected with an opaque "unsupported model version"; and pinning CopilotKit below 1.63.0 reintroduces an `/info` request storm.
+We measured rather than assumed, twice:
 
-**🎖️ Braintrust — the faithfulness eval**
+- **Tool-calling fidelity.** The entire design collapses if the agent doesn't call `getPathogenDataset`, so before committing we verified clean tool calls against the *real* tool schema on **GLM-5.2, DeepSeek V4 Pro, V4 Flash and gpt-oss-120b** — a tested fallback ladder, not a guess.
+- **Latency, and a fix for it.** GLM-5.2's default reasoning chain cost **3.02 s per turn**, which is fatal for a live demo. Fireworks accepts a `reasoning_effort` field that the AI SDK doesn't model, so we inject it into the request through a provider `fetch` wrapper: **3.02 s → 0.80 s at the API, ~1.07 s end-to-end** through the running server, with tool calls still correct. Set `FIREWORKS_REASONING_EFFORT` to put thinking back.
 
-The eval is what makes the grounding claim checkable rather than rhetorical. Our faithfulness scorer extracts every numeral from generated prose and asserts it appears in the source statistics — the exact failure mode that makes AI science dashboards dangerous — alongside a no-overclaim rubric that fails any observation asserting causation, mechanism or clinical guidance. Scores are emitted per observation to `eval/braintrust_results.json` with the input, output and verdict, in the shape a Braintrust `Eval()` consumes.
+Open weights mattered to us: the layer that narrates scientific data should be inspectable and self-hostable, not a black box we rent.
 
-We ran it against the real dataset; the current cards pass faithfulness because they are generated by restatement rather than free composition. The scorer runs locally in this submission (`braintrust_api_key_present: false` in the artifact) — the logic is the portable part, and pointing it at a Braintrust project is a config change, not a rewrite.
+### 🎖️ CopilotKit — where the honesty guarantee becomes enforceable
+
+CopilotKit is what turns "we promise the model won't lie" into something structural. Built on the **v2** API (1.63.2) — `BuiltInAgent`, `useFrontendTool`, `useAgentContext` — not the deprecated v1 surface most tutorials still show.
+
+The agent **must** call `getPathogenDataset` before answering; if nothing is loaded it says so rather than answering from memory. Crucially, the tool result carries `clustersWithPhenotypeSignal` — a computed gate that bounds what the model is permitted to conclude. **The constraint travels with the data, not just the prompt**, which is why swapping the dataset flips the agent's answer without touching a line of configuration. Generative UI renders the JSON the tool actually returned, rather than letting the model retype statistics into component props — when the numbers are the entire product, that distinction is the ballgame.
+
+Three traps we hit, and documented:
+
+- **`maxSteps` defaults to `1`** — the agent calls your tool, then stops without using the result. It looks exactly like the model ignoring the tool, and you will debug the wrong thing.
+- **The AI SDK provider must be pinned.** CopilotKit 1.63.x bundles `ai` v6 (provider 3.x); `@latest` resolves to a 4.x build and the model is rejected with an opaque "unsupported model version".
+- **Don't pin CopilotKit below 1.63.0** — it reintroduces an `/info` request storm firing 70–80 requests per page load.
+
+### Braintrust — the faithfulness eval
+
+Our scorer extracts every numeral from generated prose and asserts it appears in the source statistics — the precise failure mode that makes AI science dashboards dangerous — plus a no-overclaim rubric that fails any observation asserting causation, mechanism or clinical guidance. Per-observation input, output and verdict land in `eval/braintrust_results.json` in the shape a Braintrust `Eval()` consumes. It runs locally in this submission.
 
 ---
 
