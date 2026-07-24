@@ -23,10 +23,7 @@ import {
   ServerCog,
 } from "lucide-react";
 import {
-  REQUIRED_FILES,
-  MIN_REQUIRED,
   canAnalyze,
-  readyCount,
   useWorkspace,
   type UploadedFile,
 } from "@/lib/workspace-store";
@@ -166,7 +163,6 @@ function UploadPanel({ onAnalyze }: { onAnalyze: (data: DashboardData) => void }
   const [parsed, setParsed] = useState<ParsedUpload | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
 
-  const ready = readyCount(files);
   // A cluster summary is all that is actually needed to analyse and chat.
   const enabled = !!parsed?.data;
 
@@ -177,7 +173,7 @@ function UploadPanel({ onAnalyze }: { onAnalyze: (data: DashboardData) => void }
     const incoming: UploadedFile[] = arr.map((f) => ({
       name: f.name,
       size: f.size,
-      valid: (REQUIRED_FILES as string[]).includes(f.name),
+      valid: f.name.toLowerCase().endsWith(".json"),
     }));
     addFiles(incoming);
     try {
@@ -231,13 +227,20 @@ function UploadPanel({ onAnalyze }: { onAnalyze: (data: DashboardData) => void }
         <div className="mt-5 text-lg font-semibold text-foreground">
           {uploading ? "Uploading…" : "Drag & drop files here"}
         </div>
-        <div className="mt-1 text-sm text-muted-foreground">or click to browse — CSV and JSON supported</div>
+        <div className="mt-1 text-sm text-muted-foreground">
+          or click to browse — one cluster summary JSON is enough
+        </div>
         <div className="mt-6 flex flex-wrap items-center justify-center gap-2 text-[11px] text-muted-foreground">
-          {REQUIRED_FILES.map((n) => (
-            <span key={n} className="rounded-full border border-border bg-background/70 px-2 py-1 font-mono">
-              {n}
-            </span>
-          ))}
+          <span className="rounded-full border border-teal/40 bg-teal/10 px-2 py-1 font-mono text-teal">
+            cluster_summary.json — required
+          </span>
+          <span className="rounded-full border border-border bg-background/70 px-2 py-1 font-mono">
+            observations.json — optional
+          </span>
+        </div>
+        <div className="mt-3 text-[11px] text-muted-foreground">
+          Files are matched on their contents, so a renamed export still works.
+          Observations are generated from the cluster data if you do not supply them.
         </div>
       </div>
 
@@ -285,12 +288,14 @@ function UploadPanel({ onAnalyze }: { onAnalyze: (data: DashboardData) => void }
           <span className={`font-semibold ${enabled ? "text-success" : "text-muted-foreground"}`}>
             {enabled
               ? `${Object.keys(parsed!.data!.clusterSummary).length} clusters parsed`
-              : `${ready}/${MIN_REQUIRED.length} Files Ready`}
+              : files.length > 0
+                ? "No cluster summary found"
+                : "No files yet"}
           </span>
           <span className="text-muted-foreground ml-2">
             {enabled
               ? "Ready to analyze"
-              : "Upload a cluster_summary.json to enable analysis"}
+              : "Add a cluster summary JSON (Contract 1) to enable analysis"}
           </span>
         </div>
         <button
