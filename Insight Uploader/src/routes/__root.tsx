@@ -79,20 +79,24 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Pathogen AI — Upload-first Research Workspace" },
+      { title: "Choose data source — Pathogen AI" },
       {
         name: "description",
         content:
-          "Analyze antimicrobial resistance and virulence patterns using GPU-powered protein embeddings, AI insight generation and grounded validation.",
+          "Upload files, connect an external API, or use the built-in sample dataset to start pathogen AMR analysis.",
       },
-      { property: "og:title", content: "Pathogen AI — Research Workspace" },
+      { property: "og:title", content: "Choose data source — Pathogen AI" },
       {
         property: "og:description",
         content:
-          "Upload pathogen datasets and run GPU-powered AMR + virulence analysis with grounded AI insights.",
+          "Upload files, connect an external API, or use the built-in sample dataset to start pathogen AMR analysis.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "Choose data source — Pathogen AI" },
+      { name: "twitter:description", content: "Upload files, connect an external API, or use the built-in sample dataset to start pathogen AMR analysis." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/6c034ceb-7131-4a76-aa44-7b8d9861ad63/id-preview-74caaa96--000f4cfd-f731-47ac-a417-78929de38319.lovable.app-1784921284508.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/6c034ceb-7131-4a76-aa44-7b8d9861ad63/id-preview-74caaa96--000f4cfd-f731-47ac-a417-78929de38319.lovable.app-1784921284508.png" },
     ],
     links: [
       {

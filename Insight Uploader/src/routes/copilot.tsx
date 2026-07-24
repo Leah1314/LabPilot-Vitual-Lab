@@ -1,6 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
-import { Bot, Send, Sparkles, User } from "lucide-react";
+import { useMemo, useState } from "react";
+import { Bot, Send, Sparkles, User, Link2, UploadCloud, Database } from "lucide-react";
+import { useWorkspace } from "@/lib/workspace-store";
+import { deriveChartData } from "@/lib/data-sources";
 
 export const Route = createFileRoute("/copilot")({
   head: () => ({
@@ -16,60 +18,91 @@ export const Route = createFileRoute("/copilot")({
 
 const quickActions = [
   { q: "Which cluster has highest resistance?", chart: "cluster-resistance" },
-  { q: "Compare Klebsiella vs E.coli", chart: "cluster-resistance" },
-  { q: "Explain selected cluster", chart: "cluster-detail" },
-  { q: "Show beta-lactamase genes", chart: "gene-classes" },
+  { q: "Compare top two species", chart: "cluster-resistance" },
+  { q: "Explain top-scoring insight", chart: "insights" },
+  { q: "Show top gene classes", chart: "gene-classes" },
 ];
 
 type Msg = { role: "user" | "assistant"; content: string; chart?: string };
 
-function mockAnswer(q: string): Msg {
-  // TODO: replace with real call to Fireworks/OpenAI + Braintrust grounding.
-  if (/highest resistance/i.test(q))
-    return {
-      role: "assistant",
-      chart: "cluster-resistance",
-      content:
-        "Cluster C-05 (Acinetobacter baumannii) shows the highest resistance at 92%, driven by carbapenemase and colistin-resistance markers. Highlighted on the Cluster resistance chart.",
-    };
-  if (/klebsiella.*coli|coli.*klebsiella/i.test(q))
-    return {
-      role: "assistant",
-      chart: "cluster-resistance",
-      content:
-        "Klebsiella (C-01) shows 87% resistance vs E. coli (C-02) at 64%. Klebsiella isolates carry KPC-3 + OXA-48 co-occurrence, giving them broader β-lactam resistance.",
-    };
-  if (/beta-lactamase/i.test(q))
-    return {
-      role: "assistant",
-      chart: "gene-classes",
-      content:
-        "412 isolates carry β-lactamase genes — the largest AMR class in your dataset. Dominant subtypes: blaKPC, blaCTX-M, blaOXA.",
-    };
-  return {
-    role: "assistant",
-    chart: "cluster-detail",
-    content: `Analyzing "${q}"… The selected cluster contains 412 isolates with a resistance score of 0.87 and virulence of 0.62. Corresponding chart highlighted.`,
-  };
-}
-
 function Copilot() {
+  const { dashboardData, dataSource, connectionName, lastSyncedAt } = useWorkspace();
+  const derived = useMemo(() => (dashboardData ? deriveChartData(dashboardData) : null), [dashboardData]);
   const [msgs, setMsgs] = useState<Msg[]>([
     {
       role: "assistant",
-      content: "Ask me about clusters, resistance patterns, or gene classes. Try a quick action below.",
+      content:
+        "Ask me about clusters, resistance patterns, or gene classes. Responses are grounded in the currently loaded dataset.",
     },
   ]);
   const [input, setInput] = useState("");
   const [highlight, setHighlight] = useState<string | null>(null);
 
+  // TODO(real backend): swap this local grounding for a Fireworks/Braintrust call
+  // that receives the current cluster_summary + observations as context.
+  const answer = (q: string): Msg => {
+    if (!derived) {
+      return { role: "assistant", content: "No dataset loaded yet — choose a data source on the Upload page." };
+    }
+    if (/highest resistance/i.test(q)) {
+      const top = [...derived.clusters].sort((a, b) => b.resistance - a.resistance)[0];
+      return {
+        role: "assistant",
+        chart: "cluster-resistance",
+        content: `${top.id} (${top.label}) has the highest resistance at ${(top.resistance * 100).toFixed(0)}% across ${top.size} isolates.`,
+      };
+    }
+    if (/compare|top two|two species/i.test(q)) {
+      const [a, b] = [...derived.clusters].sort((x, y) => y.size - x.size);
+      if (a && b) {
+        return {
+          role: "assistant",
+          chart: "cluster-resistance",
+          content: `${a.label} shows ${(a.resistance * 100).toFixed(0)}% resistance vs ${b.label} at ${(b.resistance * 100).toFixed(0)}%. Population sizes: ${a.size} vs ${b.size}.`,
+        };
+      }
+    }
+    if (/insight|top-scoring|explain top/i.test(q)) {
+      const top = [...derived.insights].sort((a, b) => b.evalScore - a.evalScore)[0];
+      if (top) {
+        return {
+          role: "assistant",
+          chart: "insights",
+          content: `${top.title} — ${top.summary} (Braintrust score ${top.evalScore.toFixed(2)}).`,
+        };
+      }
+    }
+    if (/gene|beta-lactamase|class/i.test(q)) {
+      const top = derived.geneClasses.slice(0, 3).map((g) => `${g.name} (${g.count})`).join(", ");
+      return {
+        role: "assistant",
+        chart: "gene-classes",
+        content: `Top gene classes in the current dataset: ${top}.`,
+      };
+    }
+    return {
+      role: "assistant",
+      chart: "cluster-resistance",
+      content: `The current dataset has ${derived.clusters.length} clusters and ${derived.totalGenomes} genomes. Try one of the quick actions for a grounded answer.`,
+    };
+  };
+
   const send = (q: string) => {
     if (!q.trim()) return;
-    const answer = mockAnswer(q);
-    setMsgs((m) => [...m, { role: "user", content: q }, answer]);
-    setHighlight(answer.chart ?? null);
+    const a = answer(q);
+    setMsgs((m) => [...m, { role: "user", content: q }, a]);
+    setHighlight(a.chart ?? null);
     setInput("");
   };
+
+  const sourceMeta =
+    dataSource === "api"
+      ? { icon: Link2, label: "Live API" }
+      : dataSource === "upload"
+        ? { icon: UploadCloud, label: "Uploaded Files" }
+        : dataSource === "sample"
+          ? { icon: Database, label: "Sample Dataset" }
+          : null;
 
   return (
     <div className="p-6 lg:p-10 max-w-4xl mx-auto">
@@ -78,10 +111,20 @@ function Copilot() {
         Chat with your dataset
       </h1>
       <p className="mt-1 text-sm text-muted-foreground">
-        Grounded responses highlight the corresponding chart on the dashboard.
+        Grounded responses reflect the currently loaded data source.
       </p>
 
-      {/* Quick actions */}
+      {sourceMeta && (
+        <div className="mt-3 inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1 text-xs">
+          <sourceMeta.icon className="h-3.5 w-3.5 text-teal" />
+          <span className="text-foreground font-medium">{sourceMeta.label}</span>
+          {connectionName && <span className="text-muted-foreground">· {connectionName}</span>}
+          {lastSyncedAt && (
+            <span className="text-muted-foreground">· synced {new Date(lastSyncedAt).toLocaleTimeString()}</span>
+          )}
+        </div>
+      )}
+
       <div className="mt-6 flex flex-wrap gap-2">
         {quickActions.map((a) => (
           <button
@@ -95,14 +138,12 @@ function Copilot() {
         ))}
       </div>
 
-      {/* Highlighted chart pill (illustrative — dashboard would react to this signal) */}
       {highlight && (
         <div className="mt-4 rounded-lg border border-teal/40 bg-teal/5 px-3 py-2 text-xs text-navy animate-fade-in">
           Chart highlighted: <span className="font-mono">{highlight}</span> — open the Dashboard to view.
         </div>
       )}
 
-      {/* Messages */}
       <div className="mt-4 card-elevated rounded-2xl p-4 min-h-[380px] space-y-4">
         {msgs.map((m, i) => (
           <div key={i} className={`flex gap-3 ${m.role === "user" ? "justify-end" : ""}`}>
@@ -113,9 +154,7 @@ function Copilot() {
             )}
             <div
               className={`max-w-[80%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${
-                m.role === "user"
-                  ? "bg-navy text-navy-foreground"
-                  : "bg-muted text-foreground"
+                m.role === "user" ? "bg-navy text-navy-foreground" : "bg-muted text-foreground"
               }`}
             >
               {m.content}
@@ -129,7 +168,6 @@ function Copilot() {
         ))}
       </div>
 
-      {/* Composer */}
       <form
         onSubmit={(e) => {
           e.preventDefault();

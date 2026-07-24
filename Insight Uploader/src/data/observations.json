@@ -1,0 +1,41 @@
+{
+  "_meta": {
+    "MOCK": true,
+    "note": "Template for Part B, rewritten against the REAL clusters. Every cluster in this run has a flat phenotype enrichment (0.95-1.08), so no observation may claim a resistance association. Read data/cluster_enrichment.json before generating: only cluster ids listed in clusters_with_phenotype_signal may be described as enriched. Match this hedging register."
+  },
+  "generated_at": "2026-07-24T19:10:00Z",
+  "clusters": [
+    {
+      "cluster_id": "0",
+      "headline": "Core metabolic and regulatory proteins, no phenotype signal",
+      "observation": "This cluster holds 12,497 proteins led by translation elongation factor Tu (180), UTP--glucose-1-phosphate uridylyltransferase (168) and ClpP protease (160). Its phenotype split of 7,390 Resistant to 3,935 Susceptible matches the corpus base rate, so this grouping does not distinguish resistant from susceptible isolates. Species composition also tracks the cohort overall.",
+      "confidence": "high",
+      "eval_score": null,
+      "supporting_gene_count": 12497
+    },
+    {
+      "cluster_id": "1",
+      "headline": "Cell-wall and transport proteins spanning all six organisms",
+      "observation": "5,804 proteins group around D-alanyl-D-alanine carboxypeptidase (115), the SitA manganese transporter (115) and RND efflux components (81). Although efflux proteins appear here, the cluster's 3,301 Resistant to 1,837 Susceptible split is indistinguishable from background, so presence in this cluster carries no resistance information.",
+      "confidence": "high",
+      "eval_score": null,
+      "supporting_gene_count": 5804
+    },
+    {
+      "cluster_id": "2",
+      "headline": "Largest cluster, dominated by unannotated proteins",
+      "observation": "This is the largest grouping at 13,238 proteins, 888 of which are annotated only as hypothetical protein. It is the one cluster mildly enriched for Helicobacter pylori (1.46x corpus share), which is expected because H. pylori contributes virulence annotations only. Its phenotype breakdown of 7,141 Resistant to 3,443 Susceptible again matches background.",
+      "confidence": "medium",
+      "eval_score": null,
+      "supporting_gene_count": 13238
+    },
+    {
+      "cluster_id": "3",
+      "headline": "MFS-type transporters form the smallest, tightest cluster",
+      "observation": "The smallest cluster at 2,927 proteins is the most functionally coherent, led by uncharacterised MFS-type transporters (97) and the MdfA and EmrD multidrug efflux pumps (80 each). These are annotated efflux proteins from CARD, but the cluster's 1,808 Resistant to 877 Susceptible split does not depart from the corpus rate, so no association with measured resistance can be stated.",
+      "confidence": "medium",
+      "eval_score": null,
+      "supporting_gene_count": 2927
+    }
+  ]
+}

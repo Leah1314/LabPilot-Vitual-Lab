@@ -1,6 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { ShieldCheck, AlertTriangle, Sparkles } from "lucide-react";
-import { insights } from "@/lib/mock-data";
+import { useMemo } from "react";
+import { insights as fallbackInsights } from "@/lib/mock-data";
+import { useWorkspace } from "@/lib/workspace-store";
+import { deriveChartData } from "@/lib/data-sources";
 
 export const Route = createFileRoute("/insights")({
   head: () => ({
@@ -15,6 +18,10 @@ export const Route = createFileRoute("/insights")({
 });
 
 function Insights() {
+  const { dashboardData } = useWorkspace();
+  const derived = useMemo(() => (dashboardData ? deriveChartData(dashboardData) : null), [dashboardData]);
+  const list = derived?.insights ?? fallbackInsights.map((i) => ({ ...i, evalScore: i.grounded ? 0.92 : 0.72 }));
+
   return (
     <div className="p-6 lg:p-10 max-w-5xl mx-auto">
       <div className="text-xs uppercase tracking-wider text-teal font-semibold">AI Insights</div>
@@ -26,8 +33,7 @@ function Insights() {
       </p>
 
       <div className="mt-6 space-y-4">
-        {/* TODO: replace with real insights from Fireworks + Braintrust pipeline */}
-        {insights.map((i) => (
+        {list.map((i) => (
           <div key={i.id} className="card-elevated rounded-xl p-5">
             <div className="flex items-start gap-3">
               <div
@@ -45,7 +51,7 @@ function Insights() {
                       i.grounded ? "bg-success/10 text-success" : "bg-accent text-accent-foreground"
                     }`}
                   >
-                    {i.tag}
+                    {i.tag} · {i.evalScore.toFixed(2)}
                   </span>
                 </div>
                 <div className="text-sm text-muted-foreground mt-1">{i.summary}</div>
