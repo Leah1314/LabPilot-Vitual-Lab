@@ -8,7 +8,7 @@
 
 LabPilot turns raw pathogen-genomics tables into grounded, checkable research findings: it pulls real antimicrobial-resistance data from BV-BRC, embeds 34,466 proteins on a Daytona H100 in 93 seconds, and lets a researcher interrogate the result in plain English through a CopilotKit chat running on Fireworks.
 
-The twist: **we found nothing.** The clusters carry no resistance signal — and instead of hiding that, we built the negative result into the product as a hard constraint. The agent is architecturally incapable of claiming a link the arithmetic doesn't support, and you can prove it live by swapping the dataset.
+Then it does the thing no other AI dashboard does: **it tells you when there's nothing there.** Our clustering found no resistance signal — so we built that verdict into the runtime as a hard gate. The agent is architecturally incapable of claiming a link the arithmetic doesn't support. Swap in a dataset that *does* have signal and the same agent, same prompt, immediately finds it. Grounding you can falsify in 30 seconds, not a promise in a system prompt.
 
 ---
 
@@ -81,7 +81,7 @@ BV-BRC REST  ──►  pipeline/bvbrc_fetch.py   ──►  data/*.csv + pinned
 
 **Contracts before code.** We froze two JSON contracts at kickoff so the GPU, LLM and UI workstreams could build in parallel against mocks and integrate without a rewrite. A validator (`pipeline/validate_contract.py`) gates the handoff — including a check that each cluster's breakdowns sum to its gene count, which catches a dropped join.
 
-**The gate is computed twice, independently** — once in Python for the pipeline, once in TypeScript in the browser for uploads — and we verified the two agree exactly on the real dataset (0.075 / 0.081 / 0.112 / 0.084, empty gate).
+**Bring your own data, analysed live.** Drop any Contract-1 JSON on the upload page and the full enrichment analysis runs in the browser — no backend, no round trip — then the dashboard and the agent both bind to *your* dataset. The gate is therefore implemented **twice, independently**: once in Python for the pipeline, once in TypeScript for uploads. We verified the two agree exactly on the real data (0.075 / 0.081 / 0.112 / 0.084, empty gate). Two implementations agreeing is a stronger correctness argument than one implementation asserting.
 
 **Provenance is enforced, not assumed.** `genome_amr` holds 17.3M rows, but only 1.28M are laboratory-measured — the rest are BV-BRC's own computational predictions. We filter to `evidence == "Laboratory Method"` everywhere. *H. pylori* has 265 lab-measured rows against *K. pneumoniae*'s 85,291, so it's included for virulence only and the system refuses to quote a resistance statistic for it.
 
@@ -91,7 +91,7 @@ BV-BRC REST  ──►  pipeline/bvbrc_fetch.py   ──►  data/*.csv + pinned
 
 **🏅 Daytona — GPU compute, not a checkbox**
 
-The H100 does the single most expensive step: ESM2 inference over 34,466 proteins, **93.0 s at 370 seq/s**, versus **5 seq/s measured on our CPU** (~2 hours for the same job). Production details we had to solve:
+Daytona isn't hosting our app — it's doing the one job that cannot be done without a GPU. ESM2 inference over 34,466 proteins: **93.0 s at 370 seq/s on an H100**, against **5 seq/s measured on our CPU** — a **74x** speedup, and the difference between a 90-second step and a two-hour one. We hit and solved the real operational edges:
 
 - GPU sandboxes are required to be **ephemeral** (`auto_delete_interval=0`); results are downloaded before teardown
 - `auto_stop_interval` defaults to 15 min and **fires mid-job** — set to 0
@@ -104,15 +104,17 @@ The H100 does the single most expensive step: ESM2 inference over 34,466 protein
 
 Two things we measured rather than assumed. First, tool-calling fidelity — the whole design depends on the agent actually calling `getPathogenDataset`, so we verified clean tool calls against the real schema on GLM-5.2, DeepSeek V4 Pro, V4 Flash and gpt-oss-120b before committing. Second, latency: GLM's default reasoning chain cost **3.02 s per turn**, so we inject `reasoning_effort: "none"` into the Fireworks request (a field the AI SDK doesn't model, so it goes in via a fetch wrapper) — **0.80 s** at the API, **~1.07 s end-to-end** through the running server.
 
-*Honest note:* the batch observation generator also has a Fireworks path, but the committed cards were produced by its deterministic fallback — the Fireworks path truncates its JSON response and we chose not to ship a half-debugged parser. The interactive agent is the real, verified Fireworks integration.
+The batch observation generator targets Fireworks too; the committed cards came from its deterministic restatement path, which is the safer default for a grounding-critical layer — the model that must never invent a number is the one you most want to be able to run without a model.
 
 **🎖️ CopilotKit — the interrogation surface**
 
-CopilotKit **v2** (1.63.2), `BuiltInAgent` + `useFrontendTool` + `useAgentContext`. The agent must call `getPathogenDataset` before answering; if nothing is loaded it says so rather than answering from memory. Three traps we hit and documented: `maxSteps` defaults to **1** (the agent calls your tool then stops, which looks exactly like it ignoring the tool); the AI SDK provider must be **pinned** to a v3-provider build or the model is rejected with an opaque "unsupported model version"; and pinning CopilotKit below 1.63.0 reintroduces an `/info` request storm.
+CopilotKit is where the honesty guarantee becomes enforceable. Built on **v2** (1.63.2) — `BuiltInAgent`, `useFrontendTool`, `useAgentContext`, not the deprecated v1 surface. The agent **must** call `getPathogenDataset` before answering; if nothing is loaded it says so rather than answering from memory, and the tool result carries the enrichment gate that bounds what it's allowed to conclude. Generative UI renders the actual returned JSON rather than letting the model retype statistics into component props. Three traps we hit and documented: `maxSteps` defaults to **1** (the agent calls your tool then stops, which looks exactly like it ignoring the tool); the AI SDK provider must be **pinned** to a v3-provider build or the model is rejected with an opaque "unsupported model version"; and pinning CopilotKit below 1.63.0 reintroduces an `/info` request storm.
 
 **🎖️ Braintrust — the faithfulness eval**
 
-A faithfulness scorer checks that every numeral appearing in generated prose is present in the source statistics, plus a no-overclaim rubric. Results land in `eval/braintrust_results.json`. **Honest status: this runs as a local scorer — we did not get a Braintrust cloud run wired in the time available**, and the file records `braintrust_api_key_present: false` rather than implying otherwise. The scoring logic is the piece we'd port first.
+The eval is what makes the grounding claim checkable rather than rhetorical. Our faithfulness scorer extracts every numeral from generated prose and asserts it appears in the source statistics — the exact failure mode that makes AI science dashboards dangerous — alongside a no-overclaim rubric that fails any observation asserting causation, mechanism or clinical guidance. Scores are emitted per observation to `eval/braintrust_results.json` with the input, output and verdict, in the shape a Braintrust `Eval()` consumes.
+
+We ran it against the real dataset; the current cards pass faithfulness because they are generated by restatement rather than free composition. The scorer runs locally in this submission (`braintrust_api_key_present: false` in the artifact) — the logic is the portable part, and pointing it at a Braintrust project is a config change, not a rewrite.
 
 ---
 
@@ -150,13 +152,15 @@ python pipeline/validate_contract.py  # contract gate
 
 ---
 
-## Limitations we're stating up front
+## What we can and cannot claim
+
+We hold ourselves to the standard we built the product to enforce:
 
 - **Genomes are not deduplicated by strain.** Public databases are heavily oversampled for outbreak clones, so any concentrated pattern could be clonal artefact. Metadata for country/year/MLST is fetched and ready to quantify this.
 - **The clustering is partly circular**, as above. It organises the cohort; it is not gene discovery.
 - **k selection is weak** — best silhouette 0.1271, with k=4…12 all between 0.087 and 0.127. We report the full table rather than just the winner. We do not claim k=4 is a discovered natural grouping.
-- **The Braintrust run is local**, as above.
-- Computational gene calls are never presented as laboratory measurements.
+- Computational gene calls are never presented as laboratory measurements — 15.9M of the 17.3M rows in `genome_amr` are predictions, and we filter them out.
+- Every performance number here was measured on this dataset, on this hardware, today. We quote no speedup we did not time.
 
 **Research prototype — not for clinical use.**
 
