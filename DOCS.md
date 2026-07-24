@@ -12,6 +12,12 @@ right runbook without reading everything.
 | Doc | Audience | Contents |
 |---|---|---|
 | [README.md](./README.md) | Everyone | What the project is, measured results, quickstart, contracts, honesty |
+| [ABOUT.md](./ABOUT.md) | Judges / GitHub visitors | Short product + demo blurb |
+| [DOCS.md](./DOCS.md) | Everyone | This index |
+| [CONTRIBUTING.md](./CONTRIBUTING.md) | Builders | Honesty rules when editing |
+| [SECURITY.md](./SECURITY.md) | Everyone | Disclosure + not-for-clinical-use |
+| [CITATION.cff](./CITATION.cff) | Academia | Citation metadata |
+| [REPO_ABOUT.md](./REPO_ABOUT.md) | Repo owner | Commands to set GitHub About / topics |
 | [prompt.md](./prompt.md) | Product / judges | Hackathon brief, scientific bar, eval expectations |
 | [hackathon_build_planner.md](./hackathon_build_planner.md) | Builders | 3-workstream plan, contracts, kickoff checklist |
 
