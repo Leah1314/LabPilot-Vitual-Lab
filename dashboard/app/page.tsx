@@ -1,11 +1,11 @@
-import { loadDashboardData } from "@/lib/data";
-import { DashboardShell } from "@/components/DashboardShell";
+import { loadConfiguredPipeline, loadSampleDashboardData } from "@/lib/data";
+import { Workspace } from "@/components/Workspace";
 
-// Statistics come from the pipeline at request time when PIPELINE_URL is set,
-// so the page must not be statically prerendered at build.
+// PIPELINE_URL is read per request when set, so this must not be prerendered.
 export const dynamic = "force-dynamic";
 
 export default async function Page() {
-  const data = await loadDashboardData();
-  return <DashboardShell data={data} />;
+  const sample = loadSampleDashboardData();
+  const preloaded = await loadConfiguredPipeline();
+  return <Workspace sample={sample} preloaded={preloaded} />;
 }

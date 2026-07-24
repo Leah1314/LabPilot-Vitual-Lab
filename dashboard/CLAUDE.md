@@ -29,19 +29,38 @@ before claiming the dashboard works.
 
 ```
 app/layout.tsx                       fonts + Providers + metadata
-app/page.tsx                         server component; force-dynamic
+app/page.tsx                         server: sample + optional PIPELINE_URL preload
+app/api/datasource/route.ts          server proxy for user-configured endpoints
 app/api/copilotkit/route.ts          single-route transport
 app/api/copilotkit/[...path]/route.ts  multi-route transport
-components/DashboardShell.tsx        only stateful component
+components/Workspace.tsx             active dataset; renders picker or dashboard
+components/SourcePicker.tsx          sample / upload / api chooser
+components/source/*.tsx              the three panels + ValidationTrail
+components/DashboardShell.tsx        dashboard-level state
 components/DenominatorRail.tsx       signature: width == denominator
 components/LineageRail.tsx           raw rows vs distinct strains
 lib/contracts.ts                     Contract 1/2 types, joinClusters
-lib/data.ts                          loader: live PIPELINE_URL or fixtures
+lib/datasource.ts                    source kinds, ApiConfig, failure codes
+lib/validate.ts                      shape + cross-validation (shared)
+lib/build-data.ts                    assembles DashboardData from any source
+lib/data.ts                          sample loader + pipeline preload
 lib/agent-tools.ts                   defineTool server tools
 lib/copilot-runtime.ts               runtime, BuiltInAgent, system prompt
 lib/fixtures.ts                      single place JSON is cast to contracts
 data/*.json                          committed fixtures
 ```
+
+## Data sources
+
+Three sources — sample, upload, API — all resolve through
+`buildDashboardData()` to one `DashboardData`. Add a source by writing a loader
+that produces that shape; do not special-case a source downstream of the
+picker. The header chip is the only place `kind` should change rendering.
+
+`lib/validate.ts` is shared by the upload parser and the API proxy so both fail
+identically. It returns `Result<T>` (`{ok:true, value}` | `SourceFailure`)
+rather than a bare union, because `ClusterSummaryFile` has an index signature
+and `"ok" in x` cannot discriminate against it.
 
 ## Patterns
 
@@ -94,6 +113,18 @@ data/*.json                          committed fixtures
    this app.
 10. **Fonts are fetched at build time** by `next/font/google`. A build on a
     network without access to Google Fonts fails; a built app runs offline.
+11. **User-configured endpoints are fetched server-side**, via
+    `app/api/datasource`. Never move this to the browser: an arbitrary pipeline
+    will not send `Access-Control-Allow-Origin`, and `daytona.md §4.4` says CORS
+    through the Daytona preview proxy is undocumented. The route refuses cloud
+    metadata hosts; it deliberately allows localhost and private ranges because
+    the pipeline usually runs there.
+12. **Remembered connections use `useSyncExternalStore`, not a mount effect.**
+    The snapshot is memoised in `lib/datasource.ts` — returning a freshly parsed
+    array each call would loop forever, and the server snapshot must stay a
+    stable empty reference or hydration mismatches.
+13. **Never persist uploaded file contents or API keys.** Keys live in component
+    state for the tab; only endpoints and auth method go to `localStorage`.
 
 ## Honesty rules (non-negotiable, from ../prompt.md §8)
 

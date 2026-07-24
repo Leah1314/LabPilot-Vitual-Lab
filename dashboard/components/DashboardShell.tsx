@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import type { DashboardData } from "@/lib/contracts";
+import { useWorkspace } from "./Workspace";
 import { SiteHeader } from "./SiteHeader";
 import { CohortPanel } from "./CohortPanel";
 import { ClusterCard } from "./ClusterCard";
@@ -10,6 +11,7 @@ import { CooccurrenceTable } from "./CooccurrenceTable";
 import { ConsultPanel } from "./ConsultPanel";
 
 export function DashboardShell({ data }: { data: DashboardData }) {
+  const { clear } = useWorkspace();
   const [speciesFilter, setSpeciesFilter] = useState<string | null>(null);
   const [highlighted, setHighlighted] = useState<string | null>(null);
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
@@ -49,16 +51,13 @@ export function DashboardShell({ data }: { data: DashboardData }) {
 
   return (
     <div className="min-h-screen">
-      <SiteHeader
-        cohort={data.cohort}
-        source={data.source}
-        generatedAt={data.generated_at}
-      />
+      <SiteHeader data={data} onChangeSource={clear} />
 
       <div className="mx-auto max-w-[110rem] px-6 py-6">
         <div className="grid gap-6 xl:grid-cols-[16rem_minmax(0,1fr)_24rem]">
           <CohortPanel
             cohort={data.cohort}
+            speciesTally={data.speciesTally}
             clusters={data.clusters}
             speciesFilter={speciesFilter}
             onSpeciesFilter={setSpeciesFilter}
@@ -118,7 +117,20 @@ export function DashboardShell({ data }: { data: DashboardData }) {
               )}
             </section>
 
-            <CooccurrenceTable data={data.cooccurrence} />
+            {data.cooccurrence ? (
+              <CooccurrenceTable data={data.cooccurrence} />
+            ) : (
+              <section className="border border-hairline bg-card p-5">
+                <p className="eyebrow">Pairwise co-occurrence</p>
+                <p className="mt-2 max-w-[62ch] text-sm leading-relaxed text-muted">
+                  This source did not supply co-occurrence pairs. Serve a{" "}
+                  <span className="tabular">/cooccurrence</span> endpoint, or
+                  include <span className="tabular">cooccurrence.json</span> in
+                  the upload, to see ranked gene pairs with lift and strain
+                  support here.
+                </p>
+              </section>
+            )}
           </main>
 
           <div className="min-h-[32rem] xl:sticky xl:top-20 xl:h-[calc(100vh-6.5rem)]">

@@ -6,89 +6,72 @@ import {
   MOCK_COOCCURRENCE,
   MOCK_OBSERVATIONS,
 } from "./fixtures";
-import {
-  joinClusters,
-  type Cohort,
-  type ClusterSummaryFile,
-  type CooccurrenceFile,
-  type DashboardData,
-  type ObservationsFile,
-  type PipelineStats,
-} from "./contracts";
-
-const EMPTY_STATS: PipelineStats = {
-  sequences_embedded: null,
-  embedding_seconds: null,
-  embedding_hardware: null,
-  llm_median_latency_ms: null,
-  llm_model: null,
-  eval_mean_faithfulness: null,
-  eval_n_examples: null,
-};
+import { buildDashboardData } from "./build-data";
+import type { DashboardData } from "./contracts";
 
 /**
- * Fetches one endpoint from the Daytona-hosted pipeline. Returns null on any
- * failure so a partially-available backend degrades to mock data per section
- * rather than blanking the dashboard mid-demo.
+ * The built-in sample dataset, assembled on the server and handed to the
+ * client as the "Try sample data" option. This is the only source that ships
+ * with the app; upload and API sources are assembled in the browser.
+ *
+ * `syncedAt` is fixed rather than `Date.now()` so the server-rendered markup
+ * matches what React hydrates on the client. The workspace stamps a real time
+ * when the user actually selects it.
  */
-async function fetchLive<T>(base: string, path: string): Promise<T | null> {
-  try {
-    const res = await fetch(`${base}${path}`, {
-      // Statistics are recomputed rarely; revalidate often enough that a
-      // mid-demo pipeline restart is picked up without a rebuild.
-      next: { revalidate: 15 },
-      signal: AbortSignal.timeout(4000),
-    });
-    if (!res.ok) return null;
-    return (await res.json()) as T;
-  } catch {
-    return null;
-  }
+export function loadSampleDashboardData(): DashboardData {
+  return buildDashboardData({
+    kind: "sample",
+    label: "Sample dataset",
+    clusterSummary: MOCK_CLUSTER_SUMMARY,
+    observations: MOCK_OBSERVATIONS,
+    cohort: MOCK_COHORT,
+    cooccurrence: MOCK_COOCCURRENCE,
+    syncedAt: MOCK_OBSERVATIONS.generated_at,
+  });
 }
 
 /**
- * Loads dashboard data. With PIPELINE_URL unset (the default) this serves the
- * committed mock fixtures and reports `source: "mock"`, which the header
- * renders as a visible chip — Part C step C.4 is done when that chip reads
- * LIVE. Falls back to mocks whenever the pipeline is unreachable.
+ * Optional convenience for the team demo: with PIPELINE_URL set, pull the
+ * live pipeline on the server so the dashboard opens straight onto real data
+ * instead of the source picker. Returns null when unset or unreachable, and
+ * the picker is shown instead.
  */
-export async function loadDashboardData(): Promise<DashboardData> {
+export async function loadConfiguredPipeline(): Promise<DashboardData | null> {
   const base = process.env.PIPELINE_URL?.replace(/\/$/, "");
+  if (!base) return null;
 
-  let summary = MOCK_CLUSTER_SUMMARY;
-  let observations = MOCK_OBSERVATIONS;
-  let cohort = MOCK_COHORT;
-  let cooccurrence = MOCK_COOCCURRENCE;
-  let source: DashboardData["source"] = "mock";
-
-  if (base) {
-    const [liveSummary, liveObs, liveCohort, liveCooc] = await Promise.all([
-      fetchLive<ClusterSummaryFile>(base, "/cluster-summary"),
-      fetchLive<ObservationsFile>(base, "/observations"),
-      fetchLive<Cohort>(base, "/cohort"),
-      fetchLive<CooccurrenceFile>(
-        base,
-        "/cooccurrence?organism=Klebsiella%20pneumoniae&min_support=5",
-      ),
-    ]);
-
-    // Only claim LIVE when both halves of the displayed numbers are real: the
-    // cluster statistics and the observations written about them.
-    if (liveSummary && liveObs) {
-      summary = liveSummary;
-      observations = liveObs;
-      source = "live";
-      if (liveCohort) cohort = liveCohort;
-      if (liveCooc) cooccurrence = liveCooc;
+  async function get<T>(path: string): Promise<T | null> {
+    try {
+      const res = await fetch(`${base}${path}`, {
+        next: { revalidate: 15 },
+        signal: AbortSignal.timeout(4000),
+      });
+      if (!res.ok) return null;
+      return (await res.json()) as T;
+    } catch {
+      return null;
     }
   }
 
-  return {
-    source,
-    generated_at: observations.generated_at,
+  const [summary, observations, cohort, cooccurrence] = await Promise.all([
+    get<Parameters<typeof buildDashboardData>[0]["clusterSummary"]>("/cluster-summary"),
+    get<Parameters<typeof buildDashboardData>[0]["observations"]>("/observations"),
+    get<NonNullable<Parameters<typeof buildDashboardData>[0]["cohort"]>>("/cohort"),
+    get<NonNullable<Parameters<typeof buildDashboardData>[0]["cooccurrence"]>>(
+      "/cooccurrence?organism=Klebsiella%20pneumoniae&min_support=5",
+    ),
+  ]);
+
+  // Both halves of what is displayed must be real before claiming a live source.
+  if (!summary || !observations) return null;
+
+  return buildDashboardData({
+    kind: "api",
+    label: process.env.PIPELINE_NAME?.trim() || "Configured pipeline",
+    clusterSummary: summary,
+    observations,
     cohort,
-    clusters: joinClusters(summary, observations),
     cooccurrence,
-    pipeline_stats: observations.pipeline_stats ?? EMPTY_STATS,
-  };
+    syncedAt: observations.generated_at,
+  });
 }

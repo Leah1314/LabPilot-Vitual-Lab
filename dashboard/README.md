@@ -15,9 +15,8 @@ cp .env.example .env.local   # add FIREWORKS_API_KEY
 bun run dev                  # http://localhost:3000
 ```
 
-The dashboard runs without any keys — it serves the committed fixtures in
-`data/` and the header reads **MOCK DATA**. `FIREWORKS_API_KEY` is only needed
-for the Consult chat panel.
+The dashboard runs without any keys — pick **Sample dataset** on the opening
+screen. `FIREWORKS_API_KEY` is only needed for the Consult chat panel.
 
 ## Environment
 
@@ -25,33 +24,55 @@ for the Consult chat panel.
 |---|---|---|
 | `FIREWORKS_API_KEY` | For chat | Server-side only. Never prefix `NEXT_PUBLIC_`. |
 | `FIREWORKS_MODEL` | No | Defaults to `deepseek-v4-pro`. |
-| `PIPELINE_URL` | No | Daytona preview URL. Unset serves fixtures. |
+| `PIPELINE_URL` | No | Preloads a pipeline and skips the source picker. |
+| `PIPELINE_NAME` | No | Label shown for that preloaded pipeline. |
 | `COPILOTKIT_TELEMETRY_DISABLED` | No | Set `true` to silence usage telemetry. |
 
 This repo is public. Commit `.env.example` only.
 
-## Wiring in real data
+## Choosing a data source
 
-Two independent switches:
+The app opens on a picker with three options. Everything downstream reads one
+normalised shape, so the dashboard, charts and Consult panel behave identically
+whichever you choose — only the header chip changes.
 
-**Fixtures** — Parts A and B write `data/cluster_summary.json` and
-`insights/observations.json` at the repo root. Copy them in:
+**Sample dataset** — the fixtures in `data/`. One click, no setup.
+
+**Upload files** — drop `cluster_summary.json` and `observations.json` (plus
+optional `cohort.json` and `cooccurrence.json`). Parsed and validated entirely
+in your browser; nothing is uploaded anywhere. CSV is deliberately not accepted:
+turning raw BV-BRC tables into clusters is Part A's job.
+
+**Connect a pipeline** — point at any endpoint serving Contracts 1 and 2, as
+one combined endpoint or two separate ones, with optional bearer or header auth.
+**Test connection** shows the full list of checks that ran and, on success, a
+preview of cluster/observation/species counts before you commit.
+
+Requests go out from this app's server, not your browser, so the pipeline needs
+no CORS headers. That matters because `daytona.md §4.4` notes CORS behaviour
+through the Daytona preview proxy is undocumented.
+
+API keys stay in memory for the tab. Endpoints and auth method are remembered in
+`localStorage` for convenience; keys never are.
+
+### Skipping the picker
+
+Set `PIPELINE_URL` and the server preloads that pipeline, opening straight onto
+the dashboard — useful for a demo machine. `PIPELINE_NAME` labels it. If it is
+unreachable the picker is shown instead. **Change source** in the header returns
+to the picker at any time.
+
+### Refreshing the committed fixtures
+
+Parts A and B write `data/cluster_summary.json` and `insights/observations.json`
+at the repo root. Copy them into the app with:
 
 ```bash
 bun run sync-data
 ```
 
 It validates shape before overwriting, so a malformed file fails at the command
-rather than mid-demo, and leaves the previous fixtures in place if it does.
-
-**Live pipeline** — set `PIPELINE_URL` to the Daytona sandbox preview URL. The
-dashboard then fetches `/cluster-summary`, `/observations`, `/cohort` and
-`/cooccurrence`, and the header chip flips to **LIVE**. Any endpoint that fails
-falls back to its fixture, so a partial backend degrades per section instead of
-blanking the page.
-
-The chip is the check for the step C.4 handoff: if it reads MOCK during the
-demo, the numbers on screen are illustrative.
+rather than mid-demo, leaving the previous fixtures in place.
 
 ## Commands
 
@@ -67,6 +88,9 @@ demo, the numbers on screen are illustrative.
 There is no test suite. Verification is `bun run typecheck && bun run build`.
 
 ## What's on the page
+
+**The source picker** is the entry point: sample, upload, or a live pipeline.
+The header always shows which one is on screen and offers **Change source**.
 
 **Cluster cards** carry the Fireworks-written headline and observation, a
 Braintrust faithfulness badge, the lab-measured resistance breakdown, lineage
@@ -90,6 +114,11 @@ computing numbers.
 
 These are the design, not decoration — see `frontend.md §4` and `prompt.md §8`.
 
+- The header names the active source on every screen, so nobody has to ask
+  where a number came from.
+- A source supplying only Contracts 1 and 2 gets a species gene tally instead of
+  a borrowed cohort — attaching the sample's provenance to someone else's
+  numbers would be worse than showing less.
 - Deduplicated strain counts shown by default, raw counts adjacent.
 - Single-country or single-year patterns badged as possible outbreak artefacts,
   on both cluster cards and co-occurrence rows.
@@ -105,13 +134,20 @@ These are the design, not decoration — see `frontend.md §4` and `prompt.md §
 ```
 app/
   layout.tsx                         fonts, CopilotKit provider, metadata
-  page.tsx                           server component, loads data
+  page.tsx                           server component: sample + optional preload
+  api/datasource/route.ts            server-side proxy for user endpoints
   api/copilotkit/route.ts            single-route transport
   api/copilotkit/[...path]/route.ts  multi-route transport
-components/                          UI, presentational except DashboardShell
+components/
+  Workspace.tsx                      holds active dataset; picker or dashboard
+  SourcePicker.tsx                   three-tab chooser
+  source/                            Sample / Upload / Api panels
 lib/
   contracts.ts                       Contract 1/2 types + join
-  data.ts                            loader, live-or-fixture
+  datasource.ts                      source kinds, ApiConfig, failure codes
+  validate.ts                        shape + cross-validation, shared
+  build-data.ts                      assembles DashboardData from any source
+  data.ts                            sample loader + PIPELINE_URL preload
   agent-tools.ts                     server-side tools
   copilot-runtime.ts                 runtime, agent, system prompt
 data/                                committed fixtures

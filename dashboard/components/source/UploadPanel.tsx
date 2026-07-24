@@ -1,0 +1,242 @@
+"use client";
+
+import { useRef, useState } from "react";
+import type {
+  Cohort,
+  CooccurrenceFile,
+  DashboardData,
+} from "@/lib/contracts";
+import { buildDashboardData } from "@/lib/build-data";
+import { validatePayload } from "@/lib/validate";
+import { ValidationTrail } from "./ValidationTrail";
+
+/**
+ * Files the dashboard understands. Uploads are matched by filename, so a file
+ * named anything else is reported rather than silently ignored.
+ */
+const SLOTS = [
+  {
+    key: "cluster_summary",
+    filename: "cluster_summary.json",
+    required: true,
+    note: "Contract 1 — per-cluster gene counts, products, phenotypes",
+  },
+  {
+    key: "observations",
+    filename: "observations.json",
+    required: true,
+    note: "Contract 2 — headline, observation and eval score per cluster",
+  },
+  {
+    key: "cohort",
+    filename: "cohort.json",
+    required: false,
+    note: "Optional — organisms and pinned date",
+  },
+  {
+    key: "cooccurrence",
+    filename: "cooccurrence.json",
+    required: false,
+    note: "Optional — ranked gene pairs",
+  },
+] as const;
+
+type SlotKey = (typeof SLOTS)[number]["key"];
+
+function slotFor(filename: string): SlotKey | null {
+  const lower = filename.toLowerCase();
+  return SLOTS.find((s) => s.filename === lower)?.key ?? null;
+}
+
+export function UploadPanel({ onLoad }: { onLoad: (data: DashboardData) => void }) {
+  const inputRef = useRef<HTMLInputElement | null>(null);
+  const [dragOver, setDragOver] = useState(false);
+  const [parsed, setParsed] = useState<Partial<Record<SlotKey, unknown>>>({});
+  const [names, setNames] = useState<Partial<Record<SlotKey, string>>>({});
+  const [rejected, setRejected] = useState<string[]>([]);
+  const [error, setError] = useState<string | null>(null);
+  const [trail, setTrail] = useState<string[]>([]);
+
+  async function ingest(fileList: FileList | null) {
+    if (!fileList?.length) return;
+    setError(null);
+    setTrail([]);
+
+    const nextParsed = { ...parsed };
+    const nextNames = { ...names };
+    const nextRejected: string[] = [];
+
+    for (const file of Array.from(fileList)) {
+      const key = slotFor(file.name);
+      if (!key) {
+        nextRejected.push(`${file.name} — not one of the four recognised names`);
+        continue;
+      }
+      try {
+        nextParsed[key] = JSON.parse(await file.text());
+        nextNames[key] = file.name;
+      } catch {
+        nextRejected.push(`${file.name} — not valid JSON`);
+      }
+    }
+
+    setParsed(nextParsed);
+    setNames(nextNames);
+    setRejected(nextRejected);
+  }
+
+  function clearSlot(key: SlotKey) {
+    const nextParsed = { ...parsed };
+    const nextNames = { ...names };
+    delete nextParsed[key];
+    delete nextNames[key];
+    setParsed(nextParsed);
+    setNames(nextNames);
+    setError(null);
+    setTrail([]);
+  }
+
+  const hasRequired = parsed.cluster_summary !== undefined && parsed.observations !== undefined;
+
+  function analyse() {
+    const validation: string[] = [];
+    const result = validatePayload(parsed.cluster_summary, parsed.observations, validation);
+    setTrail(validation);
+
+    if (!result.ok) {
+      setError(result.message);
+      return;
+    }
+
+    setError(null);
+    onLoad(
+      buildDashboardData({
+        kind: "upload",
+        label: "Uploaded files",
+        clusterSummary: result.value.clusterSummary,
+        observations: result.value.observations,
+        cohort: (parsed.cohort as Cohort | undefined) ?? null,
+        cooccurrence: (parsed.cooccurrence as CooccurrenceFile | undefined) ?? null,
+      }),
+    );
+  }
+
+  return (
+    <section className="border border-hairline bg-card p-6">
+      <h3 className="display text-lg text-ink">Upload files</h3>
+      <p className="mt-2 max-w-[62ch] text-sm leading-relaxed text-muted">
+        Drop the JSON your pipeline already writes. Files are parsed and
+        validated in your browser and never uploaded anywhere. CSV is not
+        accepted — turning raw BV-BRC tables into clusters is Part A&rsquo;s job,
+        not the dashboard&rsquo;s.
+      </p>
+
+      <div
+        onDragOver={(e) => {
+          e.preventDefault();
+          setDragOver(true);
+        }}
+        onDragLeave={() => setDragOver(false)}
+        onDrop={(e) => {
+          e.preventDefault();
+          setDragOver(false);
+          void ingest(e.dataTransfer.files);
+        }}
+        className={`mt-5 border-2 border-dashed p-8 text-center transition-colors ${
+          dragOver ? "border-violet bg-violet-tint" : "border-hairline"
+        }`}
+      >
+        <p className="text-sm text-ink">Drop JSON files here</p>
+        <button
+          type="button"
+          onClick={() => inputRef.current?.click()}
+          className="eyebrow mt-2 cursor-pointer border-b border-dashed border-muted pb-0.5 !text-violet hover:border-violet"
+        >
+          or choose files
+        </button>
+        <input
+          ref={inputRef}
+          type="file"
+          accept="application/json,.json"
+          multiple
+          className="sr-only"
+          onChange={(e) => {
+            void ingest(e.target.files);
+            e.target.value = "";
+          }}
+        />
+      </div>
+
+      <ul className="mt-5 space-y-2">
+        {SLOTS.map((slot) => {
+          const filled = parsed[slot.key] !== undefined;
+          return (
+            <li
+              key={slot.key}
+              className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-hairline/70 pb-2"
+            >
+              <div className="min-w-0">
+                <span className="tabular text-sm text-ink">{slot.filename}</span>
+                {!slot.required && (
+                  <span className="ml-2 text-xs text-muted">optional</span>
+                )}
+                <p className="text-xs text-muted">{slot.note}</p>
+              </div>
+              {filled ? (
+                <span className="flex items-baseline gap-2 text-xs">
+                  <span className="text-viridian">loaded</span>
+                  <button
+                    type="button"
+                    onClick={() => clearSlot(slot.key)}
+                    className="cursor-pointer border-b border-dashed border-muted text-muted hover:text-ink"
+                  >
+                    remove
+                  </button>
+                </span>
+              ) : (
+                <span className="text-xs text-muted">
+                  {slot.required ? "required" : "not provided"}
+                </span>
+              )}
+            </li>
+          );
+        })}
+      </ul>
+
+      {rejected.length > 0 && (
+        <div className="mt-4 border-l-2 border-amber bg-amber-tint px-3 py-2">
+          <p className="text-xs font-semibold text-amber">Not used</p>
+          <ul className="mt-1 space-y-0.5">
+            {rejected.map((r) => (
+              <li key={r} className="text-xs text-amber">
+                {r}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {error && (
+        <p className="mt-4 border-l-2 border-safranin bg-safranin-tint px-3 py-2 text-xs leading-relaxed text-safranin">
+          {error}
+        </p>
+      )}
+
+      <ValidationTrail lines={trail} />
+
+      <button
+        type="button"
+        onClick={analyse}
+        disabled={!hasRequired}
+        className="mt-6 cursor-pointer bg-violet px-4 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
+      >
+        Validate and open dashboard
+      </button>
+      {!hasRequired && (
+        <p className="mt-2 text-xs text-muted">
+          cluster_summary.json and observations.json are both needed.
+        </p>
+      )}
+    </section>
+  );
+}

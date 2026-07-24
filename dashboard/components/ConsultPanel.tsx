@@ -46,16 +46,21 @@ export function ConsultPanel({
     description:
       "What the analyst is currently viewing, plus per-cluster statistics already computed by the pipeline. Quote these numbers verbatim; never recompute or estimate.",
     value: {
-      data_source: data.source,
-      cohort_pinned_date: data.cohort.pinned_date,
+      data_source_kind: data.kind,
+      data_source_label: data.label,
+      cohort_pinned_date: data.cohort?.pinned_date ?? null,
       observations_generated_at: data.generated_at,
       active_species_filter: speciesFilter,
       highlighted_cluster: highlightedCluster,
-      organisms: data.cohort.organisms.map((o) => ({
-        name: o.name,
-        n_genomes: o.n_genomes,
-        resistance_reportable: o.resistance_reportable,
-      })),
+      // Null when the source supplied no cohort file. In that case the species
+      // tally below is gene counts, not genome counts — do not conflate them.
+      organisms:
+        data.cohort?.organisms.map((o) => ({
+          name: o.name,
+          n_genomes: o.n_genomes,
+          resistance_reportable: o.resistance_reportable,
+        })) ?? null,
+      species_gene_tally: data.speciesTally,
       clusters: data.clusters.map((c) => ({
         cluster_id: c.cluster_id,
         headline: c.observation?.headline ?? null,
@@ -116,7 +121,11 @@ export function ConsultPanel({
         onSpeciesFilter(null);
         return JSON.stringify({ ok: true, filter: null });
       }
-      const known = data.cohort.organisms.map((o) => o.name);
+      // Falls back to the species actually present in the clusters when the
+      // source supplied no cohort file.
+      const known =
+        data.cohort?.organisms.map((o) => o.name) ??
+        data.speciesTally.map((s) => s.name);
       const match = known.find(
         (n) => n.toLowerCase() === species.toLowerCase(),
       );

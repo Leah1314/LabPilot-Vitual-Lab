@@ -95,8 +95,7 @@ export interface CooccurrenceFile {
   pairs: CooccurrencePair[];
 }
 
-/** Where the currently displayed numbers came from. Surfaced in the header. */
-export type DataSource = "mock" | "live";
+import type { DataSourceKind } from "./datasource";
 
 /** Joined view model consumed by the UI. */
 export interface ClusterView {
@@ -110,11 +109,23 @@ export interface ClusterView {
 }
 
 export interface DashboardData {
-  source: DataSource;
+  kind: DataSourceKind;
+  /** Human label for the source: connection name, "Uploaded files", etc. */
+  label: string;
+  /** When this data was loaded into the UI. */
+  syncedAt: string;
   generated_at: string;
-  cohort: Cohort;
+  /**
+   * Null when the source supplied only Contracts 1 and 2. Borrowing the sample
+   * cohort to fill the gap would attach one dataset's provenance to another's
+   * numbers, so the UI falls back to `speciesTally` and says which it is showing.
+   */
+  cohort: Cohort | null;
+  /** Species -> gene count, summed across clusters. Always derivable. */
+  speciesTally: Array<{ name: string; genes: number }>;
   clusters: ClusterView[];
-  cooccurrence: CooccurrenceFile;
+  /** Null when the source did not supply co-occurrence pairs. */
+  cooccurrence: CooccurrenceFile | null;
   pipeline_stats: PipelineStats;
 }
 
