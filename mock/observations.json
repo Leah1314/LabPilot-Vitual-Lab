@@ -1,0 +1,54 @@
+{
+  "MOCK": true,
+  "generated_at": "2026-07-24T00:00:00Z",
+  "clusters": [
+    {
+      "cluster_id": "0",
+      "headline": "Beta-lactam resistance cluster dominated by Escherichia coli",
+      "observation": "This cluster contains 8779 genes, led by beta-lactamase TEM (186), class A carbapenemase KPC (178). The species breakdown is dominated by Escherichia coli (3827), with lab-measured phenotypes reported as 4070 Resistant and 3166 Susceptible. The phenotype split matches the corpus base rate, so this cluster does not distinguish resistant from susceptible isolates.",
+      "confidence": "high",
+      "eval_score": 0.92,
+      "supporting_gene_count": 8779
+    },
+    {
+      "cluster_id": "1",
+      "headline": "Efflux and transport cluster dominated by Escherichia coli",
+      "observation": "This cluster contains 5585 genes, led by multidrug efflux RND transporter AcrB (143), Uncharacterized MFS-type transporter (98). The species breakdown is dominated by Escherichia coli (2341), with lab-measured phenotypes reported as 3659 Resistant and 879 Susceptible. This cluster does depart from the corpus base rate (deviation 0.546), so the phenotype split is worth investigating, though co-occurrence is not linkage and not causation.",
+      "confidence": "medium",
+      "eval_score": 0.94,
+      "supporting_gene_count": 5585
+    },
+    {
+      "cluster_id": "2",
+      "headline": "Aminoglycoside modification cluster dominated by Escherichia coli",
+      "observation": "This cluster contains 4493 genes, led by aminoglycoside N(6')-acetyltransferase (161), 16S rRNA methyltransferase ArmA (105). The species breakdown is dominated by Escherichia coli (2328), with lab-measured phenotypes reported as 2211 Resistant and 1759 Susceptible. The phenotype split matches the corpus base rate, so this cluster does not distinguish resistant from susceptible isolates.",
+      "confidence": "high",
+      "eval_score": 0.94,
+      "supporting_gene_count": 4493
+    },
+    {
+      "cluster_id": "3",
+      "headline": "Glycopeptide resistance cluster dominated by Escherichia coli",
+      "observation": "This cluster contains 3837 genes, led by D-Ala-D-Ala dipeptidase VanX (105), vancomycin B-type resistance protein VanW (77). The species breakdown is dominated by Escherichia coli (1643), with lab-measured phenotypes reported as 986 Resistant and 2087 Susceptible. This cluster does depart from the corpus base rate (deviation 0.568), so the phenotype split is worth investigating, though co-occurrence is not linkage and not causation.",
+      "confidence": "medium",
+      "eval_score": 0.82,
+      "supporting_gene_count": 3837
+    },
+    {
+      "cluster_id": "4",
+      "headline": "Virulence and adhesion cluster dominated by Klebsiella pneumoniae",
+      "observation": "This cluster contains 6805 genes, led by Collagen adhesin (170), T6SS component Hcp (165). The species breakdown is dominated by Klebsiella pneumoniae (2869), with lab-measured phenotypes reported as 3173 Resistant and 2351 Susceptible. The phenotype split matches the corpus base rate, so this cluster does not distinguish resistant from susceptible isolates.",
+      "confidence": "high",
+      "eval_score": 0.82,
+      "supporting_gene_count": 6805
+    },
+    {
+      "cluster_id": "5",
+      "headline": "Core metabolic cluster dominated by Escherichia coli",
+      "observation": "This cluster contains 4501 genes, led by Transketolase (EC 2.2.1.1) (100), Translation elongation factor Tu (97). The species breakdown is dominated by Escherichia coli (1608), with lab-measured phenotypes reported as 2018 Resistant and 1551 Susceptible. The phenotype split matches the corpus base rate, so this cluster does not distinguish resistant from susceptible isolates.",
+      "confidence": "high",
+      "eval_score": 0.86,
+      "supporting_gene_count": 4501
+    }
+  ]
+}

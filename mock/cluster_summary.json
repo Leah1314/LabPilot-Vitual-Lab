@@ -1,0 +1,180 @@
+{
+  "0": {
+    "n_genes": 8779,
+    "example_genes": [
+      "fig|1352.8253.peg.4280",
+      "fig|1352.8253.peg.2143",
+      "fig|1352.8253.peg.520",
+      "fig|1352.8253.peg.4504",
+      "fig|1352.8253.peg.125"
+    ],
+    "top_products": {
+      "beta-lactamase TEM": 186,
+      "class A carbapenemase KPC": 178,
+      "penicillin-binding protein 2": 160,
+      "extended-spectrum beta-lactamase CTX-M": 137,
+      "beta-lactamase class A": 70
+    },
+    "resistant_phenotype_breakdown": {
+      "Resistant": 4070,
+      "Susceptible": 3166,
+      "Unknown": 1543
+    },
+    "species_breakdown": {
+      "Escherichia coli": 3827,
+      "Klebsiella pneumoniae": 2196,
+      "Helicobacter pylori": 1546,
+      "Enterococcus faecalis": 576,
+      "Clostridioides difficile": 415,
+      "Enterococcus faecium": 219
+    }
+  },
+  "1": {
+    "n_genes": 5585,
+    "example_genes": [
+      "fig|1496.9016.peg.903",
+      "fig|1496.9016.peg.2479",
+      "fig|1496.9016.peg.4525",
+      "fig|1496.9016.peg.2394",
+      "fig|1496.9016.peg.5798"
+    ],
+    "top_products": {
+      "multidrug efflux RND transporter AcrB": 143,
+      "Uncharacterized MFS-type transporter": 98,
+      "Multidrug efflux pump EmrD (of MFS type)": 87,
+      "efflux pump membrane fusion protein AcrA": 79,
+      "outer membrane channel TolC": 58
+    },
+    "resistant_phenotype_breakdown": {
+      "Resistant": 3659,
+      "Susceptible": 879,
+      "Unknown": 1047
+    },
+    "species_breakdown": {
+      "Escherichia coli": 2341,
+      "Klebsiella pneumoniae": 1930,
+      "Helicobacter pylori": 733,
+      "Enterococcus faecalis": 259,
+      "Clostridioides difficile": 240,
+      "Enterococcus faecium": 82
+    }
+  },
+  "2": {
+    "n_genes": 4493,
+    "example_genes": [
+      "fig|562.2471.peg.5570",
+      "fig|562.2471.peg.1076",
+      "fig|562.2471.peg.1235",
+      "fig|562.2471.peg.326",
+      "fig|562.2471.peg.667"
+    ],
+    "top_products": {
+      "aminoglycoside N(6')-acetyltransferase": 161,
+      "16S rRNA methyltransferase ArmA": 105,
+      "aminoglycoside adenylyltransferase": 57,
+      "aminoglycoside O-phosphotransferase APH(3')": 51
+    },
+    "resistant_phenotype_breakdown": {
+      "Resistant": 2211,
+      "Susceptible": 1759,
+      "Unknown": 523
+    },
+    "species_breakdown": {
+      "Escherichia coli": 2328,
+      "Klebsiella pneumoniae": 1041,
+      "Helicobacter pylori": 718,
+      "Enterococcus faecalis": 214,
+      "Clostridioides difficile": 137,
+      "Enterococcus faecium": 55
+    }
+  },
+  "3": {
+    "n_genes": 3837,
+    "example_genes": [
+      "fig|1351.2349.peg.2666",
+      "fig|1351.2349.peg.5029",
+      "fig|1351.2349.peg.954",
+      "fig|1351.2349.peg.3994",
+      "fig|1351.2349.peg.4819"
+    ],
+    "top_products": {
+      "D-Ala-D-Ala dipeptidase VanX": 105,
+      "vancomycin B-type resistance protein VanW": 77,
+      "vancomycin resistance protein VanA": 72,
+      "D-alanine--D-lactate ligase VanH": 65
+    },
+    "resistant_phenotype_breakdown": {
+      "Resistant": 986,
+      "Susceptible": 2087,
+      "Unknown": 764
+    },
+    "species_breakdown": {
+      "Escherichia coli": 1643,
+      "Klebsiella pneumoniae": 1139,
+      "Helicobacter pylori": 616,
+      "Enterococcus faecalis": 155,
+      "Clostridioides difficile": 188,
+      "Enterococcus faecium": 96
+    }
+  },
+  "4": {
+    "n_genes": 6805,
+    "example_genes": [
+      "fig|210.4088.peg.4977",
+      "fig|210.4088.peg.4728",
+      "fig|210.4088.peg.990",
+      "fig|210.4088.peg.3214",
+      "fig|210.4088.peg.759"
+    ],
+    "top_products": {
+      "Collagen adhesin": 170,
+      "T6SS component Hcp": 165,
+      "Outer membrane usher protein FimD": 103,
+      "putative fimbrial-like protein": 85,
+      "cag island protein": 44
+    },
+    "resistant_phenotype_breakdown": {
+      "Resistant": 3173,
+      "Susceptible": 2351,
+      "Unknown": 1281
+    },
+    "species_breakdown": {
+      "Escherichia coli": 2451,
+      "Klebsiella pneumoniae": 2869,
+      "Helicobacter pylori": 712,
+      "Enterococcus faecalis": 284,
+      "Clostridioides difficile": 362,
+      "Enterococcus faecium": 127
+    }
+  },
+  "5": {
+    "n_genes": 4501,
+    "example_genes": [
+      "fig|1496.8653.peg.332",
+      "fig|1496.8653.peg.4896",
+      "fig|1496.8653.peg.836",
+      "fig|1496.8653.peg.5738",
+      "fig|1496.8653.peg.3215"
+    ],
+    "top_products": {
+      "Transketolase (EC 2.2.1.1)": 100,
+      "Translation elongation factor Tu": 97,
+      "Alanine racemase (EC 5.1.1.1)": 76,
+      "UDP-glucose 4-epimerase (EC 5.1.3.2)": 58,
+      "hypothetical protein": 44
+    },
+    "resistant_phenotype_breakdown": {
+      "Resistant": 2018,
+      "Susceptible": 1551,
+      "Unknown": 932
+    },
+    "species_breakdown": {
+      "Escherichia coli": 1608,
+      "Klebsiella pneumoniae": 1238,
+      "Helicobacter pylori": 1165,
+      "Enterococcus faecalis": 227,
+      "Clostridioides difficile": 170,
+      "Enterococcus faecium": 93
+    }
+  }
+}

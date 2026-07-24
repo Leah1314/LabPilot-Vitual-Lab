@@ -1,0 +1,133 @@
+{
+  "MOCK": true,
+  "n_genes": 34000,
+  "corpus_species_totals": {
+    "Escherichia coli": 14198,
+    "Klebsiella pneumoniae": 10413,
+    "Helicobacter pylori": 5490,
+    "Enterococcus faecalis": 1715,
+    "Clostridioides difficile": 1512,
+    "Enterococcus faecium": 672
+  },
+  "corpus_phenotype_totals": {
+    "Resistant": 16117,
+    "Susceptible": 11793,
+    "Unknown": 6090
+  },
+  "flat_threshold": 0.25,
+  "clusters": {
+    "0": {
+      "n_genes": 8779,
+      "species_enrichment": {
+        "Escherichia coli": 1.044,
+        "Klebsiella pneumoniae": 0.817,
+        "Helicobacter pylori": 1.091,
+        "Enterococcus faecalis": 1.301,
+        "Clostridioides difficile": 1.063,
+        "Enterococcus faecium": 1.262
+      },
+      "phenotype_enrichment": {
+        "Resistant": 0.978,
+        "Susceptible": 1.04,
+        "Unknown": 0.981
+      },
+      "max_phenotype_deviation": 0.04,
+      "phenotype_signal": false
+    },
+    "1": {
+      "n_genes": 5585,
+      "species_enrichment": {
+        "Escherichia coli": 1.004,
+        "Klebsiella pneumoniae": 1.128,
+        "Helicobacter pylori": 0.813,
+        "Enterococcus faecalis": 0.919,
+        "Clostridioides difficile": 0.966,
+        "Enterococcus faecium": 0.743
+      },
+      "phenotype_enrichment": {
+        "Resistant": 1.382,
+        "Susceptible": 0.454,
+        "Unknown": 1.047
+      },
+      "max_phenotype_deviation": 0.546,
+      "phenotype_signal": true
+    },
+    "2": {
+      "n_genes": 4493,
+      "species_enrichment": {
+        "Escherichia coli": 1.241,
+        "Klebsiella pneumoniae": 0.757,
+        "Helicobacter pylori": 0.99,
+        "Enterococcus faecalis": 0.944,
+        "Clostridioides difficile": 0.686,
+        "Enterococcus faecium": 0.619
+      },
+      "phenotype_enrichment": {
+        "Resistant": 1.038,
+        "Susceptible": 1.129,
+        "Unknown": 0.65
+      },
+      "max_phenotype_deviation": 0.129,
+      "phenotype_signal": false
+    },
+    "3": {
+      "n_genes": 3837,
+      "species_enrichment": {
+        "Escherichia coli": 1.025,
+        "Klebsiella pneumoniae": 0.969,
+        "Helicobacter pylori": 0.994,
+        "Enterococcus faecalis": 0.801,
+        "Clostridioides difficile": 1.102,
+        "Enterococcus faecium": 1.266
+      },
+      "phenotype_enrichment": {
+        "Resistant": 0.542,
+        "Susceptible": 1.568,
+        "Unknown": 1.112
+      },
+      "max_phenotype_deviation": 0.568,
+      "phenotype_signal": true
+    },
+    "4": {
+      "n_genes": 6805,
+      "species_enrichment": {
+        "Escherichia coli": 0.863,
+        "Klebsiella pneumoniae": 1.377,
+        "Helicobacter pylori": 0.648,
+        "Enterococcus faecalis": 0.827,
+        "Clostridioides difficile": 1.196,
+        "Enterococcus faecium": 0.944
+      },
+      "phenotype_enrichment": {
+        "Resistant": 0.984,
+        "Susceptible": 0.996,
+        "Unknown": 1.051
+      },
+      "max_phenotype_deviation": 0.016,
+      "phenotype_signal": false
+    },
+    "5": {
+      "n_genes": 4501,
+      "species_enrichment": {
+        "Escherichia coli": 0.856,
+        "Klebsiella pneumoniae": 0.898,
+        "Helicobacter pylori": 1.603,
+        "Enterococcus faecalis": 1.0,
+        "Clostridioides difficile": 0.849,
+        "Enterococcus faecium": 1.045
+      },
+      "phenotype_enrichment": {
+        "Resistant": 0.946,
+        "Susceptible": 0.993,
+        "Unknown": 1.156
+      },
+      "max_phenotype_deviation": 0.054,
+      "phenotype_signal": false
+    }
+  },
+  "clusters_with_phenotype_signal": [
+    "1",
+    "3"
+  ],
+  "interpretation": "Enrichment is the share within a cluster divided by the share across the whole corpus. 1.0 means indistinguishable from background. No cluster may be described as associated with resistance unless its id appears in clusters_with_phenotype_signal."
+}

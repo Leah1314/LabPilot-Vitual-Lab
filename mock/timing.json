@@ -1,0 +1,11 @@
+{
+  "MOCK": true,
+  "n_sequences": 34000,
+  "model": "esm2_t12_35M_UR50D",
+  "device": "MOCK - not a real GPU run",
+  "embedding_seconds": 91.77,
+  "sequences_per_second": 370.5,
+  "clustering_seconds": 6.9,
+  "k_selected": 6,
+  "headline": "MOCK: 34,000 proteins (not a measured run)"
+}
