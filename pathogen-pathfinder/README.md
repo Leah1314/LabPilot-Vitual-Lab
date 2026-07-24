@@ -45,7 +45,7 @@ cp .env.example .env.local
 
 ```bash
 FIREWORKS_API_KEY=fw_...
-FIREWORKS_MODEL=accounts/fireworks/models/deepseek-v4-pro   # optional
+FIREWORKS_MODEL=accounts/fireworks/models/glm-5p2   # optional
 # Optional:
 # COPILOTKIT_LICENSE_TOKEN=...
 ```
@@ -115,11 +115,15 @@ Without a payment method on file Fireworks caps the account at **10 requests per
 minute**, which will not survive a live audience clicking around. Add one before
 demoing.
 
-`deepseek-v4-pro` is a reasoning model. Its reasoning is emitted on a separate
-AG-UI channel (`REASONING_MESSAGE_*`) and does not leak into the assistant's
-text. Fall back through `deepseek-v4-flash`, then `gpt-oss-120b`, via
-`FIREWORKS_MODEL` if tool-calling fidelity disappoints — tool calling was
-verified working on both DeepSeek V4 models.
+Default model is **`glm-5p2`** (743B MoE, 1M context, open weights). Function
+calling was verified against the real `getPathogenDataset` schema. Fall back
+through `deepseek-v4-pro`, `deepseek-v4-flash`, then `gpt-oss-120b` via
+`FIREWORKS_MODEL` — tool calling is confirmed on all of them.
+
+GLM-5.2 bills at **$4.40 per 1M output tokens** against DeepSeek V4 Pro's $3.48,
+so a long demo session costs modestly more. DeepSeek V4 Pro is a reasoning model
+whose reasoning arrives on a separate AG-UI channel (`REASONING_MESSAGE_*`) and
+never leaks into assistant text; GLM emits ordinary content.
 
 ## Project layout
 

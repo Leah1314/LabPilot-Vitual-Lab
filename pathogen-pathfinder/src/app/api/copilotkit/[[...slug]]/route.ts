@@ -25,11 +25,11 @@ const fireworks = createOpenAICompatible({
   baseURL: "https://api.fireworks.ai/inference/v1",
 });
 
-// deepseek-v4-pro has confirmed function calling, which the frontend tools
-// depend on. If tool-calling fidelity disappoints, fall back through
-// deepseek-v4-flash then gpt-oss-120b via FIREWORKS_MODEL.
-const MODEL =
-  process.env.FIREWORKS_MODEL ?? "accounts/fireworks/models/deepseek-v4-pro";
+// glm-5p2: 743B, 1M context, open weights, and function calling verified
+// against this exact getPathogenDataset schema — the frontend tools depend on
+// it. Fall back through deepseek-v4-pro, then deepseek-v4-flash, then
+// gpt-oss-120b via FIREWORKS_MODEL; tool calling is confirmed on all of them.
+const MODEL = process.env.FIREWORKS_MODEL ?? "accounts/fireworks/models/glm-5p2";
 
 const SYSTEM_PROMPT = `You are a research assistant embedded in a dashboard of antimicrobial resistance and virulence statistics for gut-derived pathogens implicated in infected pancreatic necrosis.
 
