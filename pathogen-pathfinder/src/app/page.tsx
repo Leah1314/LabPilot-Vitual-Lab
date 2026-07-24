@@ -35,10 +35,13 @@ import {
   deleteRecentConnection,
   loadRecentConnections,
   loadSampleData,
+  parseUploadedFiles,
   saveRecentConnection,
   type ApiConfig,
   type AuthMethod,
+  type DashboardData,
   type DataSourceType,
+  type ParsedUpload,
   type RecentConnection,
 } from "@/lib/data-sources";
 import { testConnection, type TestConnectionResult } from "@/services/dataSourceApi";
@@ -112,8 +115,8 @@ function UploadPage() {
         </div>
 
         <div className="mt-8 animate-fade-in">
-          {tab === "upload" && <UploadPanel onAnalyze={() => {
-            loadDataSource("upload");
+          {tab === "upload" && <UploadPanel onAnalyze={(data) => {
+            loadDataSource("upload", data);
             router.push("/analyzing");
           }} />}
           {tab === "api" && (
@@ -156,27 +159,38 @@ function UploadPage() {
 /* ------------------------------------------------------------------ */
 /* Upload panel (unchanged workflow, preserved from the previous UI). */
 /* ------------------------------------------------------------------ */
-function UploadPanel({ onAnalyze }: { onAnalyze: () => void }) {
+function UploadPanel({ onAnalyze }: { onAnalyze: (data: DashboardData) => void }) {
   const { files, addFiles, removeFile } = useWorkspace();
   const [dragOver, setDragOver] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [parsed, setParsed] = useState<ParsedUpload | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
 
   const ready = readyCount(files);
-  const enabled = canAnalyze(files);
+  // A cluster summary is all that is actually needed to analyse and chat.
+  const enabled = !!parsed?.data;
 
-  // TODO: replace with real upload to backend storage.
-  const handleFiles = (list: FileList | File[]) => {
+  // Files are parsed in the browser; there is no upload to a backend.
+  const handleFiles = async (list: FileList | File[]) => {
     setUploading(true);
-    const incoming: UploadedFile[] = Array.from(list).map((f) => ({
+    const arr = Array.from(list);
+    const incoming: UploadedFile[] = arr.map((f) => ({
       name: f.name,
       size: f.size,
       valid: (REQUIRED_FILES as string[]).includes(f.name),
     }));
-    setTimeout(() => {
-      addFiles(incoming);
-      setUploading(false);
-    }, 500);
+    addFiles(incoming);
+    try {
+      setParsed(await parseUploadedFiles(arr));
+    } catch {
+      setParsed({
+        data: null,
+        enrichment: null,
+        errors: ["Could not read those files."],
+        notes: [],
+      });
+    }
+    setUploading(false);
   };
 
   const onDrop = (e: DragEvent<HTMLDivElement>) => {
@@ -255,18 +269,33 @@ function UploadPanel({ onAnalyze }: { onAnalyze: () => void }) {
         </div>
       )}
 
+      {parsed && (parsed.errors.length > 0 || parsed.notes.length > 0) && (
+        <div className="mt-6 rounded-lg border border-border bg-accent/30 p-4 text-sm">
+          {parsed.errors.map((e, i) => (
+            <div key={`e${i}`} className="text-destructive">• {e}</div>
+          ))}
+          {parsed.notes.map((n, i) => (
+            <div key={`n${i}`} className="text-muted-foreground">• {n}</div>
+          ))}
+        </div>
+      )}
+
       <div className="mt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
         <div className="text-sm">
           <span className={`font-semibold ${enabled ? "text-success" : "text-muted-foreground"}`}>
-            {ready}/{MIN_REQUIRED.length} Files Ready
+            {enabled
+              ? `${Object.keys(parsed!.data!.clusterSummary).length} clusters parsed`
+              : `${ready}/${MIN_REQUIRED.length} Files Ready`}
           </span>
           <span className="text-muted-foreground ml-2">
-            {enabled ? "All required files uploaded" : "Add the required files to enable analysis"}
+            {enabled
+              ? "Ready to analyze"
+              : "Upload a cluster_summary.json to enable analysis"}
           </span>
         </div>
         <button
           disabled={!enabled}
-          onClick={onAnalyze}
+          onClick={() => parsed?.data && onAnalyze(parsed.data)}
           className={`inline-flex items-center gap-2 rounded-lg px-6 py-3 text-sm font-semibold transition-all ${
             enabled
               ? "bg-navy text-navy-foreground hover:bg-navy/90 shadow-lg shadow-navy/20"
