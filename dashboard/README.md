@@ -55,6 +55,12 @@ through the Daytona preview proxy is undocumented.
 API keys stay in memory for the tab. Endpoints and auth method are remembered in
 `localStorage` for convenience; keys never are.
 
+Because the server fetches a URL you type, the route blocks link-local
+addresses (where cloud providers expose instance credentials), resolves DNS
+before connecting so a hostname cannot point there, and refuses redirects.
+Localhost and private ranges are allowed on purpose — that is where the
+pipeline runs.
+
 ### Skipping the picker
 
 Set `PIPELINE_URL` and the server preloads that pipeline, opening straight onto

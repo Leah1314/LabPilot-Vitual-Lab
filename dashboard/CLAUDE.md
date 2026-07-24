@@ -116,9 +116,16 @@ and `"ok" in x` cannot discriminate against it.
 11. **User-configured endpoints are fetched server-side**, via
     `app/api/datasource`. Never move this to the browser: an arbitrary pipeline
     will not send `Access-Control-Allow-Origin`, and `daytona.md §4.4` says CORS
-    through the Daytona preview proxy is undocumented. The route refuses cloud
-    metadata hosts; it deliberately allows localhost and private ranges because
-    the pipeline usually runs there.
+    through the Daytona preview proxy is undocumented.
+
+    That makes the route an SSRF surface, so it has three guards and all three
+    must stay: DNS is resolved and every returned address checked (blocks a
+    hostname pointing at `169.254.169.254`); redirects are refused with
+    `redirect: "manual"` (blocks an allowed host bouncing to a blocked one);
+    and only link-local ranges are blocked, not all private ones, because the
+    pipeline legitimately runs on localhost. A DNS server that changes its
+    answer between lookup and fetch can still win the race — closing that needs
+    a pinned-IP agent and is out of scope here.
 12. **Remembered connections use `useSyncExternalStore`, not a mount effect.**
     The snapshot is memoised in `lib/datasource.ts` — returning a freshly parsed
     array each call would loop forever, and the server snapshot must stay a

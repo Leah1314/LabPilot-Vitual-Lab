@@ -8,7 +8,7 @@
  *
  *   bun run sync-data
  */
-import { existsSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { copyFile, readFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -66,6 +66,49 @@ const JOBS: Job[] = [
     },
   },
 ];
+
+/**
+ * The check that matters most at handoff: two files that are each individually
+ * valid but describe different pipeline runs. Without it the dashboard renders
+ * headlines from one run beside counts from another, and nothing looks wrong.
+ */
+function crossCheck(): string | null {
+  const summaryPath = resolve(ROOT, "data/cluster_summary.json");
+  const obsPath = resolve(ROOT, "insights/observations.json");
+  if (!existsSync(summaryPath) || !existsSync(obsPath)) return null;
+
+  let summary: Record<string, unknown>;
+  let observations: { clusters?: Array<{ cluster_id?: unknown }> };
+  try {
+    summary = JSON.parse(readFileSync(summaryPath, "utf8"));
+    observations = JSON.parse(readFileSync(obsPath, "utf8"));
+  } catch {
+    return null; // the per-file jobs already report parse errors
+  }
+
+  const ids = new Set(Object.keys(summary));
+  const orphans = (observations.clusters ?? [])
+    .map((c) => String(c.cluster_id))
+    .filter((id) => !ids.has(id));
+
+  if (orphans.length > 0) {
+    return (
+      `observations describe cluster(s) ${orphans.join(", ")}, which are not in ` +
+      `cluster_summary (it has ${[...ids].join(", ")}). The two files are from ` +
+      `different pipeline runs — re-run Part B against the current cluster_summary.`
+    );
+  }
+  return null;
+}
+
+// Runs before any copying: a mismatch must not leave half-updated fixtures
+// behind, or the "previous fixtures are intact" message below becomes a lie.
+const mismatch = crossCheck();
+if (mismatch) {
+  console.error(`FAIL  cross-check — ${mismatch}`);
+  console.error("\nNothing was copied. The dashboard keeps its current fixtures.");
+  process.exit(1);
+}
 
 let failed = false;
 

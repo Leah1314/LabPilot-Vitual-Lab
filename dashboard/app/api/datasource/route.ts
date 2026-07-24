@@ -25,12 +25,55 @@ export const runtime = "nodejs";
 
 const TIMEOUT_MS = 12_000;
 
-/** Cloud metadata services are the classic SSRF target; refuse them outright. */
-const BLOCKED_HOSTS = new Set([
-  "169.254.169.254",
+/*
+ * SSRF posture.
+ *
+ * This route fetches a URL the user typed, which is the point — the pipeline
+ * normally runs on localhost or a Daytona preview URL, so blanket-blocking
+ * private ranges would break the primary use case. What is blocked is the
+ * thing an attacker actually wants: link-local addresses, where cloud
+ * providers expose instance credentials.
+ *
+ * Three defences, because a hostname check alone is not enough:
+ *   1. Resolve DNS first and check every returned address, so a hostname that
+ *      maps to 169.254.169.254 is refused (DNS rebinding).
+ *   2. Refuse redirects, so an allowed host cannot bounce us to a blocked one.
+ *   3. Re-check the host on each endpoint, not just the base URL.
+ *
+ * A determined attacker with a DNS server that changes its answer between our
+ * lookup and the fetch can still win the race. Closing that needs a pinned-IP
+ * agent; it is out of scope for a local research tool and noted rather than
+ * pretended away.
+ */
+const BLOCKED_HOSTNAMES = new Set([
   "metadata.google.internal",
   "metadata.goog",
 ]);
+
+function isBlockedAddress(ip: string): boolean {
+  // IPv4 link-local (169.254/16) covers the AWS/GCP/Azure metadata endpoint.
+  if (/^169\.254\./.test(ip)) return true;
+  // IPv6 link-local and the IPv4-mapped form of the above.
+  const lower = ip.toLowerCase();
+  if (lower.startsWith("fe80:")) return true;
+  if (lower.startsWith("::ffff:169.254.")) return true;
+  // GCP's alternate metadata address.
+  if (ip === "metadata.google.internal") return true;
+  return false;
+}
+
+async function hostIsAllowed(hostname: string): Promise<boolean> {
+  if (BLOCKED_HOSTNAMES.has(hostname.toLowerCase())) return false;
+  if (isBlockedAddress(hostname)) return false;
+  try {
+    const { lookup } = await import("node:dns/promises");
+    const records = await lookup(hostname, { all: true });
+    return !records.some((r) => isBlockedAddress(r.address));
+  } catch {
+    // Unresolvable: let the fetch fail and report "unreachable" instead.
+    return true;
+  }
+}
 
 function parseBaseUrl(raw: string): URL | null {
   try {
@@ -72,9 +115,19 @@ async function fetchJson(
   const res = await fetch(url, {
     headers,
     cache: "no-store",
+    // Never follow redirects: an allowed host must not be able to bounce this
+    // request onto a blocked one after the host check has already passed.
+    redirect: "manual",
     signal: AbortSignal.timeout(TIMEOUT_MS),
   });
   const ms = Date.now() - started;
+  if (res.status >= 300 && res.status < 400) {
+    throw Object.assign(new Error("redirected"), {
+      code: "redirected",
+      status: res.status,
+      ms,
+    });
+  }
   const text = await res.text();
   if (!text) return { status: res.status, body: null, ms };
   try {
@@ -118,7 +171,7 @@ export async function POST(request: Request): Promise<NextResponse<SourceResult>
   if (!base) {
     return NextResponse.json(fail("invalid_url", { validation }));
   }
-  if (BLOCKED_HOSTS.has(base.hostname)) {
+  if (!(await hostIsAllowed(base.hostname))) {
     return NextResponse.json(fail("blocked_host", { validation }));
   }
   validation.push(`base URL ${base.origin} ✓`);
@@ -158,6 +211,20 @@ export async function POST(request: Request): Promise<NextResponse<SourceResult>
             responseTimeMs: totalMs,
             endpointsTested: endpoints,
             validation,
+          }),
+        );
+      }
+      if (e.code === "redirected") {
+        validation.push(`GET ${url} returned a ${e.status} redirect`);
+        return NextResponse.json(
+          fail("blocked_host", {
+            httpStatus: e.status,
+            responseTimeMs: totalMs,
+            endpointsTested: endpoints,
+            validation,
+            message:
+              "The endpoint redirected. Redirects are not followed, because they can " +
+              "point somewhere the host check already rejected. Use the final URL directly.",
           }),
         );
       }
