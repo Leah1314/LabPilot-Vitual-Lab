@@ -7,6 +7,7 @@ import { SiteHeader } from "./SiteHeader";
 import { Sidebar, type SectionId } from "./Sidebar";
 import { CohortPanel } from "./CohortPanel";
 import { ClusterCard } from "./ClusterCard";
+import { ClusterTable } from "./ClusterTable";
 import { PipelineReadout } from "./PipelineReadout";
 import { CooccurrenceTable } from "./CooccurrenceTable";
 import { ConsultPanel } from "./ConsultPanel";
@@ -21,6 +22,7 @@ export function DashboardShell({ data }: { data: DashboardData }) {
   const [speciesFilter, setSpeciesFilter] = useState<string | null>(null);
   const [highlighted, setHighlighted] = useState<string | null>(null);
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
+  const [view, setView] = useState<"cards" | "table">("cards");
 
   const visibleClusters = useMemo(
     () =>
@@ -126,11 +128,32 @@ export function DashboardShell({ data }: { data: DashboardData }) {
                     <h2 id="clusters-heading" className="display text-2xl text-ink">
                       Gene clusters
                     </h2>
-                    <p className="text-xs text-muted">
-                      Bar width is the number of phenotyped isolates, drawn to one
-                      scale across all clusters. Max{" "}
-                      <span className="tabular text-ink">{scaleMax}</span>.
-                    </p>
+                    <div className="flex items-center gap-3">
+                      {view === "cards" && (
+                        <p className="text-xs text-muted">
+                          Bar width is phenotyped isolates, one scale across all
+                          clusters. Max{" "}
+                          <span className="tabular text-ink">{scaleMax}</span>.
+                        </p>
+                      )}
+                      <div className="flex shrink-0 border border-hairline">
+                        {(["cards", "table"] as const).map((v) => (
+                          <button
+                            key={v}
+                            type="button"
+                            onClick={() => setView(v)}
+                            aria-pressed={view === v}
+                            className={`cursor-pointer px-2.5 py-1 text-xs capitalize transition-colors ${
+                              view === v
+                                ? "bg-violet-tint text-violet"
+                                : "text-muted hover:text-ink"
+                            }`}
+                          >
+                            {v}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
                   </div>
 
                   {speciesFilter && (
@@ -155,6 +178,14 @@ export function DashboardShell({ data }: { data: DashboardData }) {
                       No cluster in this dataset contains {speciesFilter}. Clear
                       the filter to see all {data.clusters.length}.
                     </p>
+                  ) : view === "table" ? (
+                    <ClusterTable
+                      clusters={visibleClusters}
+                      onSelect={(id) => {
+                        setHighlighted(id);
+                        setView("cards");
+                      }}
+                    />
                   ) : (
                     visibleClusters.map((cluster, i) => (
                       <ClusterCard

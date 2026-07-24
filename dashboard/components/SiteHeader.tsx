@@ -1,6 +1,7 @@
 "use client";
 
 import type { DashboardData } from "@/lib/contracts";
+import { useWorkspace } from "./Workspace";
 
 const CHIP: Record<
   DashboardData["kind"],
@@ -36,8 +37,12 @@ export function SiteHeader({
   data: DashboardData;
   onChangeSource: () => void;
 }) {
+  const { resync, syncState } = useWorkspace();
   const chip = CHIP[data.kind];
   const generated = data.generated_at ? data.generated_at.slice(0, 10) : null;
+  const syncedAt = data.syncedAt
+    ? new Date(data.syncedAt).toLocaleTimeString()
+    : null;
 
   return (
     <header className="sticky top-0 z-20 border-b border-hairline bg-paper/95 backdrop-blur">
@@ -74,13 +79,36 @@ export function SiteHeader({
             </span>
           )}
 
+          {syncedAt && (
+            <span className="text-muted">
+              Loaded <span className="tabular text-ink">{syncedAt}</span>
+            </span>
+          )}
+
+          {resync && (
+            <button
+              type="button"
+              onClick={() => void resync()}
+              disabled={syncState.status === "syncing"}
+              className="cursor-pointer border-b border-dashed border-muted pb-px text-violet hover:border-violet disabled:opacity-50"
+            >
+              {syncState.status === "syncing" ? "Syncing…" : "Sync now"}
+            </button>
+          )}
+
           <button
             type="button"
             onClick={onChangeSource}
             className="cursor-pointer border-b border-dashed border-muted pb-px text-violet hover:border-violet"
           >
-            Change source
+            {resync ? "Disconnect" : "Change source"}
           </button>
+
+          {syncState.status === "error" && (
+            <span className="text-safranin" title={syncState.message}>
+              Sync failed
+            </span>
+          )}
         </div>
 
         <p className="ml-auto border border-safranin/40 bg-safranin-tint px-2.5 py-1 text-xs text-safranin">

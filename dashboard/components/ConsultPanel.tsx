@@ -4,6 +4,7 @@ import { z } from "zod";
 import {
   CopilotChat,
   useAgentContext,
+  useConfigureSuggestions,
   useFrontendTool,
   useRenderTool,
 } from "@copilotkit/react-core/v2";
@@ -19,11 +20,30 @@ interface ConsultPanelProps {
   onSpeciesFilter: (species: string | null) => void;
 }
 
+/**
+ * Rendered as native CopilotKit pills, so clicking one sends it. A static list
+ * the user has to retype is a worse demo and a worse affordance.
+ */
 const SUGGESTED = [
-  "Which cluster has the strongest lab-measured resistance, and how many strains support it?",
-  "Show me the co-occurrence pairs for Klebsiella pneumoniae.",
-  "Is anything here likely to be an outbreak artefact rather than a real pattern?",
-  "Highlight cluster 3 and explain why its confidence is low.",
+  {
+    title: "Strongest resistance",
+    message:
+      "Which cluster has the strongest lab-measured resistance, and how many distinct strains support it?",
+  },
+  {
+    title: "Co-occurrence",
+    message: "Show me the co-occurrence pairs for Klebsiella pneumoniae.",
+  },
+  {
+    title: "Artefact check",
+    message:
+      "Is anything here likely to be an outbreak artefact rather than a real pattern?",
+  },
+  {
+    title: "Still susceptible",
+    message:
+      "Which clusters still have susceptible isolates, and what are the counts?",
+  },
 ];
 
 /**
@@ -80,6 +100,11 @@ export function ConsultPanel({
       })),
     },
   });
+
+  useConfigureSuggestions(
+    { suggestions: SUGGESTED, available: "before-first-message" },
+    [],
+  );
 
   // Frontend tools must return a string (frontend.md §3 sharp edges).
   useFrontendTool({
@@ -246,14 +271,10 @@ export function ConsultPanel({
       </div>
 
       <div className="border-t border-hairline px-5 py-3">
-        <p className="eyebrow mb-2">Try</p>
-        <ul className="space-y-1">
-          {SUGGESTED.map((q) => (
-            <li key={q} className="text-xs leading-snug text-muted">
-              {q}
-            </li>
-          ))}
-        </ul>
+        <p className="text-xs leading-relaxed text-muted">
+          Suggested questions appear as pills above the input. The assistant can
+          also highlight a cluster or filter by species — ask it to.
+        </p>
       </div>
     </aside>
   );

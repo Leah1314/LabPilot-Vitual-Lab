@@ -102,6 +102,25 @@ export function GeneProducts({ data }: { data: DashboardData }) {
         />
       </section>
 
+      {products.length > 0 && (
+        <section>
+          <h3 className="display mb-3 text-lg text-ink">Top products in detail</h3>
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {products.slice(0, 6).map((p) => (
+              <div key={p.label} className="border border-hairline bg-card p-4">
+                <p className="text-xs leading-snug text-muted">{p.label}</p>
+                <p className="display mt-2 text-2xl text-ink">
+                  <span className="tabular">{p.value}</span>
+                </p>
+                <p className="mt-1 text-xs text-muted">
+                  annotated genes · {p.note}
+                </p>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
       <section className="border border-hairline bg-card p-5">
         <h3 className="display text-lg text-ink">Species</h3>
         <p className="mb-4 text-xs text-muted">

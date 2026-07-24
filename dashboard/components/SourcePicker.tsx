@@ -85,7 +85,9 @@ export function SourcePicker() {
             />
           )}
           {tab === "upload" && <UploadPanel onLoad={load} />}
-          {tab === "api" && <ApiPanel onLoad={load} />}
+          {tab === "api" && (
+            <ApiPanel onLoad={(data, config) => load(data, config)} />
+          )}
         </div>
 
         <p className="mt-10 border-t border-hairline pt-4 text-xs leading-relaxed text-muted">

@@ -42,7 +42,11 @@ function Field({
 const inputClass =
   "w-full border border-hairline bg-card px-2.5 py-1.5 text-sm text-ink outline-none focus:border-violet";
 
-export function ApiPanel({ onLoad }: { onLoad: (data: DashboardData) => void }) {
+export function ApiPanel({
+  onLoad,
+}: {
+  onLoad: (data: DashboardData, config: ApiConfig) => void;
+}) {
   const [config, setConfig] = useState<ApiConfig>(DEFAULT_API_CONFIG);
   const [showKey, setShowKey] = useState(false);
   const [testing, setTesting] = useState(false);
@@ -123,6 +127,8 @@ export function ApiPanel({ onLoad }: { onLoad: (data: DashboardData) => void }) 
         clusterSummary,
         observations: result.observations as ObservationsFile,
       }),
+      // Kept in memory so the dashboard can re-sync without retyping the key.
+      config,
     );
   }
 
