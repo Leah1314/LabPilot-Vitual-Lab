@@ -19,10 +19,37 @@ import { handle } from "hono/vercel";
 // pins @ai-sdk/provider 3.x; installing @ai-sdk/openai-compatible@latest pulls
 // a provider 4.x build for `ai` v7 and the model object is rejected with an
 // opaque "unsupported model version" rather than a clean failure.
+// GLM-5.2 thinks before answering by default, which costs seconds per turn and
+// makes the chat feel sluggish in a live demo. Fireworks accepts a
+// `reasoning_effort` field that the AI SDK does not model, so it is injected
+// into the request body here. Measured on the tool-calling path:
+//
+//   default          3.02s   25 completion tokens, 91 chars of reasoning
+//   effort "low"     0.88s   27 completion tokens, 95 chars of reasoning
+//   effort "none"    0.80s    6 completion tokens, 0 reasoning
+//
+// "none" is ~3.8x faster and still emits correct tool calls. Set
+// FIREWORKS_REASONING_EFFORT to "low"/"medium"/"high" to put thinking back.
+const REASONING_EFFORT = process.env.FIREWORKS_REASONING_EFFORT ?? "none";
+
+const fireworksFetch: typeof fetch = async (input, init) => {
+  if (init?.body && typeof init.body === "string") {
+    try {
+      const body = JSON.parse(init.body);
+      body.reasoning_effort = REASONING_EFFORT;
+      init = { ...init, body: JSON.stringify(body) };
+    } catch {
+      // Not JSON we can amend — send it through untouched rather than fail.
+    }
+  }
+  return fetch(input, init);
+};
+
 const fireworks = createOpenAICompatible({
   name: "fireworks",
   apiKey: process.env.FIREWORKS_API_KEY ?? "",
   baseURL: "https://api.fireworks.ai/inference/v1",
+  fetch: fireworksFetch,
 });
 
 // glm-5p2: 743B, 1M context, open weights, and function calling verified

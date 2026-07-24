@@ -116,7 +116,15 @@ minute**, which will not survive a live audience clicking around. Add one before
 demoing.
 
 Default model is **`glm-5p2`** (743B MoE, 1M context, open weights). Function
-calling was verified against the real `getPathogenDataset` schema. Fall back
+calling was verified against the real `getPathogenDataset` schema.
+
+**Reasoning is disabled by default.** GLM-5.2 thinks before answering, which
+cost seconds per turn and made the chat feel sluggish. The runtime injects
+`reasoning_effort: "none"` into every Fireworks request (the AI SDK does not
+model that field, so it goes in via a `fetch` wrapper). Measured on the
+tool-calling path: 3.02s default vs 0.80s with reasoning off, and ~1.07s
+end-to-end through the running server. Set `FIREWORKS_REASONING_EFFORT` to
+`low`, `medium` or `high` to put thinking back. Fall back
 through `deepseek-v4-pro`, `deepseek-v4-flash`, then `gpt-oss-120b` via
 `FIREWORKS_MODEL` — tool calling is confirmed on all of them.
 
