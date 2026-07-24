@@ -417,8 +417,6 @@ serverless options.
 
 ### 4.5 System prompt rules
 
-### 4.3 System prompt rules
-
 The LLM must be constrained hard:
 
 - It never estimates resistance itself. Every claim about resistance comes from
@@ -435,43 +433,192 @@ The LLM must be constrained hard:
 
 ## 5. PART 3 — Frontend: Next.js + CopilotKit
 
-### 5.1 Stack
+### 5.1 Stack (verified 2026-07-24 against CopilotKit 1.63.2)
 
-Next.js (App Router) + TypeScript + Tailwind, with CopilotKit as the AI
-interface layer. **Verify current CopilotKit package names, versions, and API
-signatures against the official docs before coding** — the library has had
-breaking changes across majors.
+Next.js (App Router) + TypeScript + Tailwind. CopilotKit is MIT-licensed and
+fully self-hostable — **no CopilotKit Cloud account or API key is required** for
+anything in this spec.
 
-You will need the React core and UI packages plus the runtime, a
-`/api/copilotkit` route handler, and the `<CopilotKit>` provider wrapping the app.
+```bash
+npm install @copilotkit/react-core@1.63.2 @copilotkit/react-ui@1.63.2 @copilotkit/runtime@1.63.2
+```
 
-### 5.2 The key integration
+**Use the v2 API, which lives under the `/v2` subpath of the same packages.**
+This is the most important thing in Part 3. The API you will find in most blog
+posts and older examples — `useCopilotAction`, `useCopilotReadable`,
+`OpenAIAdapter`, importing UI from `@copilotkit/react-ui` — is the **legacy v1
+surface**. It still ships and still works, but it is deprecated and the official
+docs teach v2 only. Do not mix the two in one tree; lint against bare
+`@copilotkit/react-core` imports.
 
-Point CopilotKit's runtime at Fireworks instead of OpenAI by constructing an
-OpenAI client with the Fireworks `baseURL` and passing it to the OpenAI-style
-adapter, with the model set to your chosen `accounts/fireworks/models/...` ID.
-Confirm the exact adapter class and constructor shape in the current docs —
-this is the single most version-sensitive line in the project. Get a "hello
-world" round-trip through Fireworks working before building any UI.
+| Legacy v1 | Use instead (v2) |
+|---|---|
+| `useCopilotAction` | `useFrontendTool` |
+| `useCopilotReadable` | `useAgentContext` |
+| `useCopilotAction` + `renderAndWaitForResponse` | `useHumanInTheLoop` |
+| `useCoAgent` | `useAgent` |
+| `OpenAIAdapter` + `serviceAdapter` | `BuiltInAgent` + `createCopilotRuntimeHandler` |
+
+In v2 the chat components moved into react-core — import `CopilotChat`,
+`CopilotSidebar`, and `CopilotPopup` from `@copilotkit/react-core/v2`, **not**
+from `@copilotkit/react-ui`, which has no v2 JS export. Styles come from
+`@copilotkit/react-core/v2/styles.css`. Tool parameters are **Zod schemas**, not
+the v1 array of parameter descriptors, so `zod >= 3` is required.
+
+Do not pin below **1.63.0** — it fixed a `/info` request storm that fired 70–80
+requests per page load under StrictMode, and TypeScript declaration resolution
+under modern `bundler`/`nodenext` tsconfigs.
+
+You do not need `useAgent`/CoAgents. Those are for stateful LangGraph-style
+backend graphs. Upload → predict → display needs only `useFrontendTool`,
+`useAgentContext`, and `useRenderTool`.
+
+### 5.2 The key integration — pointing CopilotKit at Fireworks
+
+There is **no `OpenAIAdapter` in the current path.** v2 replaced adapters with
+`BuiltInAgent`, which accepts a Vercel AI SDK `LanguageModel`. Since Fireworks
+is OpenAI-compatible, any AI SDK OpenAI-compatible provider works.
+
+```ts
+// app/api/copilotkit/[...path]/route.ts
+import { CopilotRuntime, createCopilotRuntimeHandler, BuiltInAgent } from "@copilotkit/runtime/v2";
+import { createOpenAICompatible } from "@ai-sdk/openai-compatible";
+
+const fireworks = createOpenAICompatible({
+  name: "fireworks",
+  apiKey: process.env.FIREWORKS_API_KEY!,
+  baseURL: "https://api.fireworks.ai/inference/v1",
+});
+
+const runtime = new CopilotRuntime({
+  agents: {
+    default: new BuiltInAgent({
+      model: fireworks("accounts/fireworks/models/deepseek-v4-pro"),
+      maxSteps: 5,
+      prompt: SYSTEM_PROMPT,   // see §4.5
+      tools: [predictResistance],
+    }),
+  },
+});
+
+const handler = createCopilotRuntimeHandler({ runtime, basePath: "/api/copilotkit" });
+export { handler as GET, handler as POST };
+```
+
+Route file must be `app/api/copilotkit/[...path]/route.ts` exporting both `GET`
+and `POST`. (Single-route mode exists via `mode: "single-route"` with only `POST`.)
+
+**Three traps here, all of which will cost you an afternoon each:**
+
+1. **AI SDK provider version mismatch — the worst one.** CopilotKit 1.63.2
+   bundles `ai@^6`, which pins `@ai-sdk/provider@3.x`. Installing
+   `@ai-sdk/openai-compatible@latest` today gives you a `provider@4.x` build for
+   `ai` v7, and the resulting model object is rejected with a confusing
+   "unsupported model version" error rather than a clean failure. **Pin
+   explicitly:** `@ai-sdk/openai-compatible@^2.0.62`, or `@ai-sdk/openai@^3.0.36`,
+   or `@ai-sdk/fireworks@^2.0.70`. Never `@latest`.
+2. **`maxSteps` defaults to `1`.** With the default, the agent calls your tool
+   and then stops without ever using the result. Set `maxSteps: 5`.
+3. **`forwardSystemMessages` defaults to `false`**, so system messages sent from
+   the client are silently dropped. Put your system prompt in `BuiltInAgent`'s
+   `prompt` field.
+
+Get a plain text round-trip through Fireworks working, then a tool call, before
+writing any UI.
+
+**Highest-risk unknown in the whole project:** CopilotKit's generative UI depends
+entirely on the model emitting well-formed tool calls in the shape `ai` v6
+expects. The plumbing accepts any OpenAI-compatible endpoint, but tool-calling
+fidelity varies across open models on Fireworks. **Prototype the tool-call path
+against your chosen model on day one.** If DeepSeek V4 Pro misbehaves, fall back
+through `deepseek-v4-flash`, then `gpt-oss-120b`.
+
+### 5.2b Backend tool
+
+```ts
+import { defineTool } from "@copilotkit/runtime/v2";
+import { z } from "zod";
+
+const predictResistance = defineTool({
+  name: "predictResistance",
+  description: "Predict whether an antibiotic will fail for an uploaded genome",
+  parameters: z.object({
+    sampleId: z.string().describe("ID returned by /api/upload"),
+    antibiotic: z.string(),
+  }),
+  execute: async ({ sampleId, antibiotic }) => {
+    const r = await fetch(`${process.env.PREDICTOR_URL}/predict`, {
+      method: "POST",
+      body: JSON.stringify({ sampleId, antibiotic }),
+      headers: { "content-type": "application/json" },
+    });
+    return await r.json();
+  },
+});
+```
 
 ### 5.3 Interface requirements
 
-**Upload.** Accept a FASTA assembly by drag-and-drop and by file picker, plus a
-"try a demo genome" path with two or three pinned examples — one clearly
+**Upload — keep the sequence away from the LLM.** CopilotKit does have a
+first-class chat attachment primitive (`attachments` on `CopilotChat`), but
+**do not use it for FASTA.** Attachments exist to feed multimodal content to the
+model and base64-inline the file into the message; a genome is megabytes of ACGT
+that the LLM must never see, the default size cap is 20 MB, and unsupported file
+types raise `RUN_ERROR`.
+
+The correct pattern:
+
+1. A plain React dropzone posting to `POST /api/upload`.
+2. The server validates the FASTA, forwards it to Part 1, and returns a
+   lightweight summary: `{ sampleId, organism, contigCount, totalBp, n50, qcPassed }`.
+3. Expose **only that summary** through `useAgentContext` — never the sequence.
+   Values must be strictly JSON-serializable; a `Date` or class instance throws.
+4. The LLM calls `predictResistance` with the `sampleId`.
+
+This keeps token cost flat regardless of genome size and gives you normal HTTP
+progress and retry behavior. If you want drag-into-chat as a convenience, enable
+`attachments` with an `onUpload` that uploads to your own storage and returns
+`{ type: "url" }`, so the model sees a URL rather than bytes.
+
+Also provide a "try a demo genome" path with three pinned examples — one clearly
 resistant, one clearly susceptible, one that fails QC and returns `no_call`.
-Validate extension and size client-side, and parse enough to confirm it looks
-like nucleotide FASTA before uploading. Handle multi-contig files.
 
-Do not try to push the file through the chat transport. Upload it via a normal
-route to Part 1, then expose the resulting analysis to the AI as readable app
-state so the assistant can discuss it.
+**Generative UI — use `useRenderTool`, not `useComponent`.** Both exist.
+`useComponent` lets the LLM call a component as a tool and fill its props, which
+means the model would be *retyping* confidence numbers into tool arguments. In a
+clinical context that is unacceptable. `useRenderTool` is renderer-only, keyed to
+the backend tool name, and renders your predictor's actual JSON:
 
-**Generative UI.** Register a frontend action the LLM calls to render a result
-card in the chat rather than describing it in prose. The card shows the call
-(`likely_to_fail` / `likely_to_work` / `no_call`) with unmistakable color
-coding, a calibrated probability with its confidence band, a determinant table
-listing each gene or mutation with its contribution, a QC panel, and the model
-version with a link to the model card.
+```tsx
+useRenderTool({
+  name: "predictResistance",
+  parameters: z.object({ sampleId: z.string(), antibiotic: z.string() }),
+  render: ({ parameters, status, result }) => {
+    if (status === "inProgress") return <Skeleton />;
+    if (status === "executing") return <div>Analyzing {parameters.sampleId}…</div>;
+    return <ResistanceCard {...JSON.parse(result)} />;
+  },
+}, []);
+```
+
+Reserve `useComponent` for things the LLM legitimately composes, such as
+comparisons or summaries.
+
+The card shows the call (`likely_to_fail` / `likely_to_work` / `no_call`) with
+unmistakable color coding, the calibrated probability with its confidence band,
+a determinant table listing each gene or mutation with its contribution, a QC
+panel, and the model version linking to the model card.
+
+Two API sharp edges worth knowing up front: `useRenderTool` reports status as
+**string literals** (`"inProgress"`, `"executing"`, `"complete"`) while
+`useFrontendTool` and `useHumanInTheLoop` use the **`ToolCallStatus` enum** — and
+that enum is imported from `@copilotkit/core`, not from `@copilotkit/react-core/v2`,
+which the docs use without ever showing the import. Also, `useFrontendTool`
+handlers must return a `string`; return `JSON.stringify(obj)`, not the object.
+
+**Optional: `useHumanInTheLoop`** fits naturally here if you want a clinician to
+approve an interpretation before it is saved. The agent pauses until `respond()`
+is called.
 
 **Honest-uncertainty design.** `no_call` must look like a deliberate answer, not
 an error — it is the most trustworthy thing the system does. Give it equal
@@ -589,3 +736,15 @@ Work strictly in this order. Each milestone must run before the next starts.
     **10 requests per minute**.
 14. Treating `github.com/daytonaio/daytona` as current. It was frozen in June
     2026; the SDKs are what ship.
+15. **Writing CopilotKit v1 code.** `useCopilotAction`, `useCopilotReadable`, and
+    `OpenAIAdapter` are the deprecated legacy surface. Use the `/v2` subpath.
+16. **Installing `@ai-sdk/*` providers at `@latest`.** They resolve to the
+    `provider@4.x` line for `ai` v7; CopilotKit 1.63.2 bundles `ai` v6 and will
+    reject the model with an opaque error. Pin to the `3.x` provider line.
+17. **Leaving `maxSteps` at its default of 1.** The agent calls the tool, then
+    stops without using the result. Looks like the model ignoring your tool.
+18. Sending the FASTA through chat attachments. Blows up token cost, hits the
+    20 MB cap, and leaks sequence data to the model for no benefit.
+19. Using `useComponent` for the prediction card, which makes the LLM retype
+    confidence numbers into tool args. Use `useRenderTool`.
+20. Leaving `showDevConsole` at its `false` default while debugging.
