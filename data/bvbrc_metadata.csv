@@ -1,0 +1,241 @@
+genome_id,genome_name,genome_quality,genome_status,geographic_location,host_name,isolation_country,isolation_source,mlst,species,strain,collection_year
+1351.1163,Enterococcus faecalis strain 16EA1,Good,WGS,"USA: Nashville, TN","Chicken, Gallus gallus",USA,Breast meat,MLST.efaecalis.314,Enterococcus faecalis,16EA1,
+1351.1164,Enterococcus faecalis strain 14EA1,Good,WGS,"USA: Seattle, WA","Chicken, Gallus gallus",USA,Breast meat,MLST.efaecalis.147,Enterococcus faecalis,14EA1,
+1351.1165,Enterococcus faecalis strain 182EA1,Good,WGS,"USA: Dallas, TX","Chicken, Gallus gallus",USA,Breast meat,MLST.efaecalis.16,Enterococcus faecalis,182EA1,
+1351.1166,Enterococcus faecalis strain 210AEA1,Good,WGS,"USA: New Orleans, LA","Chicken, Gallus gallus",USA,Breast meat,MLST.efaecalis.249,Enterococcus faecalis,210AEA1,
+1351.1167,Enterococcus faecalis strain 209EA1,Good,WGS,"USA: Tampa, FL","Chicken, Gallus gallus",USA,Breast meat,MLST.efaecalis.624,Enterococcus faecalis,209EA1,
+1351.1168,Enterococcus faecalis strain 234EA1,Good,WGS,"USA: Boise, ID","Chicken, Gallus gallus",USA,Breast meat,MLST.efaecalis.314,Enterococcus faecalis,234EA1,
+1351.1169,Enterococcus faecalis strain 213EA1,Good,WGS,"USA: Iowa City, IA","Chicken, Gallus gallus",USA,Breast meat,MLST.efaecalis.273,Enterococcus faecalis,213EA1,
+1351.1170,Enterococcus faecalis strain 250AEA1,Good,WGS,"USA: St. Paul, MN","Chicken, Gallus gallus",USA,Breast meat,,Enterococcus faecalis,250AEA1,
+1351.1171,Enterococcus faecalis strain 236EA1,Good,WGS,"USA: Boise, ID","Chicken, Gallus gallus",USA,Breast meat,MLST.Enterococcus_faecalis.79,Enterococcus faecalis,236EA1,
+1351.1172,Enterococcus faecalis strain 257EA1,Good,WGS,"USA: Charlotte, NC","Chicken, Gallus gallus",USA,Breast meat,MLST.efaecalis.1242,Enterococcus faecalis,257EA1,
+1351.1173,Enterococcus faecalis strain 262EA1,Good,WGS,"USA: Louisville, KY","Chicken, Gallus gallus",USA,Breast meat,MLST.efaecalis.177,Enterococcus faecalis,262EA1,
+1351.1174,Enterococcus faecalis strain 277EA1,Good,WGS,"USA: Fairfax, VA","Chicken, Gallus gallus",USA,Breast meat,MLST.efaecalis.237,Enterococcus faecalis,277EA1,
+1351.1175,Enterococcus faecalis strain 263EA1,Good,WGS,"USA: San Francisco, CA","Chicken, Gallus gallus",USA,Breast meat,MLST.efaecalis.126,Enterococcus faecalis,263EA1,
+1351.1176,Enterococcus faecalis strain 270AEA1,Good,WGS,"USA: New Orleans, LA","Chicken, Gallus gallus",USA,Breast meat,MLST.efaecalis.398,Enterococcus faecalis,270AEA1,
+1351.1177,Enterococcus faecalis strain 294EA1,Good,WGS,"USA: Los Angeles, CA","Chicken, Gallus gallus",USA,Breast meat,MLST.efaecalis.36,Enterococcus faecalis,294EA1,
+1351.1179,Enterococcus faecalis strain 2EA1,Good,WGS,"USA: Boston, MA","Chicken, Gallus gallus",USA,Breast meat,MLST.efaecalis.21,Enterococcus faecalis,2EA1,
+1351.1180,Enterococcus faecalis strain 300AEA1,Good,WGS,"USA: Tuscaloosa, AL","Chicken, Gallus gallus",USA,Breast meat,MLST.efaecalis.147,Enterococcus faecalis,300AEA1,
+1351.1181,Enterococcus faecalis strain 315EA1,Good,WGS,"USA: Denver, CO","Chicken, Gallus gallus",USA,Breast meat,MLST.efaecalis.147,Enterococcus faecalis,315EA1,
+1351.1182,Enterococcus faecalis strain 302EA1,Good,WGS,"USA: Detroit, MI","Chicken, Gallus gallus",USA,Breast meat,MLST.efaecalis.122,Enterococcus faecalis,302EA1,
+1351.1183,Enterococcus faecalis strain 304EA1,Good,WGS,"USA: Detroit, MI","Chicken, Gallus gallus",USA,Breast meat,MLST.efaecalis.49,Enterococcus faecalis,304EA1,
+1351.1184,Enterococcus faecalis strain 312EA1,Good,WGS,"USA: New York, NY","Chicken, Gallus gallus",USA,Breast meat,MLST.efaecalis.202,Enterococcus faecalis,312EA1,
+1351.1185,Enterococcus faecalis strain 34EA1,Good,WGS,"USA: Louisville, KY","Chicken, Gallus gallus",USA,Breast meat,,Enterococcus faecalis,34EA1,
+1351.1187,Enterococcus faecalis strain 39EA1,Good,WGS,"USA: Little Rock, AR","Chicken, Gallus gallus",USA,Breast meat,MLST.efaecalis.368,Enterococcus faecalis,39EA1,
+1351.1188,Enterococcus faecalis strain 52EA1,Good,WGS,"USA: Phoenix, AZ","Chicken, Gallus gallus",USA,Breast meat,MLST.efaecalis.21,Enterococcus faecalis,52EA1,
+1351.1189,Enterococcus faecalis strain 61EA1,Good,WGS,"USA: Charlotte, NC","Chicken, Gallus gallus",USA,Breast meat,MLST.efaecalis.314,Enterococcus faecalis,61EA1,
+1351.1190,Enterococcus faecalis strain 72EA1,Good,WGS,"USA: Tuscaloosa, AL","Chicken, Gallus gallus",USA,Breast meat,MLST.efaecalis.16,Enterococcus faecalis,72EA1,
+1351.1191,Enterococcus faecalis strain 54EA1,Good,WGS,"USA: Trenton, NJ","Chicken, Gallus gallus",USA,Breast meat,MLST.efaecalis.256,Enterococcus faecalis,54EA1,
+1351.1192,Enterococcus faecalis strain 68EA1,Good,WGS,"USA: Baltimore, MD","Chicken, Gallus gallus",USA,Breast meat,MLST.efaecalis.688,Enterococcus faecalis,68EA1,
+1351.1193,Enterococcus faecalis strain 91EA1,Good,WGS,"USA: New York, NY","Chicken, Gallus gallus",USA,Breast meat,MLST.efaecalis.444,Enterococcus faecalis,91EA1,
+1351.1194,Enterococcus faecalis strain 76EA1,Good,WGS,"USA: Chelsea, ME","Chicken, Gallus gallus",USA,Breast meat,MLST.efaecalis.21,Enterococcus faecalis,76EA1,
+1352.3955,Enterococcus faecium strain 114EA1,Good,WGS,"USA: Louisville, KY","Chicken, Gallus gallus",USA,Breast meat,MLST.efaecium.38,Enterococcus faecium,114EA1,
+1352.3956,Enterococcus faecium strain 131EA1,Good,WGS,"USA: Phoenix, AZ","Chicken, Gallus gallus",USA,Breast meat,MLST.efaecium.2194,Enterococcus faecium,131EA1,
+1352.3957,Enterococcus faecium strain 147EA1,Good,WGS,"USA: Little Rock, AR","Chicken, Gallus gallus",USA,Breast meat,MLST.efaecium.785,Enterococcus faecium,147EA1,
+1352.3958,Enterococcus faecium strain 158EA1,Good,WGS,"USA: Louisville, KY","Chicken, Gallus gallus",USA,Breast meat,,Enterococcus faecium,158EA1,
+1352.3959,Enterococcus faecium strain 160AEA1,Good,WGS,"USA: Boise, ID","Chicken, Gallus gallus",USA,Breast meat,MLST.efaecium.462,Enterococcus faecium,160AEA1,
+1352.3960,Enterococcus faecium strain 163EA1,Good,WGS,"USA: Little Rock, AR","Chicken, Gallus gallus",USA,Breast meat,MLST.efaecium.21,Enterococcus faecium,163EA1,
+1352.3961,Enterococcus faecium strain 173EA1,Good,WGS,"USA: Baltimore, MD","Chicken, Gallus gallus",USA,Breast meat,MLST.efaecium.2308,Enterococcus faecium,173EA1,
+1352.3962,Enterococcus faecium strain 177EA1,Good,WGS,"USA: Dallas, TX","Chicken, Gallus gallus",USA,Breast meat,MLST.efaecium.8,Enterococcus faecium,177EA1,
+1352.3963,Enterococcus faecium strain 176EA1,Good,WGS,"USA: St. Paul, MN","Chicken, Gallus gallus",USA,Breast meat,MLST.efaecium.21,Enterococcus faecium,176EA1,
+1352.3964,Enterococcus faecium strain 197EA1,Good,WGS,"USA: Nashville, TN","Chicken, Gallus gallus",USA,Breast meat,MLST.efaecium.434,Enterococcus faecium,197EA1,
+1352.3965,Enterococcus faecium strain 242EA1,Good,WGS,"USA: Phoenix, AZ","Chicken, Gallus gallus",USA,Breast meat,MLST.efaecium.2315,Enterococcus faecium,242EA1,
+1352.3966,Enterococcus faecium strain 261EA1,Good,WGS,"USA: Louisville, KY","Chicken, Gallus gallus",USA,Breast meat,MLST.efaecium.309,Enterococcus faecium,261EA1,
+1352.3967,Enterococcus faecium strain 205EA1,Good,WGS,"USA: Chelsea, ME","Chicken, Gallus gallus",USA,Breast meat,MLST.efaecium.2250,Enterococcus faecium,205EA1,
+1352.3968,Enterococcus faecium strain 235EA1,Good,WGS,"USA: Boise, ID","Chicken, Gallus gallus",USA,Breast meat,MLST.efaecium.2308,Enterococcus faecium,235EA1,
+1352.3969,Enterococcus faecium strain 248EA1,Good,WGS,"USA: Little Rock, AR","Chicken, Gallus gallus",USA,Breast meat,MLST.efaecium.157,Enterococcus faecium,248EA1,
+1352.3970,Enterococcus faecium strain 268EA1,Good,WGS,"USA: Boston, MA","Chicken, Gallus gallus",USA,Breast meat,MLST.efaecium.2317,Enterococcus faecium,268EA1,
+1352.3971,Enterococcus faecium strain 276EA1,Good,WGS,"USA: Pittsburgh, PA","Chicken, Gallus gallus",USA,Breast meat,MLST.efaecium.12,Enterococcus faecium,276EA1,
+1352.3972,Enterococcus faecium strain 264EA1,Good,WGS,"USA: San Francisco, CA","Chicken, Gallus gallus",USA,Breast meat,MLST.efaecium.9,Enterococcus faecium,264EA1,
+1352.3973,Enterococcus faecium strain 26EA1,Good,WGS,"USA: New Orleans, LA","Chicken, Gallus gallus",USA,Breast meat,MLST.efaecium.2318,Enterococcus faecium,26EA1,
+1352.3974,Enterococcus faecium strain 284EA1,Good,WGS,"USA: Kansas City, KS","Chicken, Gallus gallus",USA,Breast meat,MLST.efaecium.2319,Enterococcus faecium,284EA1,
+1352.3975,Enterococcus faecium strain 283EA1,Good,WGS,"USA: Kansas City, KS","Chicken, Gallus gallus",USA,Breast meat,MLST.efaecium.800,Enterococcus faecium,283EA1,
+1352.3976,Enterococcus faecium strain 292EA1,Good,WGS,"USA: New York, NY","Chicken, Gallus gallus",USA,Breast meat,MLST.efaecium.2044,Enterococcus faecium,292EA1,
+1352.3977,Enterococcus faecium strain 29EA1,Good,WGS,"USA: Tuscaloosa, AL","Chicken, Gallus gallus",USA,Breast meat,MLST.efaecium.54,Enterococcus faecium,29EA1,
+1352.3978,Enterococcus faecium strain 300BEA1,Good,WGS,,"Chicken, Gallus gallus",,Breast meat,MLST.efaecium.22,Enterococcus faecium,300BEA1,
+1352.3979,Enterococcus faecium strain 306EA1,Good,WGS,"USA: Denver, CO","Chicken, Gallus gallus",USA,Breast meat,MLST.efaecium.38,Enterococcus faecium,306EA1,
+1352.3980,Enterococcus faecium strain 311EA1,Good,WGS,"USA: New York, NY","Chicken, Gallus gallus",USA,Breast meat,MLST.efaecium.32,Enterococcus faecium,311EA1,
+1352.3981,Enterococcus faecium strain 316EA1,Good,WGS,"USA: Denver, CO","Chicken, Gallus gallus",USA,Breast meat,MLST.efaecium.38,Enterococcus faecium,316EA1,
+1352.3982,Enterococcus faecium strain 319EA1,Good,WGS,"USA: Detroit, MI","Chicken, Gallus gallus",USA,Breast meat,MLST.efaecium.76,Enterococcus faecium,319EA1,
+1352.3983,Enterococcus faecium strain 46EA1,Good,WGS,"USA: Dallas, TX","Chicken, Gallus gallus",USA,Breast meat,MLST.efaecium.54,Enterococcus faecium,46EA1,
+1352.3984,Enterococcus faecium strain 55EA1,Good,WGS,"USA: Trenton, NJ","Chicken, Gallus gallus",USA,Breast meat,MLST.efaecium.76,Enterococcus faecium,55EA1,
+1352.3985,Enterococcus faecium strain 42EA1,Good,WGS,"USA: Dallas, TX","Chicken, Gallus gallus",USA,Breast meat,MLST.efaecium.1950,Enterococcus faecium,42EA1,
+1352.3987,Enterococcus faecium strain 62EA1,Good,WGS,"USA: Charlotte, NC","Chicken, Gallus gallus",USA,Breast meat,MLST.efaecium.9,Enterococcus faecium,62EA1,
+1352.3988,Enterococcus faecium strain 70AEA1,Good,WGS,"USA: Chicago, IL","Chicken, Gallus gallus",USA,Breast meat,MLST.efaecium.1950,Enterococcus faecium,70AEA1,
+1352.3989,Enterococcus faecium strain 67EA1,Good,WGS,"USA: Baltimore, MD","Chicken, Gallus gallus",USA,Breast meat,MLST.efaecium.21,Enterococcus faecium,67EA1,
+1352.3990,Enterococcus faecium strain 74EA1,Good,WGS,"USA: Tuscaloosa, AL","Chicken, Gallus gallus",USA,Breast meat,MLST.efaecium.1973,Enterococcus faecium,74EA1,
+1352.3991,Enterococcus faecium strain 78EA1,Good,WGS,"USA: Fairfax, VA","Chicken, Gallus gallus",USA,Breast meat,MLST.efaecium.2250,Enterococcus faecium,78EA1,
+1352.3993,Enterococcus faecium strain 86EA1,Good,WGS,"USA: Tampa, FL","Chicken, Gallus gallus",USA,Breast meat,MLST.efaecium.1950,Enterococcus faecium,86EA1,
+1352.3994,Enterococcus faecium strain 79EA1,Good,WGS,"USA: Fairfax, VA","Chicken, Gallus gallus",USA,Breast meat,MLST.efaecium.54,Enterococcus faecium,79EA1,
+1352.3995,Enterococcus faecium strain 87EA1,Good,WGS,"USA: Tampa, FL","Chicken, Gallus gallus",USA,Breast meat,MLST.efaecium.12,Enterococcus faecium,87EA1,
+1352.3997,Enterococcus faecium strain 92EA1,Good,WGS,"USA: Detroit, MI","Chicken, Gallus gallus",USA,Breast meat,MLST.efaecium.22,Enterococcus faecium,92EA1,
+562.100283,Escherichia coli c2ea800c-7bb9-11e9-a8d3-68b59976a384,Good,WGS,,,Norway,,MLST.ecoli_achtman_4.131,Escherichia coli,c2ea800c-7bb9-11e9-a8d3-68b59976a384,2015.0
+562.100290,Escherichia coli c53ff29c-7bb9-11e9-a8d3-68b59976a384,Good,WGS,,,Norway,,MLST.ecoli_achtman_4.73,Escherichia coli,c53ff29c-7bb9-11e9-a8d3-68b59976a384,2015.0
+562.100301,Escherichia coli cacdeea8-7bb9-11e9-a8d3-68b59976a384,Good,WGS,,,Norway,,MLST.ecoli_achtman_4.131,Escherichia coli,cacdeea8-7bb9-11e9-a8d3-68b59976a384,2015.0
+562.11346,Escherichia coli strain RL158,Good,WGS,,,Germany,Turkey hen Schnitzel,MLST.ecoli_achtman_4.357,Escherichia coli,RL158,2012.0
+562.11347,Escherichia coli strain RL465,Good,WGS,,,Germany,Turkey hen meat,MLST.ecoli_achtman_4.410,Escherichia coli,RL465,2013.0
+562.11349,Escherichia coli strain RL145,Good,WGS,,,Germany,"Minced meat, beef",MLST.ecoli_achtman_4.88,Escherichia coli,RL145,2012.0
+562.11557,Escherichia coli strain RL138,Good,WGS,,,Germany,Chicken breast,MLST.ecoli_achtman_4.602,Escherichia coli,RL138,2012.0
+562.12959,Escherichia coli strain AR_0001,Good,WGS,,,,,MLST.ecoli_achtman_4.131,Escherichia coli,AR_0001,
+562.12960,Escherichia coli strain AR_0048,Good,WGS,,,,,MLST.ecoli_achtman_4.101,Escherichia coli,AR_0048,
+562.12961,Escherichia coli strain F1-8-ERB4,Good,WGS,Bangkok,,Thailand,Farm,MLST.klebsiella.3839,Escherichia coli,F1-8-ERB4,2015.0
+562.12962,Escherichia coli strain PB486,Good,WGS,Bangkok,"Human, Homo sapiens",Thailand,urine,MLST.klebsiella.48,Escherichia coli,PB486,2015.0
+562.135559,Escherichia coli MGL_90,Good,WGS,Chattisgarh (Jan Swasthya Sahyog),Homo sapiens,India,Pus,MLST.ecoli_achtman_4.167,Escherichia coli,MGL_90,2020.0
+562.135560,Escherichia coli MGL_106,Good,WGS,Chattisgarh (Jan Swasthya Sahyog),Homo sapiens,India,Serous discharge abd- surgical site infection,MLST.ecoli_achtman_4.2689,Escherichia coli,MGL_106,2020.0
+562.135561,Escherichia coli MGL_91,Good,WGS,Chattisgarh (Jan Swasthya Sahyog),Homo sapiens,India,Urine,MLST.Escherichia_coli_2.692,Escherichia coli,MGL_91,2020.0
+562.135562,Escherichia coli MGL_87,Good,WGS,Chattisgarh (Jan Swasthya Sahyog),Homo sapiens,India,Urine from DJ Stent,MLST.Escherichia_coli_2.88,Escherichia coli,MGL_87,2020.0
+562.135563,Escherichia coli MGL_86,Good,WGS,Chattisgarh (Jan Swasthya Sahyog),Homo sapiens,India,Urine,MLST.ecoli_achtman_4.131,Escherichia coli,MGL_86,2020.0
+562.135567,Escherichia coli 20200622_MGL_66,Good,WGS,Chattisgarh (Jan Swasthya Sahyog),Homo sapiens,India,Blood,MLST.ecoli_achtman_4.167,Escherichia coli,20200622_MGL_66,2020.0
+562.135568,Escherichia coli 20200622_MGL_67,Good,WGS,Chattisgarh (Jan Swasthya Sahyog),Homo sapiens,India,Tissue,MLST.ecoli_achtman_4.8346,Escherichia coli,20200622_MGL_67,2020.0
+562.135569,Escherichia coli 20200203_MGL_07,Good,WGS,Chattisgarh (Jan Swasthya Sahyog),Homo sapiens,India,Urine,MLST.ecoli_achtman_4.2083,Escherichia coli,20200203_MGL_07,2019.0
+562.135570,Escherichia coli 20200203_MGL_22,Good,WGS,Chattisgarh (Jan Swasthya Sahyog),Homo sapiens,India,Sputum,MLST.ecoli_achtman_4.405,Escherichia coli,20200203_MGL_22,2019.0
+562.135571,Escherichia coli MGL_125,Good,WGS,Chattisgarh (Jan Swasthya Sahyog),Homo sapiens,India,Pus,MLST.ecoli_achtman_4.8346,Escherichia coli,MGL_125,2020.0
+562.135572,Escherichia coli MGL_123,Good,WGS,Chattisgarh (Jan Swasthya Sahyog),Homo sapiens,India,Urine,MLST.ecoli_achtman_4.156,Escherichia coli,MGL_123,2020.0
+562.135573,Escherichia coli MGL_117,Good,WGS,Chattisgarh (Jan Swasthya Sahyog),Homo sapiens,India,Pus,MLST.ecoli_achtman_4.167,Escherichia coli,MGL_117,2020.0
+562.135574,Escherichia coli MGL_116,Good,WGS,Chattisgarh (Jan Swasthya Sahyog),Homo sapiens,India,Urine,MLST.ecoli_achtman_4.648,Escherichia coli,MGL_116,2020.0
+562.135575,Escherichia coli MGL_118,Good,WGS,Chattisgarh (Jan Swasthya Sahyog),Homo sapiens,India,Pus,MLST.ecoli_achtman_4.167,Escherichia coli,MGL_118,2020.0
+562.135576,Escherichia coli 20200203_MGL_04,Good,WGS,Chattisgarh (Jan Swasthya Sahyog),Homo sapiens,India,Urine,MLST.ecoli_achtman_4.448,Escherichia coli,20200203_MGL_04,2019.0
+562.135577,Escherichia coli 20200203_MGL_11,Good,WGS,Chattisgarh (Jan Swasthya Sahyog),Homo sapiens,India,Urine,MLST.ecoli_achtman_4.2450,Escherichia coli,20200203_MGL_11,2019.0
+562.135578,Escherichia coli 20200203_MGL_16,Good,WGS,Chattisgarh (Jan Swasthya Sahyog),Homo sapiens,India,Urine,MLST.ecoli_achtman_4.8346,Escherichia coli,20200203_MGL_16,2020.0
+562.135579,Escherichia coli MGL_1560,Good,WGS,Chattisgarh (Jan Swasthya Sahyog),Homo sapiens,India,Urine from DJ Stent,MLST.ecoli_achtman_4.167,Escherichia coli,MGL_1560,2021.0
+562.135581,Escherichia coli 20200203_MGL_06,Good,WGS,Chattisgarh (Jan Swasthya Sahyog),Homo sapiens,India,Urine,MLST.ecoli_achtman_4.2083,Escherichia coli,20200203_MGL_06,2019.0
+562.135582,Escherichia coli 20200203_MGL_05,Good,WGS,Chattisgarh (Jan Swasthya Sahyog),Homo sapiens,India,Urine,MLST.ecoli_achtman_4.2083,Escherichia coli,20200203_MGL_05,2019.0
+562.135583,Escherichia coli 20200317_MGL_35,Good,WGS,Chattisgarh (Jan Swasthya Sahyog),Homo sapiens,India,Peritoneal fluid,MLST.ecoli_achtman_4.405,Escherichia coli,20200317_MGL_35,2020.0
+562.135584,Escherichia coli 20200203_MGL_20,Good,WGS,Chattisgarh (Jan Swasthya Sahyog),Homo sapiens,India,Pus,MLST.ecoli_achtman_4.405,Escherichia coli,20200203_MGL_20,2019.0
+562.135585,Escherichia coli 20200203_MGL_19,Good,WGS,Chattisgarh (Jan Swasthya Sahyog),Homo sapiens,India,Pus,MLST.ecoli_achtman_4.405,Escherichia coli,20200203_MGL_19,2019.0
+562.135586,Escherichia coli MGL_150,Good,WGS,Chattisgarh (Jan Swasthya Sahyog),Homo sapiens,India,Pus,MLST.ecoli_achtman_4.167,Escherichia coli,MGL_150,2020.0
+562.135590,Escherichia coli 20200203_MGL_01,Good,WGS,Chattisgarh (Jan Swasthya Sahyog),Homo sapiens,India,Urine,MLST.Escherichia_coli_2.2,Escherichia coli,20200203_MGL_01,2019.0
+562.135591,Escherichia coli 20200203_MGL_12,Good,WGS,Chattisgarh (Jan Swasthya Sahyog),Homo sapiens,India,Urine,MLST.ecoli_achtman_4.410,Escherichia coli,20200203_MGL_12,2019.0
+562.135592,Escherichia coli MGL_131,Good,WGS,Chattisgarh (Jan Swasthya Sahyog),Homo sapiens,India,Urine,MLST.ecoli_achtman_4.410,Escherichia coli,MGL_131,2020.0
+562.135593,Escherichia coli MGL_126,Good,WGS,Chattisgarh (Jan Swasthya Sahyog),Homo sapiens,India,Urine,MLST.ecoli_achtman_4.167,Escherichia coli,MGL_126,2020.0
+562.135594,Escherichia coli 20200203_MGL_03,Good,WGS,Chattisgarh (Jan Swasthya Sahyog),Homo sapiens,India,Urine,MLST.ecoli_achtman_4.405,Escherichia coli,20200203_MGL_03,2019.0
+573.12771,Klebsiella pneumoniae strain AR_0126,Good,Complete,,,,,MLST.klebsiella.45,Klebsiella pneumoniae,AR_0126,
+573.12772,Klebsiella pneumoniae strain AR_0113,Good,Complete,,,,,MLST.klebsiella.258,Klebsiella pneumoniae,AR_0113,
+573.12773,Klebsiella pneumoniae strain AR_0138,Good,Complete,,,,,MLST.klebsiella.147,Klebsiella pneumoniae,AR_0138,
+573.12777,Klebsiella pneumoniae strain AR_0120,Good,Complete,,,,,MLST.klebsiella.258,Klebsiella pneumoniae,AR_0120,
+573.12778,Klebsiella pneumoniae strain AR_0125,Good,Complete,,,,,MLST.klebsiella.258,Klebsiella pneumoniae,AR_0125,
+573.12779,Klebsiella pneumoniae strain AR_0139,Good,Complete,,,,,MLST.klebsiella.37,Klebsiella pneumoniae,AR_0139,
+573.12780,Klebsiella pneumoniae strain AR_0145,Good,Complete,,,,,MLST.klebsiella.147,Klebsiella pneumoniae,AR_0145,
+573.12781,Klebsiella pneumoniae strain AR_0152,Good,Complete,,,,,MLST.klebsiella.147,Klebsiella pneumoniae,AR_0152,
+573.12782,Klebsiella pneumoniae strain AR_0148,Good,Complete,,,,,MLST.klebsiella.11,Klebsiella pneumoniae,AR_0148,
+573.12783,Klebsiella pneumoniae strain AR_0107,Good,Complete,,,,,MLST.klebsiella.1161,Klebsiella pneumoniae,AR_0107,
+573.12796,Klebsiella pneumoniae strain MLST-15,Good,Complete,USA: Nevada,"Human, Homo sapiens",USA,wound,MLST.klebsiella.15,Klebsiella pneumoniae,MLST-15,2016.0
+573.12868,Klebsiella pneumoniae 78,Good,WGS,USA: Houston,"Human, Homo sapiens",USA,,MLST.klebsiella.86,Klebsiella pneumoniae,78,
+573.12871,Klebsiella pneumoniae 94,Good,WGS,USA: Houston,"Human, Homo sapiens",USA,,MLST.klebsiella.37,Klebsiella pneumoniae,94,
+573.12889,Klebsiella pneumoniae 51,Good,WGS,USA: Houston,"Human, Homo sapiens",USA,,MLST.klebsiella.2330,Klebsiella pneumoniae,51,
+573.12902,Klebsiella pneumoniae 119,Good,WGS,USA: Houston,"Human, Homo sapiens",USA,,,Klebsiella pneumoniae,119,
+573.12908,Klebsiella pneumoniae 74,Good,WGS,USA: Houston,"Human, Homo sapiens",USA,,MLST.Klebsiella_pneumoniae.253,Klebsiella pneumoniae,74,
+573.12917,Klebsiella pneumoniae 112,Good,WGS,USA: Houston,"Human, Homo sapiens",USA,,MLST.klebsiella.13,Klebsiella pneumoniae,112,
+573.12925,Klebsiella pneumoniae 93,Good,WGS,USA: Houston,"Human, Homo sapiens",USA,,MLST.klebsiella.17,Klebsiella pneumoniae,93,
+573.12935,Klebsiella pneumoniae 104,Good,WGS,USA: Houston,"Human, Homo sapiens",USA,,MLST.klebsiella.133,Klebsiella pneumoniae,104,
+573.12951,Klebsiella pneumoniae 97,Poor,WGS,USA: Houston,"Human, Homo sapiens",USA,,MLST.klebsiella.2793,Klebsiella pneumoniae,97,
+573.12960,Klebsiella pneumoniae 123,Good,WGS,USA: Houston,"Human, Homo sapiens",USA,,MLST.klebsiella.1686,Klebsiella pneumoniae,123,
+573.12962,Klebsiella pneumoniae 28,Good,WGS,USA: Houston,"Human, Homo sapiens",USA,,MLST.klebsiella.17,Klebsiella pneumoniae,28,
+573.12963,Klebsiella pneumoniae 31,Good,WGS,USA: Houston,"Human, Homo sapiens",USA,,MLST.klebsiella.433,Klebsiella pneumoniae,31,
+573.12967,Klebsiella pneumoniae 18,Good,WGS,USA: Houston,"Human, Homo sapiens",USA,,MLST.klebsiella.147,Klebsiella pneumoniae,18,
+573.12989,Klebsiella pneumoniae 46,Good,WGS,USA: Houston,"Human, Homo sapiens",USA,,MLST.klebsiella.466,Klebsiella pneumoniae,46,
+573.12997,Klebsiella pneumoniae 99,Good,WGS,USA: Houston,"Human, Homo sapiens",USA,,MLST.klebsiella.17,Klebsiella pneumoniae,99,
+573.13000,Klebsiella pneumoniae 33,Good,WGS,USA: Houston,"Human, Homo sapiens",USA,,MLST.klebsiella.45,Klebsiella pneumoniae,33,
+573.13009,Klebsiella pneumoniae 16,Good,WGS,USA: Houston,"Human, Homo sapiens",USA,,MLST.klebsiella.48,Klebsiella pneumoniae,16,
+573.13013,Klebsiella pneumoniae 125,Good,WGS,USA: Houston,"Human, Homo sapiens",USA,,MLST.klebsiella.2599,Klebsiella pneumoniae,125,
+573.13037,Klebsiella pneumoniae KPN1010ec,Good,WGS,USA: Houston,"Human, Homo sapiens",USA,URINE,MLST.klebsiella.14,Klebsiella pneumoniae,KPN1010ec,2013.0
+573.13039,Klebsiella pneumoniae KPN1012ec,Good,WGS,USA: Houston,"Human, Homo sapiens",USA,URINE,MLST.klebsiella.258,Klebsiella pneumoniae,KPN1012ec,2013.0
+573.13074,Klebsiella pneumoniae KPN1056ec,Good,WGS,USA: Houston,"Human, Homo sapiens",USA,URINE,MLST.klebsiella.628,Klebsiella pneumoniae,KPN1056ec,2013.0
+573.13089,Klebsiella pneumoniae KPN1077ec,Good,WGS,USA: Houston,"Human, Homo sapiens",USA,URINE,MLST.klebsiella.307,Klebsiella pneumoniae,KPN1077ec,2013.0
+573.13090,Klebsiella pneumoniae KPN1078ec,Good,WGS,USA: Houston,"Human, Homo sapiens",USA,URINE,MLST.klebsiella.307,Klebsiella pneumoniae,KPN1078ec,2013.0
+573.13092,Klebsiella pneumoniae KPN1080ec,Good,WGS,USA: Houston,"Human, Homo sapiens",USA,URINE,MLST.klebsiella.307,Klebsiella pneumoniae,KPN1080ec,2013.0
+573.13097,Klebsiella pneumoniae KPN1091ec,Good,WGS,USA: Houston,"Human, Homo sapiens",USA,URINE,MLST.klebsiella.307,Klebsiella pneumoniae,KPN1091ec,2013.0
+573.13098,Klebsiella pneumoniae KPN1092ec,Good,WGS,USA: Houston,"Human, Homo sapiens",USA,URINE,MLST.klebsiella.16,Klebsiella pneumoniae,KPN1092ec,2013.0
+573.13107,Klebsiella pneumoniae KPN1103ec,Good,WGS,USA: Houston,"Human, Homo sapiens",USA,URINE,MLST.klebsiella.2975,Klebsiella pneumoniae,KPN1103ec,2013.0
+573.13120,Klebsiella pneumoniae KPN1118ec,Good,WGS,USA: Houston,"Human, Homo sapiens",USA,URINE,MLST.klebsiella.307,Klebsiella pneumoniae,KPN1118ec,2013.0
+573.13121,Klebsiella pneumoniae KPN1119ec,Good,WGS,USA: Houston,"Human, Homo sapiens",USA,URINE,MLST.klebsiella.307,Klebsiella pneumoniae,KPN1119ec,2013.0
+1351.1178,Enterococcus faecalis strain 297EA1,Good,WGS,"USA: Nashville, TN","Chicken, Gallus gallus",USA,Breast meat,MLST.efaecalis.397,Enterococcus faecalis,297EA1,
+1351.1186,Enterococcus faecalis strain 35EA1,Good,WGS,"USA: Louisville, KY","Chicken, Gallus gallus",USA,Breast meat,MLST.efaecalis.86,Enterococcus faecalis,35EA1,
+1351.11939,Enterococcus faecalis WW_0142J,Good,WGS,Alberta,,Canada,Sewage influent,,Enterococcus faecalis,WW_0142J,2015.0
+1351.11940,Enterococcus faecalis WW_0145A,Good,WGS,Alberta,,Canada,Sewage influent,MLST.Enterococcus_faecalis.179,Enterococcus faecalis,WW_0145A,2015.0
+1351.11943,Enterococcus faecalis WW_0053M,Good,WGS,Alberta,,Canada,Sewage influent,MLST.Enterococcus_faecalis.16,Enterococcus faecalis,WW_0053M,2014.0
+1351.11944,Enterococcus faecalis WW_0152D,Good,WGS,Alberta,,Canada,Sewage influent,MLST.Enterococcus_faecalis.480,Enterococcus faecalis,WW_0152D,2016.0
+1351.1654,Enterococcus faecalis strain 269,Good,WGS,USA:Boston,"Human, Homo sapiens",USA,penile discharge,MLST.efaecalis.6,Enterococcus faecalis,269,2016.0
+1351.434,Enterococcus faecalis strain ST55:13,Good,WGS,"USA: Cambridge, MA",Macaca mulatta,USA,cephalic recording chamber,MLST.Enterococcus_faecalis.4,Enterococcus faecalis,ST55:13,
+1351.435,Enterococcus faecalis strain ST4:1,Good,WGS,"USA: Cambridge, MA",Macaca mulatta,USA,cephalic recording chamber,MLST.efaecalis.4,Enterococcus faecalis,ST4:1,
+1351.436,Enterococcus faecalis strain ST4:12,Good,WGS,"USA: Cambridge, MA",Macaca mulatta,USA,cephalic recording chamber,MLST.efaecalis.55,Enterococcus faecalis,ST4:12,
+1496.1001,Peptoclostridium difficile strain VL_0345,Poor,WGS,,"Human, Homo sapiens",Canada,different hospitals,MLST.cdifficile.1,Clostridioides difficile,VL_0345,
+1496.1002,Peptoclostridium difficile strain VL_0420,Good,WGS,,"Human, Homo sapiens",Canada,different hospitals,MLST.cdifficile.1,Clostridioides difficile,VL_0420,
+1496.1003,Peptoclostridium difficile strain VL_0421,Poor,WGS,,"Human, Homo sapiens",Canada,different hospitals,MLST.cdifficile.1,Clostridioides difficile,VL_0421,
+1496.1007,Peptoclostridium difficile strain VL_0039,Good,WGS,,"Human, Homo sapiens",Canada,different hospitals,MLST.cdifficile.11,Clostridioides difficile,VL_0039,
+1496.1014,Peptoclostridium difficile strain VL_0060,Good,WGS,,"Human, Homo sapiens",Canada,different hospitals,MLST.cdifficile.3,Clostridioides difficile,VL_0060,
+1496.1015,Peptoclostridium difficile strain VL_0061,Poor,WGS,,"Human, Homo sapiens",Canada,different hospitals,MLST.cdifficile.1,Clostridioides difficile,VL_0061,
+1496.1020,Peptoclostridium difficile strain VL_0193,Poor,WGS,,"Human, Homo sapiens",Canada,different hospitals,MLST.cdifficile.1,Clostridioides difficile,VL_0193,
+1496.1023,Peptoclostridium difficile strain VL_0419,Good,WGS,,"Human, Homo sapiens",Canada,different hospitals,MLST.cdifficile.26,Clostridioides difficile,VL_0419,
+1496.1024,Peptoclostridium difficile strain VL_0031,Good,WGS,,"Human, Homo sapiens",Canada,different hospitals,MLST.cdifficile.2,Clostridioides difficile,VL_0031,
+1496.1025,Peptoclostridium difficile strain VL_0048,Good,WGS,,"Human, Homo sapiens",Canada,different hospitals,MLST.cdifficile.14,Clostridioides difficile,VL_0048,
+1496.1028,Peptoclostridium difficile strain VL_0065,Good,WGS,,"Human, Homo sapiens",Canada,different hospitals,MLST.cdifficile.2,Clostridioides difficile,VL_0065,
+1496.1029,Peptoclostridium difficile strain VL_0068,Good,WGS,,"Human, Homo sapiens",Canada,different hospitals,MLST.cdifficile.15,Clostridioides difficile,VL_0068,
+1496.1030,Peptoclostridium difficile strain VL_0069,Good,WGS,,"Human, Homo sapiens",Canada,different hospitals,MLST.cdifficile.3,Clostridioides difficile,VL_0069,
+1496.1034,Peptoclostridium difficile strain VL_0081,Good,WGS,,"Human, Homo sapiens",Canada,different hospitals,,Clostridioides difficile,VL_0081,
+1496.1035,Peptoclostridium difficile strain VL_0082,Good,WGS,,"Human, Homo sapiens",Canada,different hospitals,MLST.cdifficile.1,Clostridioides difficile,VL_0082,
+1496.1036,Peptoclostridium difficile strain VL_0083,Good,WGS,,"Human, Homo sapiens",Canada,different hospitals,MLST.cdifficile.15,Clostridioides difficile,VL_0083,
+1496.1038,Peptoclostridium difficile strain VL_0090,Good,WGS,,"Human, Homo sapiens",Canada,different hospitals,MLST.cdifficile.1,Clostridioides difficile,VL_0090,
+1496.1039,Peptoclostridium difficile strain VL_0092,Good,WGS,,"Human, Homo sapiens",Canada,different hospitals,MLST.cdifficile.1,Clostridioides difficile,VL_0092,
+1496.1040,Peptoclostridium difficile strain VL_0095,Good,WGS,,"Human, Homo sapiens",Canada,different hospitals,MLST.cdifficile.3,Clostridioides difficile,VL_0095,
+1496.1041,Peptoclostridium difficile strain VL_0099,Poor,WGS,,"Human, Homo sapiens",Canada,different hospitals,MLST.cdifficile.1,Clostridioides difficile,VL_0099,
+1496.1043,Peptoclostridium difficile strain VL_0107,Poor,WGS,,"Human, Homo sapiens",Canada,different hospitals,MLST.cdifficile.1,Clostridioides difficile,VL_0107,
+1496.1046,Peptoclostridium difficile strain VL_0114,Good,WGS,,"Human, Homo sapiens",Canada,different hospitals,MLST.cdifficile.1,Clostridioides difficile,VL_0114,
+1496.1049,Peptoclostridium difficile strain VL_0118,Poor,WGS,,"Human, Homo sapiens",Canada,different hospitals,MLST.cdifficile.1,Clostridioides difficile,VL_0118,
+1496.1050,Peptoclostridium difficile strain VL_0119,Good,WGS,,"Human, Homo sapiens",Canada,different hospitals,MLST.cdifficile.1,Clostridioides difficile,VL_0119,
+1496.1051,Peptoclostridium difficile strain VL_0120,Good,WGS,,"Human, Homo sapiens",Canada,different hospitals,MLST.cdifficile.1,Clostridioides difficile,VL_0120,
+1496.1054,Peptoclostridium difficile strain VL_0142,Good,WGS,,"Human, Homo sapiens",Canada,different hospitals,MLST.cdifficile.1,Clostridioides difficile,VL_0142,
+1496.1056,Peptoclostridium difficile strain VL_0152,Good,WGS,,"Human, Homo sapiens",Canada,different hospitals,MLST.cdifficile.26,Clostridioides difficile,VL_0152,
+1496.1059,Peptoclostridium difficile strain VL_0159,Good,WGS,,"Human, Homo sapiens",Canada,different hospitals,MLST.cdifficile.2,Clostridioides difficile,VL_0159,
+1496.1060,Peptoclostridium difficile strain VL_0158,Poor,WGS,,"Human, Homo sapiens",Canada,different hospitals,MLST.cdifficile.1,Clostridioides difficile,VL_0158,
+1496.1063,Peptoclostridium difficile strain VL_0171,Poor,WGS,,"Human, Homo sapiens",Canada,different hospitals,MLST.cdifficile.1,Clostridioides difficile,VL_0171,
+1496.1065,Peptoclostridium difficile strain VL_0352,Good,WGS,,"Human, Homo sapiens",Canada,different hospitals,MLST.cdifficile.3,Clostridioides difficile,VL_0352,
+1496.1066,Peptoclostridium difficile strain VL_0407,Poor,WGS,,"Human, Homo sapiens",Canada,different hospitals,,Clostridioides difficile,VL_0407,
+1496.1067,Peptoclostridium difficile strain VL_0054,Poor,WGS,,"Human, Homo sapiens",Canada,different hospitals,MLST.cdifficile.1,Clostridioides difficile,VL_0054,
+1496.1068,Peptoclostridium difficile strain VL_0059,Good,WGS,,"Human, Homo sapiens",Canada,different hospitals,MLST.cdifficile.11,Clostridioides difficile,VL_0059,
+1496.1069,Peptoclostridium difficile strain VL_0066,Poor,WGS,,"Human, Homo sapiens",Canada,different hospitals,MLST.cdifficile.1,Clostridioides difficile,VL_0066,
+1496.1070,Peptoclostridium difficile strain VL_0162,Good,WGS,,"Human, Homo sapiens",Canada,different hospitals,MLST.cdifficile.1,Clostridioides difficile,VL_0162,
+1496.1071,Peptoclostridium difficile strain VL_0222,Poor,WGS,,"Human, Homo sapiens",Canada,different hospitals,MLST.cdifficile.1,Clostridioides difficile,VL_0222,
+1496.1072,Peptoclostridium difficile strain VL_0240,Poor,WGS,,"Human, Homo sapiens",Canada,different hospitals,MLST.cdifficile.1,Clostridioides difficile,VL_0240,
+1496.1074,Peptoclostridium difficile strain VL_0370,Poor,WGS,,"Human, Homo sapiens",Canada,different hospitals,,Clostridioides difficile,VL_0370,
+1496.1077,Peptoclostridium difficile strain VL_0137,Good,WGS,,"Human, Homo sapiens",Canada,different hospitals,MLST.cdifficile.3,Clostridioides difficile,VL_0137,
+210.10419,Helicobacter pylori CHC155,Good,Complete,Viet Nam,Homo sapiens,Viet Nam,Gastric biopsies,,Helicobacter pylori,CHC155,2015.0
+210.10420,Helicobacter pylori oh1,Good,Complete,South Korea,Homo sapiens,South Korea,gut tissue,MLST.Helicobacter_pylori.31,Helicobacter pylori,oh1,2018.0
+210.10519,Helicobacter pylori H390d,Good,Complete,China: Guiyang,,China,Gastric mucosal tissue in patients with digestive disease,,Helicobacter pylori,H390d,2019.0
+210.10520,Helicobacter pylori 444A6,Good,Complete,,Homo sapiens,,gastric antrum,,Helicobacter pylori,444A6,2009.0
+210.10651,Helicobacter pylori HP34,Good,Complete,Viet Nam: Hue,Homo sapiens,Viet Nam,,MLST.Helicobacter_pylori.1074,Helicobacter pylori,HP34,2020.0
+210.10652,Helicobacter pylori HP22,Good,Complete,Viet Nam: Hue,Homo sapiens,Viet Nam,,,Helicobacter pylori,HP22,2020.0
+210.10653,Helicobacter pylori MTT79,Good,Complete,Colombia: Tolima,Homo sapiens,Colombia,TOLIMA,,Helicobacter pylori,MTT79,2019.0
+210.10654,Helicobacter pylori MTT60,Good,Complete,Colombia: Tolima,Homo sapiens,Colombia,CUNDINAMARCA,,Helicobacter pylori,MTT60,2018.0
+210.10655,Helicobacter pylori MTT03,Good,Complete,Colombia: Tolima,Homo sapiens,Colombia,TOLIMA,,Helicobacter pylori,MTT03,2020.0
+210.10656,Helicobacter pylori GCT85,Good,Complete,Colombia: Tolima,Homo sapiens,Colombia,TOLIMA,,Helicobacter pylori,GCT85,2019.0
+210.10657,Helicobacter pylori GCT56,Good,Complete,Colombia: Tolima,Homo sapiens,Colombia,CALDAS,,Helicobacter pylori,GCT56,2018.0
+210.10658,Helicobacter pylori GCT55,Good,Complete,Colombia: Tolima,Homo sapiens,Colombia,BOYACA,,Helicobacter pylori,GCT55,2018.0
+210.10659,Helicobacter pylori GCT17,Good,Complete,Colombia: Tolima,Homo sapiens,Colombia,TOLIMA,,Helicobacter pylori,GCT17,2017.0
+210.10681,Helicobacter pylori H390r,Good,Complete,"China:Guiyang, Guizhou",,China,,,Helicobacter pylori,H390r,2020.0
+210.10682,Helicobacter pylori ATCC 49503,Good,Complete,,Homo sapiens,,,,Helicobacter pylori,ATCC 49503,
+210.10683,Helicobacter pylori BS21,Good,Complete,Thailand,Homo sapiens,Thailand,stomach,,Helicobacter pylori,BS21,2020.0
+210.10684,Helicobacter pylori BS07,Good,Complete,Thailand,Homo sapiens,Thailand,stomach,,Helicobacter pylori,BS07,2020.0
+210.10685,Helicobacter pylori BS28-1,Good,Complete,Thailand,Homo sapiens,Thailand,stomach,MLST.Helicobacter_pylori.74,Helicobacter pylori,BS28-1,2021.0
+210.10686,Helicobacter pylori BS22,Good,Complete,Thailand,Homo sapiens,Thailand,stomach,,Helicobacter pylori,BS22,2020.0
+210.10687,Helicobacter pylori BS31,Good,Complete,Thailand,Homo sapiens,Thailand,stomach,,Helicobacter pylori,BS31,2021.0
+210.10688,Helicobacter pylori BS26,Good,Complete,Thailand,Homo sapiens,Thailand,stomach,,Helicobacter pylori,BS26,2021.0
+210.10689,Helicobacter pylori BS06,Good,Complete,Thailand,Homo sapiens,Thailand,stomach,,Helicobacter pylori,BS06,2020.0
+210.10690,Helicobacter pylori BS27-1,Good,Complete,Thailand,Homo sapiens,Thailand,stomach,,Helicobacter pylori,BS27-1,2021.0
+210.10691,Helicobacter pylori BS30,Good,Complete,Thailand,Homo sapiens,Thailand,stomach,,Helicobacter pylori,BS30,2021.0
+210.10692,Helicobacter pylori BT112,Good,Complete,Thailand,Homo sapiens,Thailand,stomach,,Helicobacter pylori,BT112,2015.0
+210.10693,Helicobacter pylori BS27-2,Good,Complete,Thailand,Homo sapiens,Thailand,stomach,,Helicobacter pylori,BS27-2,2021.0
+210.10710,Helicobacter pylori HP45k,Good,Complete,Belarus: Gomel,Homo sapiens,Belarus,stomach,MLST.Helicobacter_pylori.847,Helicobacter pylori,HP45k,2018.0
+210.10819,Helicobacter pylori ICDC15003-50-2,Good,Complete,China:BeiJing,Homo sapiens,China,mucous,,Helicobacter pylori,ICDC15003-50-2,2019.0
+210.10820,Helicobacter pylori ICDC15003-8-2,Good,Complete,China:BeiJing,Homo sapiens,China,mucous,,Helicobacter pylori,ICDC15003-8-2,2019.0
+210.10821,Helicobacter pylori ICDC15003-8-1,Good,Complete,China:BeiJing,Homo sapiens,China,mucous,,Helicobacter pylori,ICDC15003-8-1,2019.0
+210.10822,Helicobacter pylori ICDC15003-50-1,Good,Complete,China:BeiJing,Homo sapiens,China,mucous,,Helicobacter pylori,ICDC15003-50-1,2019.0
+210.10823,Helicobacter pylori ICDC15003s,Good,Complete,China:BeiJing,Homo sapiens,China,mucous,,Helicobacter pylori,ICDC15003s,2015.0
+210.10913,Helicobacter pylori 52N,Good,Complete,"South Korea: Jinju-si, Gyeongsangnam-do",Homo sapiens,South Korea,Gastro scope biopsy,,Helicobacter pylori,52N,2023.0
+210.10916,Helicobacter pylori P08204,Good,Complete,"South Korea: Jinju-si, Gyeongsangnam-do",Homo sapiens,South Korea,Gastro scope biopsy,,Helicobacter pylori,P08204,2023.0
+210.10917,Helicobacter pylori P07353,Good,Complete,"South Korea: Jinju-si, Gyeongsangnam-do",Homo sapiens,South Korea,Gastro scope biopsy,MLST.Helicobacter_pylori.1028,Helicobacter pylori,P07353,2023.0
+210.10918,Helicobacter pylori P08205,Good,Complete,"South Korea: Jinju-si, Gyeongsangnam-do",Homo sapiens,South Korea,Gastro scope biopsy,MLST.Helicobacter_pylori.557,Helicobacter pylori,P08205,2023.0
+210.10919,Helicobacter pylori P07928,Good,Complete,"South Korea: Jinju-si, Gyeongsangnam-do",Homo sapiens,South Korea,Gastro scope biopsy,,Helicobacter pylori,P07928,2023.0
+210.11482,Helicobacter pylori 51N,Good,Complete,"South Korea: Jinju-si, Gyeongsangnam-do",Homo sapiens,South Korea,Gastro scope biopsy,MLST.Helicobacter_pylori.53,Helicobacter pylori,51N,2023.0
+210.11581,Helicobacter pylori BS04,Good,Complete,Thailand,Homo sapiens,Thailand,stomach,,Helicobacter pylori,BS04,2020.0
+210.11582,Helicobacter pylori BS08,Good,Complete,Thailand,Homo sapiens,Thailand,stomach,MLST.Helicobacter_pylori.2269,Helicobacter pylori,BS08,2020.0

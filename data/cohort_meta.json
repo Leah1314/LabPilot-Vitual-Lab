@@ -1,0 +1,14 @@
+{
+  "pinned_at": "2026-07-24T18:51:02Z",
+  "source": "BV-BRC (bv-brc.org), annotations from CARD, NDARO, VFDB, PATRIC_VF",
+  "n_genomes": 240,
+  "n_amr_rows_lab_measured": 2725,
+  "n_spgene_rows": 40010,
+  "n_sequences": 34466,
+  "genome_phenotype_rule": "A genome is labelled Resistant when it has more Resistant than Susceptible lab-measured antibiotic results, otherwise Susceptible. Genomes with no lab-measured AMR data are labelled Unknown and counted as neither. Intermediate results are excluded.",
+  "caveats": [
+    "sp_gene calls are computational annotations, not laboratory measurements.",
+    "Helicobacter pylori is included for virulence only; it has 265 lab-measured AMR rows and no resistance statistic should be quoted for it.",
+    "Genomes are not deduplicated by strain, so clonal oversampling in the public database can inflate any within-cluster concentration."
+  ]
+}

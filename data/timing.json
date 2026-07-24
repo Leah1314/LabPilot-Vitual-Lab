@@ -1,0 +1,21 @@
+{
+  "n_sequences": 34466,
+  "model": "esm2_t12_35M_UR50D",
+  "device": "NVIDIA H100 80GB HBM3",
+  "embedding_seconds": 93.03,
+  "sequences_per_second": 370.5,
+  "clustering_seconds": 6.93,
+  "k_selected": 4,
+  "silhouette_by_k": {
+    "4": 0.1271,
+    "5": 0.1094,
+    "6": 0.096,
+    "7": 0.0922,
+    "8": 0.0945,
+    "9": 0.1047,
+    "10": 0.1056,
+    "11": 0.0872,
+    "12": 0.1099
+  },
+  "headline": "34,466 proteins embedded in 93.0s on NVIDIA H100 80GB HBM3"
+}
