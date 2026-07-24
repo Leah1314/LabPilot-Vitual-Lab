@@ -17,10 +17,21 @@
 
   --color-violet: #47285f;
   --color-violet-tint: #ece7f1;
-  --color-safranin: #be3a4b;
-  --color-safranin-tint: #f8e7e9;
+  --color-safranin: #c0392f;
+  --color-safranin-tint: #f8e7e5;
   --color-viridian: #146b5c;
   --color-viridian-tint: #e1efeb;
+
+  /*
+   * Data-mark pair for Resistant vs Susceptible. Red/teal was the intuitive
+   * choice and it failed: scripts/validate_palette.js put the pair at protan
+   * ΔE 4.1, meaning red-green colourblind readers could not separate the two
+   * segments at all. Red/blue scores protan ΔE 15.2 and passes every check.
+   * Viridian is kept for status (good/grounded), which is a different job.
+   */
+  --color-resistant: #c0392f;
+  --color-susceptible: #1a6091;
+  --color-susceptible-tint: #e4eef5;
   --color-amber: #8a6210;
   --color-amber-tint: #f6eeda;
 
@@ -99,11 +110,11 @@
   }
 
   .rail-seg-resistant {
-    background-color: var(--color-safranin);
+    background-color: var(--color-resistant);
   }
 
   .rail-seg-susceptible {
-    background-color: var(--color-viridian);
+    background-color: var(--color-susceptible);
   }
 
   /*

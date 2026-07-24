@@ -59,7 +59,7 @@ export function DenominatorRail({
         <span className="flex items-baseline gap-1.5">
           <span
             aria-hidden
-            className="inline-block h-2.5 w-2.5 translate-y-px bg-safranin"
+            className="inline-block h-2.5 w-2.5 translate-y-px bg-resistant"
           />
           <span className="tabular text-ink">{resistant}</span>
           <span className="text-muted">
@@ -69,7 +69,7 @@ export function DenominatorRail({
         <span className="flex items-baseline gap-1.5">
           <span
             aria-hidden
-            className="inline-block h-2.5 w-2.5 translate-y-px bg-viridian"
+            className="inline-block h-2.5 w-2.5 translate-y-px bg-susceptible"
           />
           <span className="tabular text-ink">{susceptible}</span>
           <span className="text-muted">

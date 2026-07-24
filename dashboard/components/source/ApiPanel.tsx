@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useSyncExternalStore } from "react";
+import type { SandboxEntry } from "@/app/api/daytona/route";
 import type {
   ClusterSummaryFile,
   DashboardData,
@@ -53,6 +54,28 @@ export function ApiPanel({ onLoad }: { onLoad: (data: DashboardData) => void }) 
     connectionsSnapshot,
     serverConnectionsSnapshot,
   );
+
+  const [sandboxes, setSandboxes] = useState<SandboxEntry[] | null>(null);
+  const [sandboxNote, setSandboxNote] = useState<string | null>(null);
+  const [listing, setListing] = useState(false);
+
+  async function listSandboxes() {
+    setListing(true);
+    setSandboxNote(null);
+    try {
+      const res = await fetch("/api/daytona");
+      const body = await res.json();
+      setSandboxes(body.sandboxes ?? []);
+      if (!body.ok) setSandboxNote(body.message ?? "Could not list sandboxes.");
+      else if ((body.sandboxes ?? []).length === 0) {
+        setSandboxNote("No sandboxes found on this account.");
+      }
+    } catch {
+      setSandboxNote("Could not reach the dashboard server.");
+    } finally {
+      setListing(false);
+    }
+  }
 
   const patch = (p: Partial<ApiConfig>) => {
     setConfig((c) => ({ ...c, ...p }));
@@ -120,6 +143,79 @@ export function ApiPanel({ onLoad }: { onLoad: (data: DashboardData) => void }) 
         dashboard&rsquo;s server, not your browser, so the pipeline does not need
         to send CORS headers.
       </p>
+
+      <div className="mt-5 border border-hairline bg-paper/60 p-4">
+        <div className="flex flex-wrap items-baseline justify-between gap-3">
+          <div>
+            <p className="eyebrow">Daytona sandboxes</p>
+            <p className="mt-1 text-xs text-muted">
+              Look up a running sandbox and fill in its preview URL. Listing only —
+              sandboxes are created and stopped from pipeline/run_on_daytona.py,
+              because GPUs bill by the hour.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={listSandboxes}
+            disabled={listing}
+            className="shrink-0 cursor-pointer border border-hairline px-2.5 py-1 text-xs text-muted hover:border-violet hover:text-violet disabled:opacity-50"
+          >
+            {listing ? "Listing…" : sandboxes ? "Refresh" : "List sandboxes"}
+          </button>
+        </div>
+
+        {sandboxNote && (
+          <p className="mt-3 text-xs leading-relaxed text-amber">{sandboxNote}</p>
+        )}
+
+        {sandboxes && sandboxes.length > 0 && (
+          <ul className="mt-3 space-y-1.5">
+            {sandboxes.map((sb) => (
+              <li
+                key={sb.id}
+                className="flex flex-wrap items-baseline justify-between gap-2 border-b border-hairline/70 pb-1.5 text-xs"
+              >
+                <span className="min-w-0">
+                  <span className="tabular text-ink">{sb.name}</span>
+                  <span
+                    className={`ml-2 ${sb.state === "started" ? "text-viridian" : "text-muted"}`}
+                  >
+                    {sb.state}
+                  </span>
+                  {sb.previewUrl && (
+                    <span className="tabular ml-2 block truncate text-muted">
+                      {sb.previewUrl}
+                    </span>
+                  )}
+                </span>
+                {sb.previewUrl ? (
+                  <button
+                    type="button"
+                    onClick={() =>
+                      patch({
+                        baseUrl: sb.previewUrl!,
+                        connectionName: sb.name,
+                        ...(sb.previewToken
+                          ? {
+                              authMethod: "header" as const,
+                              apiKeyHeader: "x-daytona-preview-token",
+                              apiKey: sb.previewToken,
+                            }
+                          : {}),
+                      })
+                    }
+                    className="shrink-0 cursor-pointer border-b border-dashed border-violet/60 text-violet hover:border-violet"
+                  >
+                    use
+                  </button>
+                ) : (
+                  <span className="shrink-0 text-muted">no preview</span>
+                )}
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
 
       <div className="mt-5 grid gap-4 sm:grid-cols-2">
         <Field label="Connection name">
