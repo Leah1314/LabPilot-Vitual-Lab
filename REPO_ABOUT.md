@@ -10,7 +10,7 @@ repo sidebar, `ABOUT.md`, and `README.md` do not drift apart.
 
 | Field | Value | Limit |
 |---|---|---|
-| **Description** | Gut-to-pancreas pathogen AMR dashboard: BV-BRC → Daytona H100 ESM2 clustering → grounded Fireworks/CopilotKit insights. Research prototype — not for clinical use. | 162 / 350 chars |
+| **Description** | Antimicrobial-resistance dashboard for the gut-derived pathogens behind infected pancreatic necrosis. BV-BRC genomes, ESM2 embeddings on a Daytona H100, and Fireworks observations that quote only measured numbers. Research prototype, not for clinical use. | 255 / 350 chars |
 | **Website** | `https://github.com/johnqh/daytona_hackathon#quickstart-demo-with-committed-data` | — |
 | **Topics** | `antimicrobial-resistance` `amr` `bioinformatics` `genomics` `bv-brc` `daytona` `fireworks-ai` `esm2` `protein-embeddings` `gpu` `copilotkit` `nextjs` `tanstack-start` `llm` `hackathon` | 15 / 20 topics |
 
@@ -22,7 +22,7 @@ cut for length.
 
 ```bash
 gh repo edit johnqh/daytona_hackathon \
-  --description "Gut-to-pancreas pathogen AMR dashboard: BV-BRC → Daytona H100 ESM2 clustering → grounded Fireworks/CopilotKit insights. Research prototype — not for clinical use." \
+  --description "Antimicrobial-resistance dashboard for the gut-derived pathogens behind infected pancreatic necrosis. BV-BRC genomes, ESM2 embeddings on a Daytona H100, and Fireworks observations that quote only measured numbers. Research prototype, not for clinical use." \
   --homepage "https://github.com/johnqh/daytona_hackathon#quickstart-demo-with-committed-data" \
   --add-topic antimicrobial-resistance --add-topic amr \
   --add-topic bioinformatics --add-topic genomics --add-topic bv-brc \
