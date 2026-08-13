@@ -58,6 +58,16 @@ Root pipeline outputs live at:
 Point the **Connect API** tab at any HTTP endpoint that serves those contracts,
 or use sample data for a key-free demo.
 
+## Hackathon benchmark
+
+Our bounded RLM delivered the headline result of the pathogen context-rot pilot:
+**7.6× less model-facing context** than a flat Mastra agent at the 96-event trajectory
+(~2.9K vs ~21.8K estimated tokens), while finishing **21.6% faster** on average. Across
+18 isolated runs, it completed 8/9 tasks against the baseline's 9/9—near-parity task
+completion with dramatically better context economy. That is the operating profile
+this prototype was built to demonstrate: long-running pathogen investigations that
+stay lean, fast, and traceable. See the [benchmark report](../../imhotep/bench/results/REPORT.md).
+
 ## Honesty
 
 Same rules as the monorepo root README:
