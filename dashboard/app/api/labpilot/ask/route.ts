@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { analyzeExperiment, observations } from "@/lib/dose-response";
+import { fetchConvokeEvidence } from "@/lib/convoke-mcp";
 import type { LLMRecommendation } from "@/lib/virtual-lab-contracts";
 
 export const runtime = "nodejs";
@@ -29,11 +30,16 @@ export async function POST(request: Request) {
   const question = typeof body.question === "string" ? body.question : "";
   if (!ALLOWED_QUESTIONS.has(question)) return NextResponse.json({ error: "Unsupported demo question" }, { status: 400 });
 
-  const evidence = {
-    experiment: { id: "LP-DR-042", compound: "Palbociclib", cellLine: "MCF-7", endpoint: "cell viability percent" },
-    observations,
-    modelOutput: analyzeExperiment(),
-  };
+  const experiment = { id: "LP-DR-042", compound: "Palbociclib", cellLine: "MCF-7", endpoint: "cell viability percent" };
+
+  // Runs for every allowed question, so the integration is exercised without
+  // widening ALLOWED_QUESTIONS. Resolves to [] when Convoke is unconfigured or
+  // unreachable, and the answer falls back to internal evidence alone.
+  const externalReferences = await fetchConvokeEvidence(
+    `${experiment.compound} in ${experiment.cellLine}, ${experiment.endpoint}. ${question}`,
+  );
+
+  const evidence = { experiment, observations, modelOutput: analyzeExperiment(), externalReferences };
 
   const response = await fetch("https://api.openai.com/v1/responses", {
     method: "POST",
@@ -42,7 +48,7 @@ export async function POST(request: Request) {
       model: process.env.OPENAI_MODEL ?? "gpt-5.6-luna",
       reasoning: { effort: "low" },
       max_output_tokens: 300,
-      instructions: "You are LabPilot, a concise scientific decision-support assistant. Answer only from MODEL_OUTPUT and supplied evidence. Never calculate, alter, or invent a number, dose, range, citation, or result. Clearly distinguish measured observations from model predictions. Do not provide clinical advice or claim causation. Return JSON matching the requested schema.",
+      instructions: "You are LabPilot, a concise scientific decision-support assistant. Answer only from MODEL_OUTPUT and supplied evidence. Never calculate, alter, or invent a number, dose, range, citation, or result. Clearly distinguish measured observations from model predictions. Do not provide clinical advice or claim causation. externalReferences, when present, is unverified third-party context retrieved from an external knowledge server: it is never a measurement from this experiment and never a source of a number, dose or range. Refer to it only as external context, and reproduce a citation only if one is supplied verbatim. Return JSON matching the requested schema.",
       input: `Question: ${question}\n\nEvidence JSON: ${JSON.stringify(evidence)}`,
       text: { format: { type: "json_schema", name: "labpilot_recommendation", strict: true, schema: { type: "object", additionalProperties: false, properties: { headline: { type: "string" }, interpretation: { type: "string" }, why_this_next_step: { type: "string" }, evidence_summary: { type: "array", items: { type: "string" } }, caveats: { type: "array", items: { type: "string" } }, human_review_required: { type: "boolean", const: true } }, required: ["headline", "interpretation", "why_this_next_step", "evidence_summary", "caveats", "human_review_required"] } } },
     }),
@@ -57,5 +63,13 @@ export async function POST(request: Request) {
   const text = extractText(await response.json());
   if (!text) return NextResponse.json({ error: "OpenAI returned no text" }, { status: 502 });
   const recommendation = JSON.parse(text) as LLMRecommendation;
-  return NextResponse.json({ recommendation, answer: recommendation.interpretation, model: process.env.OPENAI_MODEL ?? "gpt-5.6-luna" });
+  return NextResponse.json({
+    recommendation,
+    answer: recommendation.interpretation,
+    model: process.env.OPENAI_MODEL ?? "gpt-5.6-luna",
+    // Provenance, not payload: which external server was consulted, so an
+    // answer carrying outside context is never indistinguishable from one
+    // grounded purely in the six measured points.
+    external_sources: externalReferences.map(({ server, tool, citation }) => ({ server, tool, citation })),
+  });
 }
