@@ -34,8 +34,10 @@ export interface ConvokeEvidence {
   server: string;
   tool: string;
   citation?: string;
-  /** Verbatim text from the tool, truncated. Never parsed for numbers. */
+  /** Verbatim text from the tool. Never parsed for numbers. */
   text: string;
+  /** Whether `text` was cut at MAX_EVIDENCE_CHARS, so callers can disclose it. */
+  truncated: boolean;
 }
 
 interface Session {
@@ -157,7 +159,9 @@ function queryArgument(tool: McpTool): string | null {
   return QUERY_KEYS.find((key) => strings.includes(key)) ?? required[0] ?? strings[0] ?? null;
 }
 
-function extract(result: ToolResult): { text: string; citation?: string } | null {
+function extract(
+  result: ToolResult,
+): { text: string; citation?: string; truncated: boolean } | null {
   if (result.isError) return null;
 
   const parts: string[] = [];
@@ -202,12 +206,13 @@ function extract(result: ToolResult): { text: string; citation?: string } | null
   }
   if (!text) return null;
 
+  const truncated = text.length > MAX_EVIDENCE_CHARS;
   return {
-    text:
-      text.length <= MAX_EVIDENCE_CHARS
-        ? text
-        : `${text.slice(0, MAX_EVIDENCE_CHARS)}\n[truncated by LabPilot at ${MAX_EVIDENCE_CHARS} characters]`,
+    text: truncated
+      ? `${text.slice(0, MAX_EVIDENCE_CHARS)}\n[truncated by LabPilot at ${MAX_EVIDENCE_CHARS} characters]`
+      : text,
     citation,
+    truncated,
   };
 }
 
@@ -268,6 +273,7 @@ export async function fetchConvokeEvidence(query: string): Promise<ConvokeEviden
         tool: tool.name,
         citation: found.citation,
         text: found.text,
+        truncated: found.truncated,
       },
     ];
   } catch {
