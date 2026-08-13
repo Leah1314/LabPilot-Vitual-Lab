@@ -18,7 +18,11 @@ export default function RootLayout({
           name="description"
           content="Upload files, connect an API, or use sample data to explore pathogen AMR clusters with a CopilotKit agent."
         />
-        <link rel="icon" href="/favicon.ico" type="image/x-icon" />
+        {/*
+          No manual <link rel="icon">: a hardcoded root-absolute href ignores
+          basePath and 404s wherever the app is not served from /. Next serves
+          src/app/favicon.ico automatically and prefixes it correctly.
+        */}
       </head>
       <body className="antialiased" suppressHydrationWarning>
         <CopilotKit
