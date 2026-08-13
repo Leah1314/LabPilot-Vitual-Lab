@@ -1,26 +1,21 @@
-import "server-only";
-
 import { fetchConvokeEvidence, type ConvokeEvidence } from "./convoke-mcp";
 
 /**
- * `load_datasource` — the read-only typed capability from the technical
- * product guide §8: "Normalized reference evidence + provenance".
+ * Normalizes Convoke results into reference evidence with stable provenance.
  *
- * This sits between the Convoke transport and every consumer, because the
- * guide has three of them: the scientific model layer counts these records as
- * `reference_points` (§9.2), the RLM Evidence branch inspects them (§7), and
- * Ask LabPilot quotes them. Putting the normalization in a route body would
- * mean re-implementing it for each.
- *
- * Guide §5 is the reason this file exists rather than passing raw text to a
- * prompt: "Every measured or reference observation should have a stable
- * provenance reference. RLM receipts should point to those references rather
- * than inventing free-form evidence."
+ * This sits between the transport and the agent tool because the agent's hard
+ * rules turn on provenance, not on prose. Rule 6 of the runtime system prompt
+ * forbids blurring computational annotation with laboratory measurement, and
+ * rule 1 forbids the model producing any number that did not come from a tool
+ * result. External text that arrives as an undifferentiated blob invites
+ * exactly those two failures, so every record carries what it is and where it
+ * came from, and the model is told to cite the ref rather than restate the
+ * finding as its own.
  */
 
 export interface ReferenceEvidence {
   source_id: string;
-  /** The stable ref a receipt cites instead of restating the text (§5, §9.5). */
+  /** The stable ref an answer cites instead of restating the text. */
   provenance_ref: string;
   source_label: string;
   citation?: string;
@@ -33,10 +28,7 @@ export interface ReferenceEvidence {
 
 export interface DatasourceLoad {
   evidence: ReferenceEvidence[];
-  /**
-   * `model.reference_points` in §9.2, and the count §12 requires be disclosed
-   * when a public source is unavailable and we continue on measured data.
-   */
+  /** Disclosed count, so "no external evidence" is never silent. */
   reference_points: number;
   /** False when no reference source is configured at all. */
   configured: boolean;
@@ -51,8 +43,8 @@ function slug(value: string): string {
 
 /**
  * Derive the id from the citation where there is one, so the same source keeps
- * the same ref between runs and a receipt written today still resolves
- * tomorrow. Position is the fallback, and is only stable within one response.
+ * the same ref between runs and an answer given today still resolves tomorrow.
+ * Position is the fallback, and is only stable within one response.
  */
 function sourceId(entry: ConvokeEvidence, index: number): string {
   const server = slug(entry.server) || "reference";
@@ -61,18 +53,17 @@ function sourceId(entry: ConvokeEvidence, index: number): string {
 }
 
 function qualityNotes(entry: ConvokeEvidence): string[] {
-  // The state model (§4) has no transition from reference evidence to
-  // MEASURED. Saying so on every record keeps that visible downstream.
-  const notes = ["unverified external reference; not a measured observation"];
+  // Annotation and external context are not laboratory measurement. Saying so
+  // on every record keeps system-prompt rule 6 enforceable downstream.
+  const notes = ["unverified external reference; not a laboratory measurement"];
   if (!entry.citation) notes.push("no citation supplied by the source");
   if (entry.truncated) notes.push("truncated before use");
   return notes;
 }
 
 /**
- * Never throws and never returns partial failure as success. An unreachable or
- * unconfigured source yields zero evidence, which §12 requires we continue
- * from: "continue with internal/measured dataset and disclose evidence count".
+ * Never throws. An unreachable or unconfigured source yields zero evidence and
+ * the agent continues on the loaded dataset alone.
  */
 export async function loadDatasource(query: string): Promise<DatasourceLoad> {
   const configured = Boolean(process.env.CONVOKE_MCP_URL);

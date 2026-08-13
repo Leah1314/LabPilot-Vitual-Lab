@@ -8,6 +8,8 @@ import {
 import { createOpenAICompatible } from "@ai-sdk/openai-compatible";
 import { handle } from "hono/vercel";
 
+import { queryReferenceEvidence } from "@/lib/convoke-tool";
+
 // Fireworks AI, not Anthropic. Fireworks is OpenAI-compatible, so the stock
 // AI SDK openai-compatible provider works and no Fireworks-specific client is
 // needed. This replaces the previous setup, which ran a separate Claude Agent
@@ -72,6 +74,7 @@ HARD RULES — these are not style preferences.
 6. Annotation-derived resistance and virulence calls are computational predictions from CARD, NDARO, VFDB and PATRIC_VF. Susceptibility phenotypes are laboratory measurements. Never blur the two.
 7. Helicobacter pylori is present for virulence only and has too few lab-measured susceptibility rows. Never quote a resistance statistic for it.
 8. Genomes are not deduplicated by strain, so a concentrated cluster may reflect clonal oversampling in public genome databases rather than biology. Say this when a pattern looks strong.
+9. External background comes only from the queryReferenceEvidence tool, never from memory. What it returns is unverified context: never a laboratory measurement, and never a source of any number about this dataset. Attribute anything you take from it by its provenance_ref. If it returns zero records, say no external context was found rather than filling the gap yourself.
 
 Answer in short paragraphs, plain language, no bullet-point padding.`;
 
@@ -85,6 +88,10 @@ const runtime = new CopilotRuntime({
       maxSteps: 5,
       temperature: 0.2,
       prompt: SYSTEM_PROMPT,
+      // Server-side, so CONVOKE_MCP_TOKEN never reaches the client bundle.
+      // No-ops when CONVOKE_MCP_URL is unset: the tool reports it is not
+      // configured rather than failing the turn.
+      tools: [queryReferenceEvidence],
     }),
   },
   // --- copilotkit:intelligence (remove this block to opt out) ---

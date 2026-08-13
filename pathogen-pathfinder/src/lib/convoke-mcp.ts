@@ -1,35 +1,32 @@
-import "server-only";
-
 /**
  * Convoke, reached as an MCP server over Streamable HTTP (spec 2025-06-18).
  *
- * We connect from this server rather than handing OpenAI a remote-MCP tool
- * entry, for three reasons: the results can be stamped as external references
- * and bounded by the honesty rules before the model sees them; the `strict`
- * json_schema contract in /api/labpilot/ask stays untouched; and it works if
- * Convoke is private or firewalled, which an OpenAI-hosted tool would not be.
+ * Imported only by the CopilotKit runtime route, which runs server-side, so the
+ * endpoint and token never reach the client bundle. There is no `server-only`
+ * import because this app does not carry that dependency; keep the import graph
+ * that way.
  *
  * Deliberately dependency-free. @modelcontextprotocol/sdk would add a second
- * client stack to a dependency tree CopilotKit already pins hard (CLAUDE.md
- * gotcha 2), to save three fetch calls against one server.
+ * client stack to a dependency tree this app already pins hard — see the
+ * @ai-sdk/openai-compatible pin in the runtime route — to save three fetch
+ * calls against one server.
  *
- * The endpoint is operator-configured via env, not user-supplied, so the SSRF
- * guards that app/api/datasource needs do not apply here.
+ * The endpoint is operator-configured via env, not user-supplied, so this is
+ * not the SSRF surface a user-supplied datasource URL would be.
  */
 
 const PROTOCOL_VERSION = "2025-06-18";
 const TIMEOUT_MS = 8_000;
 
 /**
- * Bounds what an external server can inject into the prompt. A tool that
- * returns a long document would otherwise overflow the Responses request and
- * fail the call, so configuring Convoke would *disable* live answers — worse
- * than leaving it unconfigured.
+ * Bounds what an external server can return into the agent loop. A tool that
+ * answered with a long document would otherwise crowd out the dataset the
+ * agent actually has to reason over, and blow the turn's latency budget.
  */
 const MAX_EVIDENCE_CHARS = 4_000;
 
 export interface ConvokeEvidence {
-  /** Matches ExperimentObservation["source"] — never "internal", never "measured". */
+  /** Never "measured", never a laboratory phenotype — see system prompt rule 6. */
   source: "public_reference";
   server: string;
   tool: string;
@@ -209,7 +206,7 @@ function extract(
   const truncated = text.length > MAX_EVIDENCE_CHARS;
   return {
     text: truncated
-      ? `${text.slice(0, MAX_EVIDENCE_CHARS)}\n[truncated by LabPilot at ${MAX_EVIDENCE_CHARS} characters]`
+      ? `${text.slice(0, MAX_EVIDENCE_CHARS)}\n[truncated at ${MAX_EVIDENCE_CHARS} characters]`
       : text,
     citation,
     truncated,
@@ -219,7 +216,7 @@ function extract(
 /**
  * Returns [] whenever Convoke is unconfigured, unreachable, slow, or returns
  * nothing usable. Convoke is supplementary context: a dead server degrades the
- * answer to internal evidence only, it never fails the request.
+ * answer to the loaded dataset alone, it never fails the turn.
  */
 export async function fetchConvokeEvidence(query: string): Promise<ConvokeEvidence[]> {
   const url = process.env.CONVOKE_MCP_URL;
@@ -235,7 +232,7 @@ export async function fetchConvokeEvidence(query: string): Promise<ConvokeEviden
     const initialized = await request(session, 1, "initialize", {
       protocolVersion: PROTOCOL_VERSION,
       capabilities: {},
-      clientInfo: { name: "labpilot-virtual-lab", version: "0.1.0" },
+      clientInfo: { name: "pathogen-pathfinder", version: "0.1.0" },
     });
     if (!initialized) return [];
 
