@@ -76,7 +76,7 @@ export type InvestigationReceipt = {
     z.infer<typeof BranchOutput> & {
       id: "support" | "challenge";
       role: "support" | "challenge";
-      status: "supported" | "challenged";
+      status: "supported" | "challenged" | "uncertain";
       label: string;
       evidenceRefs: string[];
     }
@@ -186,10 +186,50 @@ function assertEvidenceRefs(output: { claims: Array<{ evidenceRefs: string[] }> 
 }
 
 export async function investigate(input: InvestigationRequest): Promise<InvestigationReceipt> {
-  const selected = provider();
   const refs = input.dataset.clusters.map(({ id }) => id);
   const known = new Set(refs);
   const calls: InvestigationReceipt["calls"] = [];
+
+  if (input.dataset.clustersWithPhenotypeSignal.length === 0) {
+    const policyFinding =
+      "No cluster passed the phenotype-signal gate, so the available computational annotations and raw counts cannot support a cluster-level resistance association.";
+    return {
+      id: crypto.randomUUID(),
+      objective: input.objective,
+      verdict: "insufficient_evidence",
+      answer: policyFinding,
+      synthesis: policyFinding,
+      claims: [],
+      limitations: [policyFinding],
+      modelCalls: 0,
+      branches: [
+        {
+          id: "support",
+          role: "support",
+          status: "uncertain",
+          label: "Evidence / support",
+          summary:
+            "The dataset contains candidate computational annotations, but none can be promoted to a resistance association without a qualifying phenotype signal.",
+          claims: [],
+          limitations: [policyFinding],
+          evidenceRefs: [],
+        },
+        {
+          id: "challenge",
+          role: "challenge",
+          status: "challenged",
+          label: "Skeptic / challenge",
+          summary: policyFinding,
+          claims: [],
+          limitations: [policyFinding],
+          evidenceRefs: [],
+        },
+      ],
+      calls,
+    };
+  }
+
+  const selected = provider();
   const run = async (role: "support" | "challenge", instruction: string) => {
     const startedAt = new Date().toISOString();
     const output = await callJson(

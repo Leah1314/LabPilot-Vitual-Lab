@@ -12,8 +12,9 @@ import { deriveChartData } from "@/lib/data-sources";
 
 const quickActions = [
   {
-    title: "Highest resistance",
-    message: "Which cluster has the highest resistance? Cite cluster id, species, and %.",
+    title: "Mechanism coverage",
+    message:
+      "Use Convoke to audit KPC and OXA-48 development-program coverage for the Klebsiella computational annotations. Verify entity resolution, separate external program evidence from local phenotype evidence, and identify what is supported or contested.",
   },
   {
     title: "Challenge a pattern",

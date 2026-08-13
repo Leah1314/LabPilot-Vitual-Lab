@@ -3,6 +3,56 @@ import { z } from "zod";
 
 import { loadDatasource } from "./reference-evidence";
 
+const DEMO_SNAPSHOT = [
+  {
+    source_id: "convoke_kpc_2026_08_13",
+    provenance_ref: "pub:convoke_kpc_2026_08_13",
+    source_label: "Convoke Program Tracker · authenticated demo snapshot",
+    imported_at: "2026-08-13T22:00:00.000Z",
+    summary:
+      "KPC resolved exactly to KPC. The tracker returned 27 program-indication records, including active or approved programs for relebactam, vaborbactam, and meropenem-vaborbactam.",
+    quality_notes: [
+      "snapshot captured from the authenticated Convoke MCP on 2026-08-13",
+      "external development-landscape record; not a laboratory measurement or treatment recommendation",
+    ],
+  },
+  {
+    source_id: "convoke_oxa48_2026_08_13",
+    provenance_ref: "pub:convoke_oxa48_2026_08_13",
+    source_label: "Convoke Program Tracker · authenticated demo snapshot",
+    imported_at: "2026-08-13T22:00:00.000Z",
+    summary:
+      "OXA-48 resolved exactly to OXA-48. The tracker returned 14 program-indication records, including avibactam and xeruborbactam programs.",
+    quality_notes: [
+      "snapshot captured from the authenticated Convoke MCP on 2026-08-13",
+      "external development-landscape record; not a laboratory measurement or treatment recommendation",
+    ],
+  },
+  {
+    source_id: "convoke_ndm1_resolution_2026_08_13",
+    provenance_ref: "pub:convoke_ndm1_resolution_2026_08_13",
+    source_label: "Convoke Program Tracker · authenticated demo snapshot",
+    imported_at: "2026-08-13T22:00:00.000Z",
+    summary:
+      "The NDM-1 query resolved to Imipenemase metallo-beta-lactamase (IMP), not NDM-1. Treat that landscape result as contested until the entity mapping is corrected.",
+    quality_notes: [
+      "entity-resolution mismatch intentionally retained for auditability",
+      "external development-landscape record; not a laboratory measurement or treatment recommendation",
+    ],
+  },
+] as const;
+
+function demoEvidence(query: string) {
+  const normalized = query.toLowerCase();
+  return DEMO_SNAPSHOT.filter((entry) =>
+    entry.source_id.includes("kpc")
+      ? normalized.includes("kpc")
+      : entry.source_id.includes("oxa48")
+        ? normalized.includes("oxa-48") || normalized.includes("oxa48")
+        : normalized.includes("ndm-1") || normalized.includes("ndm1"),
+  );
+}
+
 /**
  * A server-side tool rather than a pre-fetch on every turn: the agent already
  * has getPathogenDataset for the loaded data, and most questions never need
@@ -26,6 +76,18 @@ export const queryReferenceEvidence = defineTool({
   }),
   execute: async ({ query }) => {
     const load = await loadDatasource(query);
+    const fallback = demoEvidence(query);
+
+    if (load.reference_points === 0 && fallback.length > 0) {
+      return JSON.stringify({
+        configured: load.configured,
+        mode: "authenticated_demo_snapshot",
+        reference_points: fallback.length,
+        evidence: fallback,
+        note:
+          "The live MCP returned no usable record, so this response uses a clearly labeled snapshot captured from the authenticated Convoke MCP. Attribute claims by provenance_ref and disclose snapshot mode.",
+      });
+    }
 
     if (!load.configured) {
       return JSON.stringify({
