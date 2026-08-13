@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { measuredPoints, predictViability } from "@/lib/dose-response";
+import { analyzeExperiment, observations } from "@/lib/dose-response";
+import type { LLMRecommendation } from "@/lib/virtual-lab-contracts";
 
 export const runtime = "nodejs";
 
@@ -28,11 +29,10 @@ export async function POST(request: Request) {
   const question = typeof body.question === "string" ? body.question : "";
   if (!ALLOWED_QUESTIONS.has(question)) return NextResponse.json({ error: "Unsupported demo question" }, { status: 400 });
 
-  const simulation = predictViability(35);
   const evidence = {
     experiment: { id: "LP-DR-042", compound: "Palbociclib", cellLine: "MCF-7", endpoint: "cell viability percent" },
-    measuredPoints,
-    modelOutput: { method: "log-dose interpolation", simulation35nM: simulation, recommendedDosesNm: [35, 15, 70] },
+    observations,
+    modelOutput: analyzeExperiment(),
   };
 
   const response = await fetch("https://api.openai.com/v1/responses", {
@@ -42,8 +42,9 @@ export async function POST(request: Request) {
       model: process.env.OPENAI_MODEL ?? "gpt-5.6-luna",
       reasoning: { effort: "low" },
       max_output_tokens: 300,
-      instructions: "You are LabPilot, a concise scientific decision-support assistant. Answer only from the supplied evidence. Never calculate, alter, or invent a number; copy numeric claims exactly from evidence. Clearly distinguish measured observations from model predictions. Do not provide clinical advice or claim causation. Use 2–4 short sentences.",
+      instructions: "You are LabPilot, a concise scientific decision-support assistant. Answer only from MODEL_OUTPUT and supplied evidence. Never calculate, alter, or invent a number, dose, range, citation, or result. Clearly distinguish measured observations from model predictions. Do not provide clinical advice or claim causation. Return JSON matching the requested schema.",
       input: `Question: ${question}\n\nEvidence JSON: ${JSON.stringify(evidence)}`,
+      text: { format: { type: "json_schema", name: "labpilot_recommendation", strict: true, schema: { type: "object", additionalProperties: false, properties: { headline: { type: "string" }, interpretation: { type: "string" }, why_this_next_step: { type: "string" }, evidence_summary: { type: "array", items: { type: "string" } }, caveats: { type: "array", items: { type: "string" } }, human_review_required: { type: "boolean", const: true } }, required: ["headline", "interpretation", "why_this_next_step", "evidence_summary", "caveats", "human_review_required"] } } },
     }),
   });
 
@@ -53,7 +54,8 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "LabPilot AI is temporarily unavailable" }, { status: 502 });
   }
 
-  const answer = extractText(await response.json());
-  if (!answer) return NextResponse.json({ error: "OpenAI returned no text" }, { status: 502 });
-  return NextResponse.json({ answer, model: process.env.OPENAI_MODEL ?? "gpt-5.6-luna" });
+  const text = extractText(await response.json());
+  if (!text) return NextResponse.json({ error: "OpenAI returned no text" }, { status: 502 });
+  const recommendation = JSON.parse(text) as LLMRecommendation;
+  return NextResponse.json({ recommendation, answer: recommendation.interpretation, model: process.env.OPENAI_MODEL ?? "gpt-5.6-luna" });
 }

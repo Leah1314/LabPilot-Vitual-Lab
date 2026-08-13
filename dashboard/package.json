@@ -11,6 +11,7 @@
     "sync-data": "bun run scripts/sync-data.ts"
   },
   "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.873.0",
     "@ai-sdk/openai-compatible": "2.0.62",
     "@copilotkit/react-core": "1.63.2",
     "@copilotkit/runtime": "1.63.2",

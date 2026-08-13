@@ -1,3 +1,5 @@
+import type { ExperimentObservation, ModelAnalysis } from "./virtual-lab-contracts";
+
 export type MeasuredPoint = { dose: number; viability: number; unit: "nM" };
 
 export const measuredPoints: MeasuredPoint[] = [
@@ -53,3 +55,21 @@ export function predictViability(doseInput: number): Prediction {
 }
 
 export const recommendations = [35, 15, 70].map(predictViability);
+
+export const observations: ExperimentObservation[] = measuredPoints.map((point, index) => ({
+  experiment_id: "EXP-001", sample_id: `MCF7-${index + 1}`, compound: "Palbociclib", cell_line: "MCF-7",
+  dose: point.dose, unit: point.unit, endpoint: "cell_viability", value: point.viability,
+  source: "internal", status: "measured",
+}));
+
+export function analyzeExperiment(): ModelAnalysis {
+  const primary = predictViability(35);
+  return {
+    experiment_id: "EXP-001",
+    primary_recommendation: { dose: 35, unit: "nM", predicted_response: primary.viability, estimated_range: [primary.low, primary.high], score: 0.86 },
+    alternatives: [15, 70],
+    model: { type: "monotonic_log_dose_interpolation", version: "labpilot-model-0.2", n_measured: observations.length, warning: "Hackathon decision-support estimate" },
+    evidence: [{ source: "internal", n: observations.length }],
+    requires_human_approval: true,
+  };
+}

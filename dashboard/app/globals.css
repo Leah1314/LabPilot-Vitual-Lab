@@ -253,6 +253,20 @@
   .plan dl div { display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--color-hairline); font-size:.76rem; }
   .plan dt { color:var(--color-muted); }
   footer { margin-top:18px; color:var(--color-muted); text-align:center; font-size:.68rem; }
-  @media(max-width:1000px) { .dashboard-grid,.recommendation,.simulation-grid { grid-template-columns:1fr; } .recommendation > div + div { border-left:0; border-top:1px solid var(--color-hairline); } }
+  .provenance-grid { display:grid; grid-template-columns:1.5fr 1fr; gap:18px; margin-top:18px; }
+  .evidence-drawer summary { display:flex; justify-content:space-between; align-items:center; padding:18px 20px; cursor:pointer; list-style:none; }
+  .evidence-drawer summary > span:first-child { display:grid; gap:4px; }
+  .evidence-drawer summary > span:last-child { color:var(--color-muted); font:500 .68rem var(--font-mono); }
+  .evidence-drawer > div { border-top:1px solid var(--color-hairline); padding:18px 20px; }
+  .evidence-drawer > div > p { font-size:.8rem; color:var(--color-muted); }
+  .evidence-drawer ul { margin:14px 0; }
+  .evidence-drawer li { display:grid; grid-template-columns:.8fr .6fr .8fr 1fr; gap:8px; padding:8px 0; border-bottom:1px solid var(--color-hairline); font-size:.7rem; }
+  .evidence-drawer li em { color:#225b49; font-style:normal; }
+  .audit-card { padding:18px 20px; }
+  .audit-card ol { list-style:none; border-left:2px solid var(--color-violet-tint); margin-left:5px; }
+  .audit-card li { position:relative; display:flex; justify-content:space-between; gap:10px; padding:7px 0 7px 18px; font-size:.74rem; }
+  .audit-card li::before { content:""; position:absolute; left:-5px; top:12px; width:8px; height:8px; background:var(--color-violet); border-radius:50%; }
+  .audit-card time { color:var(--color-muted); font:500 .62rem var(--font-mono); }
+  @media(max-width:1000px) { .dashboard-grid,.recommendation,.simulation-grid,.provenance-grid { grid-template-columns:1fr; } .recommendation > div + div { border-left:0; border-top:1px solid var(--color-hairline); } }
   @media(max-width:650px) { .lab-shell { padding:0 14px 20px; } .topbar { align-items:flex-start; padding:14px 0; gap:10px; } .prototype-chip { max-width:140px; text-align:center; } .experiment-head { align-items:stretch; flex-direction:column; } .meta-strip { display:grid; grid-template-columns:1fr 1fr; } }
 }
