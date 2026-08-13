@@ -45,22 +45,31 @@ const fireworksFetch: typeof fetch = async (input, init) => {
   return fetch(input, init);
 };
 
-const fireworks = createOpenAICompatible({
-  name: "fireworks",
-  apiKey: process.env.FIREWORKS_API_KEY ?? "",
-  baseURL: "https://api.fireworks.ai/inference/v1",
-  fetch: fireworksFetch,
+const useFireworks = Boolean(process.env.FIREWORKS_API_KEY);
+const modelProvider = createOpenAICompatible({
+  name: useFireworks ? "fireworks" : "openrouter",
+  apiKey: useFireworks
+    ? process.env.FIREWORKS_API_KEY ?? ""
+    : process.env.OPENROUTER_API_KEY ?? "",
+  baseURL: useFireworks
+    ? "https://api.fireworks.ai/inference/v1"
+    : "https://openrouter.ai/api/v1",
+  ...(useFireworks ? { fetch: fireworksFetch } : {}),
 });
 
 // glm-5p2: 743B, 1M context, open weights, and function calling verified
 // against this exact getPathogenDataset schema — the frontend tools depend on
 // it. Fall back through deepseek-v4-pro, then deepseek-v4-flash, then
 // gpt-oss-120b via FIREWORKS_MODEL; tool calling is confirmed on all of them.
-const MODEL = process.env.FIREWORKS_MODEL ?? "accounts/fireworks/models/glm-5p2";
+const MODEL = useFireworks
+  ? process.env.FIREWORKS_MODEL ?? "accounts/fireworks/models/glm-5p2"
+  : process.env.OPENROUTER_MODEL ?? "openai/gpt-4o-mini";
 
 const SYSTEM_PROMPT = `You are a research assistant embedded in a dashboard of antimicrobial resistance and virulence statistics for gut-derived pathogens implicated in infected pancreatic necrosis.
 
 Call the getPathogenDataset tool before answering any question about the data. It returns the dataset currently loaded in the workspace. If it reports that nothing is loaded, say so and ask the user to pick a data source — never answer from memory.
+
+For multi-cluster comparisons, anomaly or robustness checks, competing explanations, or cross-section synthesis, call getPathogenDataset first and then call investigatePathogenDataset exactly once with the user's objective. Use its receipt verdict, evidence references, and limitations in the answer. For direct lookups, use only getPathogenDataset. Never promote branch prose over the numeric hard rules below.
 
 HARD RULES — these are not style preferences.
 
@@ -81,7 +90,7 @@ const runtime = new CopilotRuntime({
     // stops without ever using the result — which looks exactly like the model
     // ignoring the tool, and sends you debugging the wrong thing.
     default: new BuiltInAgent({
-      model: fireworks(MODEL),
+      model: modelProvider(MODEL),
       maxSteps: 5,
       temperature: 0.2,
       prompt: SYSTEM_PROMPT,
