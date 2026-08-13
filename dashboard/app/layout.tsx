@@ -27,9 +27,8 @@ const plexMono = IBM_Plex_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Gut-to-Pancreas AMR — resistance and virulence co-occurrence",
-  description:
-    "Research prototype. Lineage-corrected resistance and virulence co-occurrence across gut-derived pathogens implicated in infected pancreatic necrosis. Not for clinical use.",
+  title: "LabPilot Virtual Lab — Explore before you experiment",
+  description: "Experiment decision support: explore results, simulate likely outcomes, and approve the next experiment.",
 };
 
 export default function RootLayout({

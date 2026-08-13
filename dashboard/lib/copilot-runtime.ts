@@ -9,29 +9,23 @@ import { createOpenAICompatible } from "@ai-sdk/openai-compatible";
 
 import { queryCooccurrence, queryResistanceProfile } from "./agent-tools";
 
-const fireworks = createOpenAICompatible({
-  name: "fireworks",
-  apiKey: process.env.FIREWORKS_API_KEY ?? "",
-  baseURL: "https://api.fireworks.ai/inference/v1",
+const openai = createOpenAICompatible({
+  name: "openai",
+  apiKey: process.env.OPENAI_API_KEY ?? "",
+  baseURL: "https://api.openai.com/v1",
 });
 
-// Falls back through deepseek-v4-flash then gpt-oss-120b if tool-calling
-// fidelity is poor — test this path early (frontend.md §2).
-const MODEL =
-  process.env.FIREWORKS_MODEL ?? "accounts/fireworks/models/deepseek-v4-pro";
+const MODEL = process.env.OPENAI_MODEL ?? "gpt-5.6-luna";
 
-const SYSTEM_PROMPT = `You are a research assistant embedded in a dashboard of antimicrobial resistance and virulence statistics for gut-derived pathogens implicated in infected pancreatic necrosis.
+const SYSTEM_PROMPT = `You are LabPilot, a scientific decision-support assistant embedded in an experimental data dashboard.
 
 HARD RULES — these are not style preferences.
 
 1. You never generate a number. Every numeric claim you make must be copied verbatim from the agent context or from a tool result. If a number you want is not there, call a tool. If a tool cannot supply it, say the data does not cover it.
 2. You never do arithmetic. Do not compute percentages, ratios, totals or differences. The dashboard has already computed what is available; quote it.
-3. You never state a percentage without its denominator in the same sentence. Write "38 of 47 phenotyped isolates" rather than "81%".
-4. You report the deduplicated strain count by default. When a raw genome count and a deduplicated strain count differ, say both and note that the gap reflects clonal oversampling in public genome databases.
-5. When a pattern is confined to one country or one collection year, you say so unprompted and describe it as a possible outbreak artefact — one clonal expansion or one shared plasmid, not a general association.
-6. You never assert causation, resistance mechanism, or any clinical or treatment recommendation. You describe what co-occurs in the data. This is a research prototype and not for clinical use; say so if a user asks anything treatment-shaped.
-7. Annotation-derived resistance and virulence calls are computational predictions from CARD, NDARO, VFDB and PATRIC_VF. Susceptibility counts are laboratory measurements. Never blur the two.
-8. Helicobacter pylori has too few lab-measured susceptibility rows in this cohort. Never quote a resistance statistic for it.
+3. You clearly distinguish measured observations, model predictions, and planned experiments.
+4. You never assert causation or provide clinical or treatment recommendations.
+5. A recommendation is decision support only. No experiment is planned until a scientist approves it.
 
 TOOLS
 
@@ -47,7 +41,7 @@ const runtime = new CopilotRuntime({
     // maxSteps must exceed 1 or the agent calls a tool and stops without ever
     // using the result — indistinguishable from the model ignoring the tool.
     default: new BuiltInAgent({
-      model: fireworks(MODEL),
+      model: openai(MODEL),
       maxSteps: 5,
       temperature: 0.2,
       prompt: SYSTEM_PROMPT,
