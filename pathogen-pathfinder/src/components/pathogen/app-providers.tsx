@@ -17,7 +17,7 @@ export function AppProviders({ children }: { children: React.ReactNode }) {
         <AgentContextBridge>
           <div className="flex min-h-screen w-full bg-background text-foreground">
             <AppSidebar />
-            <main className="min-w-0 flex-1 animate-fade-in pb-20 md:pb-0">{children}</main>
+            <main className="flex-1 min-w-0 animate-fade-in">{children}</main>
           </div>
         </AgentContextBridge>
       </CopilotChatConfigurationProvider>

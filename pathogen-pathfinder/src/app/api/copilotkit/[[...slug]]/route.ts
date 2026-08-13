@@ -8,8 +8,6 @@ import {
 import { createOpenAICompatible } from "@ai-sdk/openai-compatible";
 import { handle } from "hono/vercel";
 
-import { queryReferenceEvidence } from "@/lib/convoke-tool";
-
 // Fireworks AI, not Anthropic. Fireworks is OpenAI-compatible, so the stock
 // AI SDK openai-compatible provider works and no Fireworks-specific client is
 // needed. This replaces the previous setup, which ran a separate Claude Agent
@@ -47,31 +45,22 @@ const fireworksFetch: typeof fetch = async (input, init) => {
   return fetch(input, init);
 };
 
-const useFireworks = Boolean(process.env.FIREWORKS_API_KEY);
-const modelProvider = createOpenAICompatible({
-  name: useFireworks ? "fireworks" : "openrouter",
-  apiKey: useFireworks
-    ? process.env.FIREWORKS_API_KEY ?? ""
-    : process.env.OPENROUTER_API_KEY ?? "",
-  baseURL: useFireworks
-    ? "https://api.fireworks.ai/inference/v1"
-    : "https://openrouter.ai/api/v1",
-  ...(useFireworks ? { fetch: fireworksFetch } : {}),
+const fireworks = createOpenAICompatible({
+  name: "fireworks",
+  apiKey: process.env.FIREWORKS_API_KEY ?? "",
+  baseURL: "https://api.fireworks.ai/inference/v1",
+  fetch: fireworksFetch,
 });
 
 // glm-5p2: 743B, 1M context, open weights, and function calling verified
 // against this exact getPathogenDataset schema — the frontend tools depend on
 // it. Fall back through deepseek-v4-pro, then deepseek-v4-flash, then
 // gpt-oss-120b via FIREWORKS_MODEL; tool calling is confirmed on all of them.
-const MODEL = useFireworks
-  ? process.env.FIREWORKS_MODEL ?? "accounts/fireworks/models/glm-5p2"
-  : process.env.OPENROUTER_MODEL ?? "openai/gpt-4o-mini";
+const MODEL = process.env.FIREWORKS_MODEL ?? "accounts/fireworks/models/glm-5p2";
 
 const SYSTEM_PROMPT = `You are a research assistant embedded in a dashboard of antimicrobial resistance and virulence statistics for gut-derived pathogens implicated in infected pancreatic necrosis.
 
 Call the getPathogenDataset tool before answering any question about the data. It returns the dataset currently loaded in the workspace. If it reports that nothing is loaded, say so and ask the user to pick a data source — never answer from memory.
-
-For multi-cluster comparisons, anomaly or robustness checks, competing explanations, or cross-section synthesis, call getPathogenDataset first and then call investigatePathogenDataset exactly once with the user's objective. Use its receipt verdict, evidence references, and limitations in the answer. For direct lookups, use only getPathogenDataset. Never promote branch prose over the numeric hard rules below.
 
 HARD RULES — these are not style preferences.
 
@@ -83,7 +72,6 @@ HARD RULES — these are not style preferences.
 6. Annotation-derived resistance and virulence calls are computational predictions from CARD, NDARO, VFDB and PATRIC_VF. Susceptibility phenotypes are laboratory measurements. Never blur the two.
 7. Helicobacter pylori is present for virulence only and has too few lab-measured susceptibility rows. Never quote a resistance statistic for it.
 8. Genomes are not deduplicated by strain, so a concentrated cluster may reflect clonal oversampling in public genome databases rather than biology. Say this when a pattern looks strong.
-9. External background comes only from the queryReferenceEvidence tool, never from memory. What it returns is unverified context: never a laboratory measurement, and never a source of any number about this dataset. Attribute anything you take from it by its provenance_ref. If it returns zero records, say no external context was found rather than filling the gap yourself.
 
 Answer in short paragraphs, plain language, no bullet-point padding.`;
 
@@ -93,14 +81,10 @@ const runtime = new CopilotRuntime({
     // stops without ever using the result — which looks exactly like the model
     // ignoring the tool, and sends you debugging the wrong thing.
     default: new BuiltInAgent({
-      model: modelProvider(MODEL),
+      model: fireworks(MODEL),
       maxSteps: 5,
       temperature: 0.2,
       prompt: SYSTEM_PROMPT,
-      // Server-side, so CONVOKE_MCP_TOKEN never reaches the client bundle.
-      // No-ops when CONVOKE_MCP_URL is unset: the tool reports it is not
-      // configured rather than failing the turn.
-      tools: [queryReferenceEvidence],
     }),
   },
   // --- copilotkit:intelligence (remove this block to opt out) ---

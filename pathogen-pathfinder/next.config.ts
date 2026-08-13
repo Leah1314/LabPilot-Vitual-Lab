@@ -1,42 +1,7 @@
-import { existsSync } from "node:fs";
-import { resolve } from "node:path";
 import type { NextConfig } from "next";
 
-/*
- * Shared config lives in the repo-root `.env`, so one file serves every surface
- * rather than each app keeping its own copy of the same keys.
- *
- * Next only reads `.env` from the app directory, so the root file is loaded
- * here: next.config is evaluated at startup in the same process that later
- * serves requests, before any route reads process.env.
- *
- * Precedence is what you want and is verified, not assumed: loadEnvFile does
- * not overwrite variables already present, so a real environment variable (CI,
- * Docker, the shell) still beats the file, and `pathogen-pathfinder/.env` —
- * which Next loads afterwards — stays available for per-app overrides.
- *
- * Guarded by existsSync because the root file is optional, and because cwd is
- * not the app directory in every deployment shape.
- */
-const rootEnv = resolve(process.cwd(), "..", ".env");
-if (existsSync(rootEnv)) process.loadEnvFile(rootEnv);
-
-// Set only by .github/workflows/gh-pages.yml. GitHub Pages serves static files
-// and nothing else, so that build also deletes src/app/api before running —
-// POST/PATCH/DELETE handlers cannot be exported, and the agent has no server to
-// run on regardless. The default build stays `standalone` for Docker.
-const staticExport = process.env.STATIC_EXPORT === "1";
-
-// A project page is served from a subdirectory named after the repo, so every
-// asset URL needs the prefix. "Vitual" is the upstream repo's own misspelling —
-// it must match exactly or the deployed site 404s on all of its assets.
-const REPO_BASE_PATH = "/LabPilot-Vitual-Lab";
-
 const nextConfig: NextConfig = {
-  output: staticExport ? "export" : "standalone",
-  // trailingSlash so /dashboard resolves to /dashboard/index.html on a host
-  // with no rewrite rules. Left off the server build, which routes for itself.
-  ...(staticExport ? { basePath: REPO_BASE_PATH, trailingSlash: true } : {}),
+  output: "standalone",
   serverExternalPackages: ["@copilotkit/runtime"],
   env: {
     // The public Threads UI flag is DERIVED from the server-side license token.
