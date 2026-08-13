@@ -31,6 +31,9 @@ data/embeddings.npy
 # OS
 .DS_Store
 
+# Local Codex memory should stay out of this public repo
+Codex-Memory/
+
 # Office lock files
 ~/\$*.pptx
 pitch/~\$*

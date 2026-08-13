@@ -14,12 +14,28 @@ Research prototype only. Not for clinical use.
 
 This repository started from reusable work in [johnqh/daytona_hackathon](https://github.com/johnqh/daytona_hackathon), then was rewritten toward the LabPilot Virtual Lab product direction.
 
+It is important to read this repo as a rewrite, not a rename of the original project.
+
+We reused selected parts of the original codebase that were still useful to us:
+
+- parts of the dashboard UI shell
+- some Next.js / React / TypeScript app structure
+- a few interaction patterns and reusable frontend components
+- optional compatibility with earlier pipeline-style integration points
+
+But this is not the same product as the original hackathon repo. The scientific workflow, AI behavior, data contracts, and product goal are different:
+
+- the original project explored a pathogen research workflow
+- LabPilot Virtual Lab focuses on virtual experiment planning for biopharma teams
+- the current AI path uses OpenAI rather than the earlier Fireworks-first setup
+- the current product loop centers on recommendation, simulation, and human approval
+- the current persistence path is optional AWS-backed storage for approved plans
+
 Main surfaces:
 
 - `dashboard/`: the primary LabPilot product UI
 - `pathogen-pathfinder/`: older sibling surface from the upstream hackathon work
 - `pipeline/`, `data/`, `insights/`: upstream research pipeline assets retained for reference and possible reuse
-- `Codex-Memory/`: local long-term working memory for this project and future Codex sessions
 
 ## Current product behavior
 
@@ -40,6 +56,64 @@ The app is intentionally opinionated:
 - approval is explicit and auditable
 
 ## Architecture
+
+The system is organized as a dashboard-first experimental decision stack:
+
+```text
+LABPILOT VIRTUAL LAB
+
+┌─────────────────────────────────────────────────────┐
+│                    Frontend / UI                    │
+│                                                     │
+│  Experiment Dashboard                              │
+│  - dose-response chart                             │
+│  - measured datapoints                             │
+│  - predicted datapoints                            │
+│  - Ask LabPilot                                    │
+│  - Suggest Next Experiment                         │
+│  - Simulate Experiment                             │
+│  - Approve / Modify / Reject                       │
+└───────────────────────┬─────────────────────────────┘
+                        │
+                        ▼
+┌─────────────────────────────────────────────────────┐
+│               Application / API Layer               │
+│                                                     │
+│  GET /experiment/:id                               │
+│  POST /analyze                                     │
+│  POST /suggest-next                                │
+│  POST /simulate                                    │
+│  POST /approve                                     │
+└───────────────┬────────────────┬────────────────────┘
+                │                │
+                ▼                ▼
+
+┌──────────────────────────┐   ┌──────────────────────────┐
+│ Scientific Model Layer   │   │      LLM / Agent         │
+│                          │   │                          │
+│ - curve fitting          │   │ - explain results       │
+│ - interpolation          │   │ - answer questions      │
+│ - prediction             │   │ - explain recommendation│
+│ - uncertainty            │   │ - summarize evidence    │
+│ - next-point selection   │   │ - structured response   │
+│                          │   │                          │
+│ DOES THE MATH            │   │ DOES NOT INVENT NUMBERS │
+└─────────────┬────────────┘   └────────────┬─────────────┘
+              │                             │
+              └─────────────┬───────────────┘
+                            ▼
+┌─────────────────────────────────────────────────────┐
+│                    Data Layer                       │
+│                                                     │
+│ LabPilot experiments                               │
+│ + local/public reference dataset                   │
+│ + experiment metadata                              │
+│ + model results                                    │
+│ + approved planned experiments                     │
+└─────────────────────────────────────────────────────┘
+```
+
+In short: the scientific model does the math, the LLM explains the math, and the dashboard makes that loop reviewable by a scientist.
 
 ### Frontend
 
@@ -63,13 +137,21 @@ The app is intentionally opinionated:
 
 The virtual-lab flow is normalized through typed contracts in [dashboard/lib/virtual-lab-contracts.ts](/Users/user/Documents/LabPilot%20Vitual%20Lab/dashboard/lib/virtual-lab-contracts.ts).
 
-Key API routes:
+Current implementation routes are:
 
 - `POST /api/labpilot/ask`
 - `POST /api/model/analyze`
 - `POST /api/simulate`
 - `POST /api/plan-experiment`
 - `GET /api/experiment/[id]`
+
+Conceptually, these map to the product actions above:
+
+- `GET /experiment/:id` → current experiment review
+- `POST /analyze` → model analysis
+- `POST /suggest-next` → next experiment recommendation
+- `POST /simulate` → virtual next-point simulation
+- `POST /approve` → human approval / modification / rejection workflow
 
 ## Quick start
 
@@ -147,18 +229,6 @@ What was intentionally changed:
 - the core demo now reflects the product guidance document
 - AWS is the preferred persistence path instead of adding another vendor dependency
 - experiment planning and approval are first-class parts of the UX
-
-## Codex memory
-
-This repo includes a local Obsidian-style knowledge base under `Codex-Memory/` plus project instructions in `AGENTS.md`.
-
-Purpose:
-
-- preserve durable project decisions and preferences across Codex sessions
-- reduce repeated repo re-reading
-- keep reusable project context close to the codebase
-
-This memory is for project context only and should never store secrets.
 
 ## Notes
 
