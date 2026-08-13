@@ -1,12 +1,13 @@
 # LabPilot Virtual Lab
 
-LabPilot Virtual Lab is an AI-assisted experimental planning dashboard for biopharma teams. It keeps the interactive UI from the original hackathon work, but the core decision loop is now aligned to the product guidance: structured observations, model-based next-step recommendations, explicit human approval, and optional AWS-backed persistence.
+LabPilot Virtual Lab is an AI-assisted experimental planning dashboard for biopharma teams. It turns measured experiments and public or reference evidence into deterministic next-step candidates, then uses a governed investigation layer to challenge those candidates before a scientist decides what to run.
 
 The current implementation is optimized for:
 
 - OpenAI credits for the reasoning layer
 - AWS account credits for lightweight persistence
 - A dashboard-first workflow for reviewing evidence before running the next experiment
+- A bounded investigation workflow that explains why a recommendation should be trusted, challenged, or rejected
 
 Research prototype only. Not for clinical use.
 
@@ -36,24 +37,28 @@ Main surfaces:
 - `dashboard/`: the primary LabPilot product UI
 - `pathogen-pathfinder/`: older sibling surface from the upstream hackathon work
 - `pipeline/`, `data/`, `insights/`: upstream research pipeline assets retained for reference and possible reuse
+- `docs/`: product guidance and technical references that define the current LabPilot direction
 
 ## Current product behavior
 
-The dashboard centers on a single virtual experiment workflow:
+The dashboard centers on a governed virtual experiment workflow:
 
 1. Review measured dose-response observations
-2. Run deterministic analysis on the current experiment
-3. Ask LabPilot for a constrained OpenAI explanation
-4. Simulate a next dose in the allowed range
-5. Generate a recommended next experiment plan
-6. Require human approval before any plan is treated as accepted
+2. Normalize measured and reference evidence into a shared experiment view
+3. Run deterministic analysis to suggest candidate next experiments
+4. Simulate a candidate dose with predicted response and uncertainty
+5. Investigate the recommendation through bounded Evidence, Model, Skeptic, and Operations branches
+6. Review the resulting Lab Run Receipt
+7. Require human approval before any candidate becomes a planned experiment
 
 The app is intentionally opinionated:
 
 - measured vs predicted values are clearly separated
 - recommendations are evidence-bounded
-- the LLM is constrained to a fixed schema
+- deterministic models own the numbers
+- the governed LLM or RLM layer explains, challenges, and traces the recommendation
 - approval is explicit and auditable
+- planned experiments never become measured experiments until future wet-lab results exist
 
 ## Architecture
 
@@ -71,7 +76,9 @@ LABPILOT VIRTUAL LAB
 │  - predicted datapoints                            │
 │  - Ask LabPilot                                    │
 │  - Suggest Next Experiment                         │
-│  - Simulate Experiment                             │
+│  - Simulate Candidate                              │
+│  - Investigate Recommendation                      │
+│  - Lab Run Receipt                                 │
 │  - Approve / Modify / Reject                       │
 └───────────────────────┬─────────────────────────────┘
                         │
@@ -79,25 +86,26 @@ LABPILOT VIRTUAL LAB
 ┌─────────────────────────────────────────────────────┐
 │               Application / API Layer               │
 │                                                     │
-│  GET /experiment/:id                               │
-│  POST /analyze                                     │
-│  POST /suggest-next                                │
-│  POST /simulate                                    │
-│  POST /approve                                     │
-└───────────────┬────────────────┬────────────────────┘
-                │                │
-                ▼                ▼
-
+│  GET  /experiments/:id                            │
+│  POST /analysis/suggest-next                      │
+│  POST /analysis/simulate                          │
+│  POST /rlm/investigate                            │
+│  POST /experiments/propose                        │
+│  POST /experiments/:id/approve                    │
+└───────────────┬─────────────────┬───────────────────┘
+                │                 │
+                ▼                 ▼
 ┌──────────────────────────┐   ┌──────────────────────────┐
-│ Scientific Model Layer   │   │      LLM / Agent         │
+│ Scientific Model Layer   │   │  Governed RLM Harness    │
 │                          │   │                          │
-│ - curve fitting          │   │ - explain results       │
-│ - interpolation          │   │ - answer questions      │
-│ - prediction             │   │ - explain recommendation│
-│ - uncertainty            │   │ - summarize evidence    │
-│ - next-point selection   │   │ - structured response   │
+│ - curve fitting          │   │ - evidence branch       │
+│ - interpolation          │   │ - model branch          │
+│ - prediction             │   │ - skeptic branch        │
+│ - uncertainty            │   │ - operations branch     │
+│ - candidate ranking      │   │ - bounded trace         │
+│ - compare candidates     │   │ - Lab Run Receipt       │
 │                          │   │                          │
-│ DOES THE MATH            │   │ DOES NOT INVENT NUMBERS │
+│ DOES THE MATH            │   │ DOES NOT OWN APPROVAL   │
 └─────────────┬────────────┘   └────────────┬─────────────┘
               │                             │
               └─────────────┬───────────────┘
@@ -109,11 +117,13 @@ LABPILOT VIRTUAL LAB
 │ + local/public reference dataset                   │
 │ + experiment metadata                              │
 │ + model results                                    │
+│ + run receipts                                     │
 │ + approved planned experiments                     │
+│ + audit events                                     │
 └─────────────────────────────────────────────────────┘
 ```
 
-In short: the scientific model does the math, the LLM explains the math, and the dashboard makes that loop reviewable by a scientist.
+In short: the deterministic model owns the numbers, the governed RLM investigates and challenges those numbers, and the scientist owns the final decision.
 
 ### Frontend
 
@@ -127,6 +137,7 @@ In short: the scientific model does the math, the LLM explains the math, and the
 - OpenAI Responses API
 - default model: `gpt-5.6-luna`
 - optional upgrade path: `gpt-5.6-terra`
+- governed investigation workflow built around a bounded RLM-style harness
 
 ### Persistence
 
@@ -137,7 +148,7 @@ In short: the scientific model does the math, the LLM explains the math, and the
 
 The virtual-lab flow is normalized through typed contracts in [dashboard/lib/virtual-lab-contracts.ts](/Users/user/Documents/LabPilot%20Vitual%20Lab/dashboard/lib/virtual-lab-contracts.ts).
 
-Current implementation routes are:
+Current implementation and target product routes are:
 
 - `POST /api/labpilot/ask`
 - `POST /api/model/analyze`
@@ -145,13 +156,22 @@ Current implementation routes are:
 - `POST /api/plan-experiment`
 - `GET /api/experiment/[id]`
 
-Conceptually, these map to the product actions above:
+The current product guide expands that API shape toward:
 
-- `GET /experiment/:id` → current experiment review
-- `POST /analyze` → model analysis
-- `POST /suggest-next` → next experiment recommendation
-- `POST /simulate` → virtual next-point simulation
-- `POST /approve` → human approval / modification / rejection workflow
+- `GET /experiments/:id` → current experiment review
+- `POST /analysis/suggest-next` → deterministic candidate recommendation
+- `POST /analysis/simulate` → virtual candidate simulation
+- `POST /rlm/investigate` → governed investigation and Lab Run Receipt
+- `POST /experiments/propose` → proposal JSON generation
+- `POST /experiments/:id/approve` → explicit human approval workflow
+
+Shared product contracts now revolve around:
+
+- experiment response
+- candidate output from the scientific model
+- simulation request and response
+- RLM investigation request
+- Lab Run Receipt
 
 ## Quick start
 
@@ -226,9 +246,24 @@ What was intentionally kept:
 What was intentionally changed:
 
 - Fireworks-first reasoning was replaced by OpenAI
-- the core demo now reflects the product guidance document
+- the core demo now reflects the product guidance documents
 - AWS is the preferred persistence path instead of adding another vendor dependency
 - experiment planning and approval are first-class parts of the UX
+- the product direction now explicitly includes a governed RLM investigation layer and a Lab Run Receipt artifact
+
+## Product guide
+
+The current technical guide is checked into the repo at:
+
+- `docs/LabPilot_Virtual_Lab_Complete_Technical_Product_Guide.docx`
+
+This guide is the current source of truth for:
+
+- product scope and work split
+- governed RLM investigation behavior
+- state model and provenance rules
+- shared API contracts
+- demo script and positioning
 
 ## Notes
 
