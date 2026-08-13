@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import { Bot, Database, Link2, Sparkles, UploadCloud } from "lucide-react";
+import { Bot, Database, Link2, UploadCloud } from "lucide-react";
 import {
   CopilotChat,
   CopilotChatConfigurationProvider,
@@ -16,8 +16,9 @@ const quickActions = [
     message: "Which cluster has the highest resistance? Cite cluster id, species, and %.",
   },
   {
-    title: "Compare species",
-    message: "Compare the top two species by isolate count — resistance and virulence.",
+    title: "Challenge a pattern",
+    message:
+      "Investigate the strongest apparent resistance pattern. Compare supporting evidence with the strongest counter-explanation and show the trace.",
   },
   {
     title: "Top insight",
@@ -63,28 +64,34 @@ export default function CopilotPage() {
         Chat with your dataset
       </h1>
       <p className="mt-1 text-sm text-muted-foreground">
-        Powered by CopilotKit + Fireworks AI. Answers are grounded in the
-        currently loaded workspace data.
+        CopilotKit coordinates grounded tools over the currently loaded
+        workspace data.
       </p>
 
       {sourceMeta && (
-        <div className="mt-3 inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1 text-xs">
-          <sourceMeta.icon className="h-3.5 w-3.5 text-teal" />
-          <span className="text-foreground font-medium">{sourceMeta.label}</span>
-          {connectionName && (
-            <span className="text-muted-foreground">· {connectionName}</span>
-          )}
-          {lastSyncedAt && (
-            <span className="text-muted-foreground">
-              · synced {new Date(lastSyncedAt).toLocaleTimeString()}
-            </span>
-          )}
-          {derived && (
-            <span className="text-muted-foreground">
-              · {derived.clusters.length} clusters · {derived.totalGenomes}{" "}
-              genomes
-            </span>
-          )}
+        <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1.5 text-xs">
+          <div className="inline-flex min-w-0 items-center gap-2 rounded-full border border-border bg-card px-3 py-1">
+            <sourceMeta.icon className="h-3.5 w-3.5 shrink-0 text-teal" />
+            <span className="font-medium text-foreground">{sourceMeta.label}</span>
+            {connectionName && (
+              <span className="truncate text-muted-foreground">
+                · {connectionName}
+              </span>
+            )}
+          </div>
+          <div className="flex flex-wrap items-center gap-x-2 text-muted-foreground tabular-nums">
+            {lastSyncedAt && (
+              <span>
+                Synced {new Date(lastSyncedAt).toLocaleTimeString()}
+              </span>
+            )}
+            {derived && (
+              <span>
+                {derived.clusters.length} clusters · {derived.totalGenomes}{" "}
+                genomes
+              </span>
+            )}
+          </div>
         </div>
       )}
 
@@ -95,18 +102,6 @@ export default function CopilotPage() {
           here for grounded answers.
         </div>
       )}
-
-      <div className="mt-4 flex flex-wrap gap-2">
-        {quickActions.map((q) => (
-          <span
-            key={q.title}
-            className="rounded-full border border-border bg-card px-3 py-1.5 text-xs text-muted-foreground"
-          >
-            <Sparkles className="inline h-3 w-3 mr-1 text-teal" />
-            {q.title}
-          </span>
-        ))}
-      </div>
 
       <div className="mt-4 flex-1 min-h-0 card-elevated rounded-2xl overflow-hidden [&_.copilotKitChat]:h-full">
         <CopilotChatConfigurationProvider

@@ -20,6 +20,10 @@ import {
   PieChartProps,
 } from "@/components/generative-ui/charts/pie-chart";
 import { ToolReasoning } from "@/components/tool-rendering";
+import {
+  RlmReceipt,
+  type RlmInvestigationReceipt,
+} from "@/components/pathogen/rlm-receipt";
 
 /**
  * Keeps the CopilotKit agent shared state in sync with the loaded Pathogen AI
@@ -27,8 +31,13 @@ import { ToolReasoning } from "@/components/tool-rendering";
  */
 export function usePathogenAgentContext() {
   const { agent } = useAgent({ agentId: "default" });
-  const { dashboardData, dataSource, connectionName, lastSyncedAt, analyzed } =
-    useWorkspace();
+  const {
+    dashboardData,
+    dataSource,
+    connectionName,
+    lastSyncedAt,
+    analyzed,
+  } = useWorkspace();
 
   const derived = useMemo(
     () => (dashboardData ? deriveChartData(dashboardData) : null),
@@ -90,6 +99,75 @@ export function usePathogenAgentContext() {
       },
     },
     [derived, dataSource, connectionName, lastSyncedAt],
+  );
+
+  useFrontendTool(
+    {
+      name: "investigatePathogenDataset",
+      description:
+        "Run a bounded support-versus-skeptic investigation across the loaded dataset. Use after getPathogenDataset for comparisons, anomaly checks, competing explanations, or robustness questions.",
+      parameters: z.object({ objective: z.string().min(8) }),
+      handler: async ({ objective }) => {
+        if (!derived || !dashboardData) {
+          throw new Error("No dataset is loaded for investigation.");
+        }
+        const observations = new Map(
+          dashboardData.observations.clusters.map((item) => [String(item.cluster_id), item]),
+        );
+        const response = await fetch("/api/investigate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            objective,
+            dataset: {
+              source: connectionName ?? dataSource ?? "workspace",
+              generatedAt: dashboardData.observations.generated_at,
+              clustersWithPhenotypeSignal:
+                dashboardData.enrichment?.clusters_with_phenotype_signal ?? [],
+              clusters: Object.entries(dashboardData.clusterSummary).map(([id, cluster]) => {
+                const observation = observations.get(id);
+                return {
+                  id,
+                  nGenes: cluster.n_genes,
+                  headline: observation?.headline,
+                  observation: observation?.observation,
+                  confidence: observation?.confidence,
+                  evalScore: observation?.eval_score,
+                  species: cluster.species_breakdown,
+                  phenotypes: cluster.resistant_phenotype_breakdown,
+                  products: cluster.top_products,
+                };
+              }),
+            },
+          }),
+        });
+        if (!response.ok) {
+          const error = (await response.json().catch(() => null)) as { error?: string } | null;
+          throw new Error(error?.error ?? "Investigation failed.");
+        }
+        return (await response.json()) as RlmInvestigationReceipt;
+      },
+      render: ({ status, result }) => {
+        if (status === "inProgress" || status === "executing") {
+          return (
+            <div className="card-elevated rounded-xl px-4 py-3 text-xs text-muted-foreground">
+              Investigating support and counter-evidence…
+            </div>
+          );
+        }
+        if (!result) return <></>;
+        try {
+          const receipt =
+            typeof result === "string"
+              ? (JSON.parse(result) as RlmInvestigationReceipt)
+              : (result as RlmInvestigationReceipt);
+          return <RlmReceipt receipt={receipt} />;
+        } catch {
+          return <></>;
+        }
+      },
+    },
+    [derived, dashboardData, dataSource, connectionName, lastSyncedAt],
   );
 
   useComponent({
