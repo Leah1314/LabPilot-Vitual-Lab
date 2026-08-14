@@ -9,8 +9,16 @@ import {
   useDefaultRenderTool,
   useFrontendTool,
 } from "@copilotkit/react-core/v2";
-import { useWorkspace } from "@/lib/workspace-store";
-import { deriveChartData } from "@/lib/data-sources";
+import {
+  candidate,
+  measured,
+  program,
+  publicEvidence,
+  rankedExperiments,
+  receipt,
+  simulation,
+  sources,
+} from "@/lib/drug-trial-fixtures";
 import {
   BarChart,
   BarChartProps,
@@ -20,95 +28,161 @@ import {
   PieChartProps,
 } from "@/components/generative-ui/charts/pie-chart";
 import { ToolReasoning } from "@/components/tool-rendering";
+import {
+  RlmReceipt,
+  type RlmInvestigationReceipt,
+} from "@/components/pathogen/rlm-receipt";
 
-/**
- * Keeps the CopilotKit agent shared state in sync with the loaded Pathogen AI
- * workspace dataset, and registers frontend tools the agent can call.
- */
 export function usePathogenAgentContext() {
   const { agent } = useAgent({ agentId: "default" });
-  const { dashboardData, dataSource, connectionName, lastSyncedAt, analyzed } =
-    useWorkspace();
 
-  const derived = useMemo(
-    () => (dashboardData ? deriveChartData(dashboardData) : null),
-    [dashboardData],
-  );
-
-  const pathogenSnapshot = useMemo(
+  const workspaceSnapshot = useMemo(
     () => ({
-      analyzed,
-      dataSource,
-      connectionName,
-      lastSyncedAt,
-      dataset: derived,
+      loaded: true,
+      program,
+      evidenceSummary: {
+        connectedSources: sources.length,
+        measuredObservations: measured.length,
+        publicEvidence: publicEvidence.length,
+        predictedObservations: simulation.predictions.length,
+      },
+      recommendation: candidate,
+      rankedExperiments,
+      runReceipt: receipt,
+      publicEvidence,
+      measured,
+      predictions: simulation.predictions,
+      sources,
     }),
-    [analyzed, dataSource, connectionName, lastSyncedAt, derived],
+    [],
   );
 
-  const pathogenJson = useMemo(
-    () => JSON.stringify(pathogenSnapshot),
-    [pathogenSnapshot],
+  const workspaceJson = useMemo(
+    () => JSON.stringify(workspaceSnapshot),
+    [workspaceSnapshot],
   );
 
   useAgentContext({
-    description: "Currently loaded Pathogen AI workspace dataset",
-    value: pathogenJson,
+    description: "Current Drug Discovery Workspace state for the RMC-6236 demo",
+    value: workspaceJson,
   });
 
   useEffect(() => {
     if (!agent?.setState) return;
-    const prev = JSON.stringify(agent.state?.pathogen ?? null);
-    if (prev === pathogenJson) return;
+    const previous = JSON.stringify(agent.state?.drugDiscoveryWorkspace ?? null);
+    if (previous === workspaceJson) return;
     agent.setState({
       ...(agent.state ?? {}),
-      pathogen: pathogenSnapshot,
+      drugDiscoveryWorkspace: workspaceSnapshot,
     });
-  }, [agent, pathogenJson, pathogenSnapshot]);
+  }, [agent, workspaceJson, workspaceSnapshot]);
 
   useFrontendTool(
     {
-      name: "getPathogenDataset",
+      name: "getDrugDiscoveryWorkspace",
       description:
-        "Return the currently loaded pathogen AMR dataset (clusters, gene classes, insights, KPIs). Call this before answering dataset questions.",
+        "Return the active Drug Discovery Workspace state, including the RMC-6236 program context, measured observations, public evidence, deterministic predictions, ranked experiments, and the current recommendation.",
       parameters: z.object({}),
-      handler: async () => {
-        if (!derived) {
-          return {
-            loaded: false,
-            message:
-              "No dataset loaded yet. Ask the user to choose a data source on the Upload page.",
-          };
+      handler: async () => workspaceSnapshot,
+    },
+    [workspaceSnapshot],
+  );
+
+  useFrontendTool(
+    {
+      name: "investigateDrugDiscoveryWorkspace",
+      description:
+        "Run a bounded support-versus-skeptic investigation over the active Drug Discovery Workspace. Use for competing explanations, robustness checks, recommendation challenges, and next-experiment decisions.",
+      parameters: z.object({ objective: z.string().min(8) }),
+      handler: async ({ objective }) => {
+        const response = await fetch("/api/investigate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            objective,
+            workspace: {
+              generatedAt: new Date().toISOString(),
+              program,
+              recommendation: candidate,
+              receipt,
+              evidence: [
+                ...measured.map((item) => ({
+                  id: item.id,
+                  kind: "measured",
+                  title: `${item.concentrationNm} nM cellular viability`,
+                  summary: `${item.viability}% viability measured in the AsPC-1 cellular model at ${item.concentrationNm} nM.`,
+                })),
+                ...publicEvidence.map((item) => ({
+                  id: item.id,
+                  kind: "public",
+                  title: `${item.assay} in ${item.model}`,
+                  summary: `${item.compound} showed ${item.assay} of ${item.value} ${item.unit} in ${item.model} for ${item.target}.`,
+                })),
+                ...simulation.predictions.map((item) => ({
+                  id: item.id,
+                  kind: "predicted",
+                  title: `${item.concentrationNm} nM predicted viability`,
+                  summary: `${item.viability}% viability predicted at ${item.concentrationNm} nM by ${item.modelVersion}.`,
+                })),
+              ],
+              alternatives: rankedExperiments.slice(1, 5).map((item) => ({
+                id: `alt-${item.rank}`,
+                title: item.experiment,
+                summary: `${item.informationGain} information gain, ${item.evidenceGap} evidence gap, ${item.complexity} complexity.`,
+              })),
+            },
+          }),
+        });
+        if (!response.ok) {
+          const error = (await response.json().catch(() => null)) as
+            | { error?: string; message?: string }
+            | null;
+          throw new Error(
+            error?.message ?? error?.error ?? "Investigation failed.",
+          );
         }
-        return {
-          loaded: true,
-          dataSource,
-          connectionName,
-          lastSyncedAt,
-          dataset: derived,
-        };
+        return (await response.json()) as RlmInvestigationReceipt;
+      },
+      render: ({ status, result }) => {
+        if (status === "inProgress" || status === "executing") {
+          return (
+            <div className="card-elevated rounded-xl px-4 py-3 text-xs text-muted-foreground">
+              Investigating support and counter-evidence…
+            </div>
+          );
+        }
+        if (!result) return <></>;
+        try {
+          const receipt =
+            typeof result === "string"
+              ? (JSON.parse(result) as RlmInvestigationReceipt)
+              : (result as RlmInvestigationReceipt);
+          return <RlmReceipt receipt={receipt} />;
+        } catch {
+          return <></>;
+        }
       },
     },
-    [derived, dataSource, connectionName, lastSyncedAt],
+    [],
   );
 
   useComponent({
     name: "barChart",
-    description: "Render a bar chart for pathogen cluster or gene-class data.",
+    description: "Render a bar chart for drug-discovery evidence comparisons.",
     parameters: BarChartProps,
     render: BarChart,
   });
 
   useComponent({
     name: "pieChart",
-    description: "Render a pie chart for phenotype or species breakdowns.",
+    description: "Render a pie chart for evidence composition or source mix.",
     parameters: PieChartProps,
     render: PieChart,
   });
 
   useDefaultRenderTool({
     render: ({ name, status, parameters }) => {
-      if (name === "getPathogenDataset") return <></>;
+      if (name === "getDrugDiscoveryWorkspace") return <></>;
       return <ToolReasoning name={name} status={status} args={parameters} />;
     },
   });

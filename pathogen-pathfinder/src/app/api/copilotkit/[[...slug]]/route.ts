@@ -7,6 +7,7 @@ import {
 } from "@copilotkit/runtime/v2";
 import { createOpenAICompatible } from "@ai-sdk/openai-compatible";
 import { handle } from "hono/vercel";
+import { queryReferenceEvidence } from "@/lib/convoke-tool";
 
 // Fireworks AI, not Anthropic. Fireworks is OpenAI-compatible, so the stock
 // AI SDK openai-compatible provider works and no Fireworks-specific client is
@@ -45,46 +46,57 @@ const fireworksFetch: typeof fetch = async (input, init) => {
   return fetch(input, init);
 };
 
-const fireworks = createOpenAICompatible({
-  name: "fireworks",
-  apiKey: process.env.FIREWORKS_API_KEY ?? "",
-  baseURL: "https://api.fireworks.ai/inference/v1",
-  fetch: fireworksFetch,
+const useFireworks = Boolean(process.env.FIREWORKS_API_KEY);
+const modelProvider = createOpenAICompatible({
+  name: useFireworks ? "fireworks" : "openrouter",
+  apiKey: useFireworks
+    ? process.env.FIREWORKS_API_KEY ?? ""
+    : process.env.OPENROUTER_API_KEY ?? "",
+  baseURL: useFireworks
+    ? "https://api.fireworks.ai/inference/v1"
+    : "https://openrouter.ai/api/v1",
+  ...(useFireworks ? { fetch: fireworksFetch } : {}),
 });
 
 // glm-5p2: 743B, 1M context, open weights, and function calling verified
-// against this exact getPathogenDataset schema — the frontend tools depend on
-// it. Fall back through deepseek-v4-pro, then deepseek-v4-flash, then
+// against this exact Drug Discovery Workspace tool contract. Fall back through
+// deepseek-v4-pro, then deepseek-v4-flash, then
 // gpt-oss-120b via FIREWORKS_MODEL; tool calling is confirmed on all of them.
-const MODEL = process.env.FIREWORKS_MODEL ?? "accounts/fireworks/models/glm-5p2";
+const MODEL = useFireworks
+  ? process.env.FIREWORKS_MODEL ?? "accounts/fireworks/models/glm-5p2"
+  : process.env.OPENROUTER_MODEL ?? "openai/gpt-4o-mini";
 
-const SYSTEM_PROMPT = `You are a research assistant embedded in a dashboard of antimicrobial resistance and virulence statistics for gut-derived pathogens implicated in infected pancreatic necrosis.
+const SYSTEM_PROMPT = `You are LabPilot's research copilot inside a Drug Discovery Workspace.
 
-Call the getPathogenDataset tool before answering any question about the data. It returns the dataset currently loaded in the workspace. If it reports that nothing is loaded, say so and ask the user to pick a data source — never answer from memory.
+Call the getDrugDiscoveryWorkspace tool before answering any question about the active workspace. It returns the current program context, measured observations, public evidence, deterministic predictions, ranked experiments, and the current recommendation. If it reports that nothing is loaded, say so plainly and do not answer from memory.
 
-HARD RULES — these are not style preferences.
+For competing explanations, robustness questions, recommendation challenges, experiment prioritization, or "what would falsify this?" style prompts, call getDrugDiscoveryWorkspace first and then call investigateDrugDiscoveryWorkspace exactly once with the user's objective. Use its receipt verdict, evidence references, and limitations in the answer. For direct lookups, use only getDrugDiscoveryWorkspace.
 
-1. You never generate a number. Every numeric claim must be copied verbatim from a tool result or the agent context. If a number you want is not there, say the data does not cover it.
-2. You never do arithmetic. Do not compute percentages, ratios, totals or differences. Quote what the dashboard already computed.
-3. You never state a percentage without its denominator in the same sentence. Write "7,390 of 12,497 genes" rather than "59%".
-4. Resistance association is gated by the data, not by your judgement. The tool result contains a field named clustersWithPhenotypeSignal, a list of cluster ids whose phenotype split departs from the corpus base rate. You may only describe a cluster as linked to, enriched for, associated with or predictive of resistance if its id appears in that list. If the list is empty, and the user asks which cluster is most resistant, say plainly that no cluster separates resistant from susceptible isolates — every cluster reproduces the corpus base rate — and that this is a real finding rather than missing data. Never pick a highest cluster by eyeballing raw counts; a large cluster has more of everything.
-5. You never assert causation, resistance mechanism, or any clinical or treatment recommendation. You describe what the data contains. This is a research prototype and not for clinical use; say so if a user asks anything treatment-shaped.
-6. Annotation-derived resistance and virulence calls are computational predictions from CARD, NDARO, VFDB and PATRIC_VF. Susceptibility phenotypes are laboratory measurements. Never blur the two.
-7. Helicobacter pylori is present for virulence only and has too few lab-measured susceptibility rows. Never quote a resistance statistic for it.
-8. Genomes are not deduplicated by strain, so a concentrated cluster may reflect clonal oversampling in public genome databases rather than biology. Say this when a pattern looks strong.
+Use queryReferenceEvidence only for external background the active workspace cannot answer. Anything it returns is unverified external context, never an internal measurement, never a source of any number about the active workspace, and must be attributed by provenance_ref. If it returns no records, say no external context was found rather than filling the gap from memory.
+
+HARD RULES
+
+1. Never invent a number. Every numeric claim must come directly from a tool result or the active workspace state.
+2. Never do arithmetic unless the tool result already contains the computed value. Quote the workspace's own numbers instead of deriving new ones.
+3. Never give clinical, dosing, treatment, or patient-care advice. This is a research prototype for experiment planning and evidence review.
+4. Keep evidence types separate. Internal measurements, public evidence, deterministic predictions, ranked alternatives, and external reference evidence are not interchangeable.
+5. Treat the RMC-6236 workspace as preclinical drug-discovery evidence, not a clinical or pathogen-analysis workflow.
+6. When patterns could be explained by sparse sampling, assay mismatch, model uncertainty, or missing biological context, say so plainly.
+7. Prefer concise, decision-useful explanations: what the workspace shows, what it does not show, what the strongest counterargument is, and what the next review step should be.
 
 Answer in short paragraphs, plain language, no bullet-point padding.`;
 
 const runtime = new CopilotRuntime({
   agents: {
-    // maxSteps must exceed 1 or the agent calls getPathogenDataset and then
+    // maxSteps must exceed 1 or the agent calls getDrugDiscoveryWorkspace and then
     // stops without ever using the result — which looks exactly like the model
     // ignoring the tool, and sends you debugging the wrong thing.
     default: new BuiltInAgent({
-      model: fireworks(MODEL),
+      model: modelProvider(MODEL),
       maxSteps: 5,
       temperature: 0.2,
       prompt: SYSTEM_PROMPT,
+      tools: [queryReferenceEvidence],
     }),
   },
   // --- copilotkit:intelligence (remove this block to opt out) ---

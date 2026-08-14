@@ -6,10 +6,10 @@ import { LayoutDashboard, Sparkles, BookOpen, FlaskConical, ReceiptText, Activit
 
 const items = [
   { href: "/dashboard", label: "Discovery Workspace", icon: LayoutDashboard },
-  { href: "/dashboard#evidence", label: "Evidence", icon: BookOpen },
-  { href: "/dashboard#next-experiment", label: "Next Experiment", icon: FlaskConical },
-  { href: "/dashboard#brainstorm", label: "Brainstorm Lab", icon: Sparkles },
-  { href: "/dashboard#receipts", label: "Run Receipts", icon: ReceiptText },
+  { href: "/evidence", label: "Evidence", icon: BookOpen },
+  { href: "/next-experiment", label: "Next Experiment", icon: FlaskConical },
+  { href: "/brainstorm", label: "Brainstorm Lab", icon: Sparkles },
+  { href: "/run-receipts", label: "Run Receipts", icon: ReceiptText },
 ] as const;
 
 export function AppSidebar() {
@@ -29,7 +29,7 @@ export function AppSidebar() {
 
       <nav className="flex-1 p-3 space-y-1">
         {items.map((item) => {
-          const active = item.href === "/dashboard" ? pathname === "/dashboard" : false;
+          const active = pathname === item.href;
           const Icon = item.icon;
           return (
             <Link

@@ -12,20 +12,20 @@ import { deriveChartData } from "@/lib/data-sources";
 
 const quickActions = [
   {
-    title: "Highest resistance",
-    message: "Which cluster has the highest resistance? Cite cluster id, species, and %.",
+    title: "Evidence gap",
+    message: "What is the strongest evidence gap in the loaded workspace, and what follow-up review step would reduce uncertainty the most?",
   },
   {
-    title: "Compare species",
-    message: "Compare the top two species by isolate count — resistance and virulence.",
+    title: "Challenge a pattern",
+    message: "Investigate the strongest apparent pattern in the loaded workspace. Compare the supporting view with the strongest counterargument and show the receipt.",
+  },
+  {
+    title: "External context",
+    message: "Use external reference evidence only if needed to add background context to the strongest finding in the workspace.",
   },
   {
     title: "Top insight",
-    message: "Explain the top-scoring insight and its Braintrust eval score.",
-  },
-  {
-    title: "Gene classes",
-    message: "Show the top gene classes and render a bar chart of counts.",
+    message: "Explain the top-scoring insight and its confidence, limitations, and next review implication.",
   },
 ];
 
@@ -63,8 +63,7 @@ export default function CopilotPage() {
         Chat with your dataset
       </h1>
       <p className="mt-1 text-sm text-muted-foreground">
-        Powered by CopilotKit + Fireworks AI. Answers are grounded in the
-        currently loaded workspace data.
+        Powered by CopilotKit with grounded workspace tools and backend investigation support.
       </p>
 
       {sourceMeta && (
@@ -112,11 +111,11 @@ export default function CopilotPage() {
         <CopilotChatConfigurationProvider
           agentId="default"
           labels={{
-            modalHeaderTitle: "Pathogen AI Copilot",
+            modalHeaderTitle: "Drug Discovery Copilot",
             chatInputPlaceholder:
-              "Ask about a cluster, gene, or resistance pattern…",
+              "Ask about evidence, uncertainty, comparison, or the next experiment…",
             welcomeMessageText:
-              "Ask me about clusters, resistance patterns, gene classes, or insights. I ground answers in your loaded dataset via getPathogenDataset.",
+              "Ask me about the loaded workspace, supporting evidence, counterarguments, or the next best experiment. I ground answers in your dataset and can run a bounded investigation when the question needs it.",
             chatDisclaimerText: "",
           }}
         >
