@@ -1,7 +1,7 @@
 // Simple in-memory workspace store shared across routes.
 // TODO: replace with real backend state (uploaded files stored in Lovable Cloud
 // and API connections proxied through a server-side edge function).
-import { createContext, useContext, useMemo, useState, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import {
   DEFAULT_API_CONFIG,
   loadFromUploadedFiles,
@@ -39,6 +39,18 @@ export type UploadedFile = { name: string; size: number; valid: boolean };
 
 // Non-secret parts of an API connection persisted for reload-in-tab convenience.
 const SESSION_CONFIG_KEY = "pathogen-ai:api-config";
+const SESSION_SAMPLE_KEY = "labpilot:sample-workspace";
+type PersistedSample = { dashboardData: DashboardData; lastSyncedAt: string };
+function readPersistedSample(): PersistedSample | null {
+  if (typeof window === "undefined") return null;
+  try { return JSON.parse(window.sessionStorage.getItem(SESSION_SAMPLE_KEY) ?? "null") as PersistedSample | null; }
+  catch { return null; }
+}
+function writePersistedSample(value: PersistedSample | null) {
+  if (typeof window === "undefined") return;
+  if (value) window.sessionStorage.setItem(SESSION_SAMPLE_KEY, JSON.stringify(value));
+  else window.sessionStorage.removeItem(SESSION_SAMPLE_KEY);
+}
 
 type WorkspaceState = {
   files: UploadedFile[];
@@ -92,6 +104,13 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
   const [lastSyncedAt, setLastSyncedAt] = useState<string | null>(null);
   const [connectionName, setConnectionName] = useState<string | null>(null);
 
+  useEffect(() => {
+    const persisted = readPersistedSample();
+    if (!persisted?.dashboardData || !persisted.lastSyncedAt) return;
+    setDataSource("sample"); setDashboardData(persisted.dashboardData);
+    setLastSyncedAt(persisted.lastSyncedAt); setConnectionName("Sample Dataset"); setAnalyzed(true);
+  }, []);
+
   const value = useMemo<WorkspaceState>(
     () => ({
       files,
@@ -109,6 +128,7 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
         }),
       removeFile: (name) => setFiles((prev) => prev.filter((f) => f.name !== name)),
       reset: () => {
+        writePersistedSample(null);
         setFiles([]);
         setAnalyzed(false);
         setDataSource(null);
@@ -127,12 +147,15 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
       loadDataSource: (kind, data) => {
         const resolved =
           data ?? (kind === "upload" ? loadFromUploadedFiles() : loadSampleData());
+        const syncedAt = new Date().toISOString();
+        writePersistedSample(kind === "sample" ? { dashboardData: resolved, lastSyncedAt: syncedAt } : null);
         setDataSource(kind);
         setDashboardData(resolved);
-        setLastSyncedAt(new Date().toISOString());
+        setLastSyncedAt(syncedAt);
         setConnectionName(kind === "upload" ? "Uploaded Files" : "Sample Dataset");
       },
       loadApiData: (config, data) => {
+        writePersistedSample(null);
         setDataSource("api");
         setDashboardData(data);
         setLastSyncedAt(new Date().toISOString());
@@ -143,6 +166,7 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
         setLastSyncedAt(new Date().toISOString());
       },
       disconnect: () => {
+        writePersistedSample(null);
         // Clear the API key from memory and sessionStorage.
         setApiConfigState((prev) => {
           const next = { ...prev, apiKey: "" };
