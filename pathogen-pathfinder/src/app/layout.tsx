@@ -13,10 +13,10 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        <title>Pathogen AI — Research Workspace</title>
+        <title>LabPilot — Drug Discovery Workspace</title>
         <meta
           name="description"
-          content="Upload files, connect an API, or use sample data to explore pathogen AMR clusters with a CopilotKit agent."
+          content="Explore prior evidence, simulate candidate doses, and decide what to test next in the LabPilot Virtual Lab."
         />
         <link rel="icon" href="/favicon.ico" type="image/x-icon" />
       </head>

@@ -746,6 +746,3 @@ function Field({ label, children, full }: { label: string; children: React.React
     </label>
   );
 }
-
-// Re-export DEFAULT_API_CONFIG so tsc doesn't complain about the import.
-export { DEFAULT_API_CONFIG };
